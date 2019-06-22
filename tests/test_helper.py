@@ -97,6 +97,20 @@ class Apple:
     assert indent_num == 2
 
 
+def test_get_line_indent_num():
+    line_indent_num = helper.get_line_indent_num(
+        line_str='print("100")')
+    assert line_indent_num == 0
+
+    line_indent_num = helper.get_line_indent_num(
+        line_str='    print("100")')
+    assert line_indent_num == 1
+
+    line_indent_num = helper.get_line_indent_num(
+        line_str='        if print == 100:')
+    assert line_indent_num == 2
+
+
 def test_get_func_overall_docstring():
     py_module_str = '''
 def sample_func_1(apple):

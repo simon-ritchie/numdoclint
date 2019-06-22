@@ -125,6 +125,29 @@ def get_func_indent_num(py_module_str, func_name):
     return indent_num
 
 
+def get_line_indent_num(line_str):
+    """
+    Get the number of indents of the target line.
+
+    Parameters
+    ----------
+    line_str : str
+        String of target line.
+
+    Returns
+    -------
+    line_indent_num : int
+        Number of indents.
+    """
+    space_num = 0
+    for line_char in line_str:
+        if line_char != ' ':
+            break
+        space_num += 1
+    line_indent_num = space_num // 4
+    return line_indent_num
+
+
 def get_func_overall_docstring(py_module_str, func_name):
     """
     Get the target docstring fo the target function.
@@ -151,4 +174,10 @@ def get_func_overall_docstring(py_module_str, func_name):
         py_module_str=py_module_str,
         func_name=func_name,
     )
+    func_str = ''
+    for index, line_str in enumerate(line_splited_list):
+        if index == 0:
+            func_str += line_str
+            continue
+        line_indent_num = get_line_indent_num(line_str=line_str)
     pass
