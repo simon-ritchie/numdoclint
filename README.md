@@ -10,3 +10,7 @@ Numdoc Lint provides features such as NumPy style docstring  checking.
 
 # Testing
 
+The following library modules are used for testing.
+
+- pytest==4.3.1
+- voluptuous==0.11.5
