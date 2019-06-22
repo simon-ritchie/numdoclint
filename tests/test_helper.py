@@ -126,7 +126,44 @@ def sample_func_2(apple):
     apple : Fruit
         Apple object.
     """
+    pass
+
+
+def sample_func_3(orange):
+    """sample_func_3.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    pass
     '''
     docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_0')
+    assert docstring == ''
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_1')
+    assert docstring == ''
+
+    docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_2')
-    pass
+    expected_docstring = """    sample_func_2.
+
+    Parameters
+    ----------
+    apple : Fruit
+        Apple object."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str,
+        func_name='sample_func_3')
+    expected_docstring = """    sample_func_3.
+
+    Returns
+    -------
+    price : int
+        Sample price."""
+    assert docstring == expected_docstring

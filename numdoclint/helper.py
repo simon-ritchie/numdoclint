@@ -180,4 +180,28 @@ def get_func_overall_docstring(py_module_str, func_name):
             func_str += line_str
             continue
         line_indent_num = get_line_indent_num(line_str=line_str)
-    pass
+        if line_indent_num < indent_num and line_str != '':
+            break
+        func_str += '\n%s' % line_str
+
+    double_quote_doc_exists = '"""' in func_str
+    single_quote_doc_exists = "'''" in func_str
+    if not double_quote_doc_exists and not single_quote_doc_exists:
+        return ''
+
+    if double_quote_doc_exists:
+        match = re.search(
+            pattern=r'""".*"""',
+            string=func_str, flags=re.DOTALL)
+        docstring = match.group()
+        docstring = docstring.replace('"""', '')
+    if single_quote_doc_exists:
+        match = re.search(
+            pattern=r"'''.*'''",
+            string=func_str, flags=re.DOTALL)
+        docstring = match.group()
+        docstring = docstring.replace("'''", '')
+    docstring = docstring.strip()
+    if not docstring.startswith('    '):
+        docstring = '    ' + docstring
+    return docstring
