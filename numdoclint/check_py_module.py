@@ -3,6 +3,8 @@
 
 import os
 
+from numdoclint import helper
+
 
 def check_python_module(py_module_path):
     """
@@ -33,6 +35,8 @@ def check_python_module(py_module_path):
         If the target module can not be found.
     """
     _check_module_exists(py_module_path=py_module_path)
+    module_str = helper.read_file_str(file_path=py_module_path)
+    
     pass
 
 
