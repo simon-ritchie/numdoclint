@@ -83,3 +83,72 @@ def get_arg_name_list(py_module_str, func_name):
             continue
         arg_name_list.append(arg_name)
     return arg_name_list
+
+
+def get_func_indent_num(py_module_str, func_name):
+    """
+    Get the baseline number of the target function's indents.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    indent_num : int
+        If the function is written at the top-level indent, 1 will
+        be set. If it is a class method etc., 2 will be set.
+
+    Raises
+    ------
+    ValueError
+        If the target function can not be found.
+    """
+    pattern = 'def %s' % func_name
+    pattern = r'\n.*' + pattern
+    match = re.search(pattern=pattern, string=py_module_str)
+    if match is None:
+        err_msg = 'Target function not found: %s' % func_name
+        raise ValueError(err_msg)
+    start_idx = match.start()
+    func_str = py_module_str[start_idx:]
+    func_str = func_str.replace('\n', '')
+    space_num = 0
+    for func_char in func_str:
+        if func_char != ' ':
+            break
+        space_num += 1
+    indent_num = space_num // 4 + 1
+    return indent_num
+
+
+def get_func_overall_docstring(py_module_str, func_name):
+    """
+    Get the target docstring fo the target function.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    docstring : str
+        Target docstring string.
+    """
+    match = re.search('def %s' % func_name, py_module_str)
+    if match is None:
+        return ''
+    start_idx = match.start()
+    func_str = py_module_str[start_idx:]
+    line_splited_list = func_str.split('\n')
+    indent_num = get_func_indent_num(
+        py_module_str=py_module_str,
+        func_name=func_name,
+    )
+    pass

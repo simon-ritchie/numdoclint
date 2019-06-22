@@ -33,6 +33,11 @@ def check_python_module(py_module_path):
     ------
     FileNotFoundError
         If the target module can not be found.
+
+    Notes
+    ------
+    - Currently, if there are multiple functions with the same name
+        in the module, only the first function will be checked.
     """
     _check_module_exists(py_module_path=py_module_path)
     module_str = helper.read_file_str(file_path=py_module_path)
