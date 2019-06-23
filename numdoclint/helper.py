@@ -205,3 +205,98 @@ def get_func_overall_docstring(py_module_str, func_name):
     if not docstring.startswith('    '):
         docstring = '    ' + docstring
     return docstring
+
+
+DOC_PARAM_INFO_KEY_ARG_NAME = 'arg_name'
+DOC_PARAM_INFO_KEY_TYPE_NAME = 'type_name'
+DOC_PARAM_INFO_KEY_DEFAULT_VAL = 'default_value'
+
+
+def get_docstring_param_info_list(docstring):
+    """
+    Get a list of argument information in docstring.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring string.
+
+    Returns
+    -------
+    param_info_list : list of dicts
+        Lit containing argument information.
+        Values are set in the dictionary with the following keys.
+        - DOC_PARAM_INFO_KEY_ARG_NAME : str -> Argument name.
+        - DOC_PARAM_INFO_KEY_TYPE_NAME : str -> Name of the type.
+        - DOC_PARAM_INFO_KEY_DEFAULT_VAL : str -> Description of the
+            default value.
+    """
+    if docstring == '':
+        return []
+    is_in = 'Params\n    ---' in docstring
+    if not is_in:
+        return []
+    splited_param_doc_list = get_splited_param_doc_list(
+        docstring=docstring
+    )
+
+
+def get_splited_param_doc_list(docstring):
+    """
+    Get docstring string splited into each argument.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring string.
+
+    Returns
+    -------
+    splited_param_doc_list : list of str
+        List of splited arugment information.
+    """
+    param_docstring = get_param_docstring(docstring=docstring)
+    pass
+
+
+def get_param_docstring(docstring):
+    """
+    Get docstring of argument part.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring string.
+
+    Returns
+    -------
+    param_docstring : str
+        Argument part docstring.
+    """
+    param_part_started = False
+    initial_hyphen_appeared = False
+    line_splited_docstring_list = docstring.split('\n')
+    param_docstring = ''
+    pre_line_str = ''
+    for line_str in line_splited_docstring_list:
+        if line_str == '    Parameters':
+            param_part_started = True
+            continue
+        is_hyphen_line = '----' in line_str
+        if (param_part_started
+                and not initial_hyphen_appeared
+                and is_hyphen_line):
+            initial_hyphen_appeared = True
+            continue
+        if not initial_hyphen_appeared:
+            continue
+        if is_hyphen_line:
+            break
+
+        if pre_line_str != '':
+            if param_docstring != '':
+                param_docstring += '\n'
+            param_docstring += pre_line_str
+        pre_line_str = line_str
+    param_docstring = param_docstring.strip()
+    return param_docstring

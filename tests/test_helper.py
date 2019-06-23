@@ -167,3 +167,43 @@ def sample_func_3(orange):
     price : int
         Sample price."""
     assert docstring == expected_docstring
+
+
+def test_get_param_docstring():
+
+    param_docstring = helper.get_param_docstring(docstring='')
+    assert param_docstring == ''
+
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    name : str
+        Sample name.
+    location_id : int
+        Sample location id.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+
+    param_docstring = helper.get_param_docstring(docstring=docstring)
+    expected_docstring = """name : str
+        Sample name.
+    location_id : int
+        Sample location id."""
+    assert param_docstring == expected_docstring
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    param_docstring = helper.get_param_docstring(docstring=docstring)
+    assert param_docstring == ''
