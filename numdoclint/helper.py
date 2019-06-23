@@ -194,19 +194,19 @@ def get_func_overall_docstring(py_module_str, func_name):
 
     if double_quote_doc_exists:
         match = re.search(
-            pattern=r'""".*"""',
+            pattern=r'""".*?"""',
             string=func_str, flags=re.DOTALL)
         docstring = match.group()
         docstring = docstring.replace('"""', '')
     if single_quote_doc_exists:
         match = re.search(
-            pattern=r"'''.*'''",
+            pattern=r"'''.*?'''",
             string=func_str, flags=re.DOTALL)
         docstring = match.group()
         docstring = docstring.replace("'''", '')
     docstring = docstring.strip()
     if not docstring.startswith('    '):
-        docstring = '    ' + docstring
+        docstring = '    ' * func_indent_num + docstring
     docstring = _set_docstring_indent_number_to_one(
         docstring=docstring,
         indent_num=func_indent_num,
