@@ -290,8 +290,21 @@ def get_splited_param_doc_list(docstring):
         List of splited arugment information.
     """
     param_docstring = get_param_docstring(docstring=docstring)
-
-    pass
+    line_splited_param_doc_list = param_docstring.split('\n')
+    single_param_doc = ''
+    splited_param_doc_list = []
+    for line_str in line_splited_param_doc_list:
+        indent_num = get_line_indent_num(line_str=line_str)
+        if indent_num == 1:
+            if single_param_doc != '':
+                splited_param_doc_list.append(single_param_doc)
+            single_param_doc = ''
+        if single_param_doc != '':
+            single_param_doc += '\n'
+        single_param_doc += line_str
+    if single_param_doc != '':
+        splited_param_doc_list.append(single_param_doc)
+    return splited_param_doc_list
 
 
 def get_param_docstring(docstring):
@@ -333,5 +346,4 @@ def get_param_docstring(docstring):
                 param_docstring += '\n'
             param_docstring += pre_line_str
         pre_line_str = line_str
-    param_docstring = param_docstring.strip()
     return param_docstring

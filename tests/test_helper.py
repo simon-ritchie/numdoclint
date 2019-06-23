@@ -244,7 +244,7 @@ def test_get_param_docstring():
     """
 
     param_docstring = helper.get_param_docstring(docstring=docstring)
-    expected_docstring = """name : str
+    expected_docstring = """    name : str
         Sample name.
     location_id : int
         Sample location id."""
@@ -260,3 +260,31 @@ def test_get_param_docstring():
     """
     param_docstring = helper.get_param_docstring(docstring=docstring)
     assert param_docstring == ''
+
+
+def test_get_splited_param_doc_list():
+    docstring = """
+    Sample function.
+
+    Parameters
+    ----------
+    name : str
+        Sample name.
+    location_id : int
+        Sample id.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    splited_param_doc_list = helper.get_splited_param_doc_list(
+        docstring=docstring)
+    assert len(splited_param_doc_list) == 2
+    expected_param_doc = """    name : str
+        Sample name."""
+    assert splited_param_doc_list[0] == expected_param_doc
+
+    expected_param_doc = """    location_id : int
+        Sample id."""
+    assert splited_param_doc_list[1] == expected_param_doc
