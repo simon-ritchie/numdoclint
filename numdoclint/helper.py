@@ -74,9 +74,9 @@ def get_arg_name_list(py_module_str, func_name):
     args_str = searched_result_str.split('def ')[1]
     args_str = args_str.split('(')[1]
     args_str = args_str.split(')')[0]
-    splited_arg_name_list = args_str.split(',')
+    splitted_arg_name_list = args_str.split(',')
     arg_name_list = []
-    for arg_name in splited_arg_name_list:
+    for arg_name in splitted_arg_name_list:
         arg_name = arg_name.replace(' ', '')
         arg_name = arg_name.split(':')[0]
         if arg_name == '':
@@ -172,13 +172,13 @@ def get_func_overall_docstring(py_module_str, func_name):
         func_name=func_name)
     start_idx = match.start()
     func_str = py_module_str[start_idx:]
-    line_splited_list = func_str.split('\n')
+    line_splitted_list = func_str.split('\n')
     indent_num = get_func_indent_num(
         py_module_str=py_module_str,
         func_name=func_name,
     )
     func_str = ''
-    for index, line_str in enumerate(line_splited_list):
+    for index, line_str in enumerate(line_splitted_list):
         if index == 0:
             func_str += line_str
             continue
@@ -269,15 +269,36 @@ def get_docstring_param_info_list(docstring):
     is_in = 'Params\n    ---' in docstring
     if not is_in:
         return []
-    splited_param_doc_list = get_splited_param_doc_list(
+    splitted_param_doc_list = get_splitted_param_doc_list(
         docstring=docstring
     )
+    for splitted_param_doc in splitted_param_doc_list:
+        arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
     pass
 
 
-def get_splited_param_doc_list(docstring):
+def _get_docstring_var_name(var_doc):
     """
-    Get docstring string splited into each argument.
+    Get the name of argument or return value from docstring.
+
+    Parameters
+    ----------
+    var_doc : str
+        Docstring's part of argument or return value.
+
+    Returns
+    -------
+    var_name : str
+        Argument or return value name.
+    """
+    var_name = var_doc.split(':')[0]
+    var_name = var_name.strip()
+    return var_name
+
+
+def get_splitted_param_doc_list(docstring):
+    """
+    Get docstring string splitted into each argument.
 
     Parameters
     ----------
@@ -286,25 +307,25 @@ def get_splited_param_doc_list(docstring):
 
     Returns
     -------
-    splited_param_doc_list : list of str
-        List of splited arugment information.
+    splitted_param_doc_list : list of str
+        List of splitted arugment information.
     """
     param_docstring = get_param_docstring(docstring=docstring)
-    line_splited_param_doc_list = param_docstring.split('\n')
+    line_splitted_param_doc_list = param_docstring.split('\n')
     single_param_doc = ''
-    splited_param_doc_list = []
-    for line_str in line_splited_param_doc_list:
+    splitted_param_doc_list = []
+    for line_str in line_splitted_param_doc_list:
         indent_num = get_line_indent_num(line_str=line_str)
         if indent_num == 1:
             if single_param_doc != '':
-                splited_param_doc_list.append(single_param_doc)
+                splitted_param_doc_list.append(single_param_doc)
             single_param_doc = ''
         if single_param_doc != '':
             single_param_doc += '\n'
         single_param_doc += line_str
     if single_param_doc != '':
-        splited_param_doc_list.append(single_param_doc)
-    return splited_param_doc_list
+        splitted_param_doc_list.append(single_param_doc)
+    return splitted_param_doc_list
 
 
 def get_param_docstring(docstring):
@@ -323,10 +344,10 @@ def get_param_docstring(docstring):
     """
     param_part_started = False
     initial_hyphen_appeared = False
-    line_splited_docstring_list = docstring.split('\n')
+    line_splitted_docstring_list = docstring.split('\n')
     param_docstring = ''
     pre_line_str = ''
-    for line_str in line_splited_docstring_list:
+    for line_str in line_splitted_docstring_list:
         if line_str == '    Parameters':
             param_part_started = True
             continue

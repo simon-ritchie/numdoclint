@@ -262,7 +262,7 @@ def test_get_param_docstring():
     assert param_docstring == ''
 
 
-def test_get_splited_param_doc_list():
+def test_get_splitted_param_doc_list():
     docstring = """
     Sample function.
 
@@ -278,13 +278,21 @@ def test_get_splited_param_doc_list():
     price : int
         Sample price.
     """
-    splited_param_doc_list = helper.get_splited_param_doc_list(
+    splitted_param_doc_list = helper.get_splitted_param_doc_list(
         docstring=docstring)
-    assert len(splited_param_doc_list) == 2
+    assert len(splitted_param_doc_list) == 2
     expected_param_doc = """    name : str
         Sample name."""
-    assert splited_param_doc_list[0] == expected_param_doc
+    assert splitted_param_doc_list[0] == expected_param_doc
 
     expected_param_doc = """    location_id : int
         Sample id."""
-    assert splited_param_doc_list[1] == expected_param_doc
+    assert splitted_param_doc_list[1] == expected_param_doc
+
+
+def test__get_docstring_var_name():
+    var_doc = """    price : int
+        Sample price.
+    """
+    var_name = helper._get_docstring_var_name(var_doc=var_doc)
+    assert var_name == 'price'
