@@ -167,6 +167,9 @@ def get_func_overall_docstring(py_module_str, func_name):
     match = re.search('def %s' % func_name, py_module_str)
     if match is None:
         return ''
+    func_indent_num = get_func_indent_num(
+        py_module_str=py_module_str,
+        func_name=func_name)
     start_idx = match.start()
     func_str = py_module_str[start_idx:]
     line_splited_list = func_str.split('\n')
@@ -204,6 +207,36 @@ def get_func_overall_docstring(py_module_str, func_name):
     docstring = docstring.strip()
     if not docstring.startswith('    '):
         docstring = '    ' + docstring
+    docstring = _set_docstring_indent_number_to_one(
+        docstring=docstring,
+        indent_num=func_indent_num,
+    )
+    return docstring
+
+
+def _set_docstring_indent_number_to_one(docstring, indent_num):
+    """
+    Set the number of indents in docstring to one.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring.
+    indent_num : int
+        Indent's baseline number of the target function.
+
+    Returns
+    -------
+    docstring : str
+        Docstring after adjusting the number of indents.
+    """
+    if indent_num == 1:
+        return docstring
+    while indent_num > 1:
+        docstring = re.sub(
+            pattern=r'^    ', repl='', string=docstring,
+            flags=re.MULTILINE)
+        indent_num -= 1
     return docstring
 
 
@@ -239,6 +272,7 @@ def get_docstring_param_info_list(docstring):
     splited_param_doc_list = get_splited_param_doc_list(
         docstring=docstring
     )
+    pass
 
 
 def get_splited_param_doc_list(docstring):
@@ -256,6 +290,7 @@ def get_splited_param_doc_list(docstring):
         List of splited arugment information.
     """
     param_docstring = get_param_docstring(docstring=docstring)
+
     pass
 
 

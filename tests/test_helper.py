@@ -169,6 +169,38 @@ def sample_func_3(orange):
     assert docstring == expected_docstring
 
 
+def test__set_docstring_indent_number_to_one():
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    name : str
+        Sample name.
+    """
+    result_docstring = helper._set_docstring_indent_number_to_one(
+        docstring=docstring, indent_num=1)
+    assert docstring == result_docstring
+
+    docstring = """
+        Sample docstring.
+
+        Parameters
+        ----------
+        name : str
+            Sample name."""
+    result_docstring = helper._set_docstring_indent_number_to_one(
+        docstring=docstring, indent_num=2)
+    expected_docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    name : str
+        Sample name."""
+    assert result_docstring == expected_docstring
+
+
 def test_get_param_docstring():
 
     param_docstring = helper.get_param_docstring(docstring='')
