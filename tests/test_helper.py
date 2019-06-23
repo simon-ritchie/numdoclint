@@ -1,4 +1,5 @@
 import pytest
+from voluptuous import Schema, All, Any
 
 from numdoclint import helper
 
@@ -296,3 +297,93 @@ def test__get_docstring_var_name():
     """
     var_name = helper._get_docstring_var_name(var_doc=var_doc)
     assert var_name == 'price'
+
+
+def test__get_docstring_type_name():
+    var_doc = """    price : int or None, default None, optional
+        Sample price.
+    """
+    type_name = helper._get_docstring_type_name(var_doc=var_doc)
+    assert type_name == 'int or None'
+
+
+def test__get_docstring_default_value():
+    var_doc = """    price : int
+        Sample price.
+    """
+    default_val = helper._get_docstring_default_value(var_doc=var_doc)
+    assert default_val == ''
+
+    var_doc = """    price : int or None, default None, optional
+        Sample price.
+    """
+    default_val = helper._get_docstring_default_value(var_doc=var_doc)
+    assert default_val == 'None'
+
+
+def test__get_docstring_var_description():
+    var_doc = """    price : int
+        Sample price.
+        Sample price.
+    """
+    description = helper._get_docstring_var_description(
+        var_doc=var_doc)
+    expected_description = """        Sample price.
+        Sample price."""
+    assert description == expected_description
+
+
+def test_get_docstring_param_info_list():
+    param_info_list = helper.get_docstring_param_info_list(docstring='')
+    assert param_info_list == []
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    param_info_list = helper.get_docstring_param_info_list(
+        docstring=docstring)
+    assert param_info_list == []
+
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    name : str, default 'apple'
+        Sample name.
+    location_id : int or None
+        Sample id.
+        Sample id.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    param_info_list = helper.get_docstring_param_info_list(
+        docstring=docstring)
+    assert len(param_info_list) == 2
+    schema_1 = Schema(
+        schema={
+            helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'name',
+            helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'str',
+            helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: "'apple'",
+            helper.DOC_PARAM_INFO_KEY_DESCRIPTION: '        Sample name.',
+        },
+        required=True)
+    schema_1(param_info_list[0])
+    schema_2 = Schema(
+        schema={
+            helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'location_id',
+            helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int or None',
+            helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+            helper.DOC_PARAM_INFO_KEY_DESCRIPTION: \
+                '        Sample id.\n        Sample id.',
+        },
+        required=True)
+    schema_2(param_info_list[1])

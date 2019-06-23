@@ -243,6 +243,7 @@ def _set_docstring_indent_number_to_one(docstring, indent_num):
 DOC_PARAM_INFO_KEY_ARG_NAME = 'arg_name'
 DOC_PARAM_INFO_KEY_TYPE_NAME = 'type_name'
 DOC_PARAM_INFO_KEY_DEFAULT_VAL = 'default_value'
+DOC_PARAM_INFO_KEY_DESCRIPTION = 'description'
 
 
 def get_docstring_param_info_list(docstring):
@@ -263,18 +264,98 @@ def get_docstring_param_info_list(docstring):
         - DOC_PARAM_INFO_KEY_TYPE_NAME : str -> Name of the type.
         - DOC_PARAM_INFO_KEY_DEFAULT_VAL : str -> Description of the
             default value.
+        - DOC_PARAM_INFO_KEY_DESCRIPTION : str -> Description of the
+            argument.
     """
     if docstring == '':
         return []
-    is_in = 'Params\n    ---' in docstring
+    is_in = 'Parameters\n    ---' in docstring
     if not is_in:
         return []
     splitted_param_doc_list = get_splitted_param_doc_list(
         docstring=docstring
     )
+    param_info_list = []
     for splitted_param_doc in splitted_param_doc_list:
         arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
-    pass
+        type_name = _get_docstring_type_name(var_doc=splitted_param_doc)
+        default_val = _get_docstring_default_value(var_doc=splitted_param_doc)
+        description = _get_docstring_var_description(
+            var_doc=splitted_param_doc)
+        param_info_dict = {
+            DOC_PARAM_INFO_KEY_ARG_NAME: arg_name,
+            DOC_PARAM_INFO_KEY_TYPE_NAME: type_name,
+            DOC_PARAM_INFO_KEY_DEFAULT_VAL: default_val,
+            DOC_PARAM_INFO_KEY_DESCRIPTION: description,
+        }
+        param_info_list.append(param_info_dict)
+    return param_info_list
+
+
+def _get_docstring_var_description(var_doc):
+    """
+    Get a description of argument or return value from docstring.
+
+    Parameters
+    ----------
+    var_doc : str
+        Docstring's part of argument or return value.
+
+    Returns
+    -------
+    description : str
+        Description of argument or return value.
+    """
+    splitted_list = var_doc.split('\n')
+    description = '\n'.join(splitted_list[1:])
+    description = description.rstrip()
+    return description
+
+
+def _get_docstring_default_value(var_doc):
+    """
+    Get the description of argument's default value from docstring.
+
+    Parameters
+    ----------
+    var_doc : str
+        Docstring's part of argument.
+
+    Returns
+    -------
+    default_val : str
+        Description of the defautl value.
+    """
+    default_val = var_doc.split('\n')[0]
+    is_in = 'default' in default_val
+    if not is_in:
+        return ''
+    default_val = default_val.split('default')[1]
+    default_val = default_val.split(',')[0]
+    default_val = default_val.strip()
+    return default_val
+
+
+def _get_docstring_type_name(var_doc):
+    """
+    Get the string of argument or return value type's description
+    from docstring.
+
+    Parameters
+    ----------
+    var_doc : str
+        Docstring's part of argument or return value.
+
+    Returns
+    -------
+    type_name : str
+        Argument or return value's type description.
+    """
+    type_name = var_doc.split('\n')[0]
+    type_name = type_name.split(':')[1]
+    type_name = type_name.split(',')[0]
+    type_name = type_name.strip()
+    return type_name
 
 
 def _get_docstring_var_name(var_doc):
