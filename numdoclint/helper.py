@@ -307,6 +307,8 @@ def _get_docstring_var_description(var_doc):
         Description of argument or return value.
     """
     splitted_list = var_doc.split('\n')
+    if len(splitted_list) < 2:
+        return ''
     description = '\n'.join(splitted_list[1:])
     description = description.rstrip()
     return description
@@ -352,6 +354,9 @@ def _get_docstring_type_name(var_doc):
         Argument or return value's type description.
     """
     type_name = var_doc.split('\n')[0]
+    colon_exists = ':' in type_name
+    if not colon_exists:
+        return ''
     type_name = type_name.split(':')[1]
     type_name = type_name.split(',')[0]
     type_name = type_name.strip()

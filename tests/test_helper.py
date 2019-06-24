@@ -306,6 +306,12 @@ def test__get_docstring_type_name():
     type_name = helper._get_docstring_type_name(var_doc=var_doc)
     assert type_name == 'int or None'
 
+    var_doc = """    price, optional
+        Sample price.
+    """
+    type_name = helper._get_docstring_type_name(var_doc=var_doc)
+    assert type_name == ''
+
 
 def test__get_docstring_default_value():
     var_doc = """    price : int
@@ -331,6 +337,11 @@ def test__get_docstring_var_description():
     expected_description = """        Sample price.
         Sample price."""
     assert description == expected_description
+
+    var_doc = """   print : int
+    """
+    description = helper._get_docstring_var_description(
+        var_doc=var_doc)
 
 
 def test_get_docstring_param_info_list():
