@@ -306,6 +306,7 @@ def _get_docstring_var_description(var_doc):
     description : str
         Description of argument or return value.
     """
+    var_doc = var_doc.rstrip()
     splitted_list = var_doc.split('\n')
     if len(splitted_list) < 2:
         return ''

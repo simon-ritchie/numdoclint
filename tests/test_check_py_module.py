@@ -73,3 +73,34 @@ def test__check_lacked_param():
         },
         required=True)
     schema_2(info_list[1])
+
+
+def test__check_lacked_docstring_param_type():
+    expected_module_path = 'test/path/to/module.py'
+    expected_func_name = 'test_func'
+    param_info_list = [{
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'price',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: '',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample price.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'name',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'str',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample name.',
+    }]
+    info_list = check_py_module._check_lacked_docstring_param_type(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        param_info_list=param_info_list)
+    assert len(info_list) == 1
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema(info_list[0])
