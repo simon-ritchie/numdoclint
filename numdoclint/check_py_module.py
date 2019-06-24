@@ -56,6 +56,14 @@ def check_python_module(py_module_path):
     pass
 
 
+INFO_ID_LACKED_ARGUMENT = 1
+
+INFO_KEY_MODULE_PATH = 'module_path'
+INFO_KEY_FUNC_NAME = 'func_name'
+INFO_KEY_INFO_ID = 'info_id'
+INFO_KEY_INFO = 'info'
+
+
 def _get_single_func_info_list(module_path, module_str, func_name):
     """
     Get a list that stores the check result information for
@@ -81,9 +89,102 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         - info : str
     """
     info_list = []
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=module_str, func_name=func_name)
     arg_name_list = helper.get_arg_name_list(
         py_module_str=module_str, func_name=func_name)
+    param_info_list = helper.get_docstring_param_info_list(
+        docstring=docstring)
+
+    single_info_list = _check_lacked_param(
+        module_path=module_path, func_name=func_name,
+        arg_name_list=arg_name_list, param_info_list=param_info_list)
+    info_list.extend(single_info_list)
     pass
+
+
+def _check_lacked_param(
+        module_path, func_name, arg_name_list, param_info_list):
+    """
+    Check for missing arguments between arguments and docstring.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    arg_name_list : list of str
+        List of argument names.
+    param_info_list : list of dicts
+        A list containing argument information of docstring.
+        The dictionary needs a key with the following constants:
+        - helper.DOC_PARAM_INFO_KEY_ARG_NAME : str
+        - helper.DOC_PARAM_INFO_KEY_TYPE_NAME : str
+        - helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL : str
+        - helper.DOC_PARAM_INFO_KEY_DESCRIPTION : str
+
+    Returns
+    -------
+    info_list : list of dict
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    """
+    info_list = []
+    for param_info_dict in param_info_list:
+        param_arg_name = param_info_dict[
+            helper.DOC_PARAM_INFO_KEY_ARG_NAME]
+        is_in = param_arg_name in arg_name_list
+        if is_in:
+            continue
+        info = 'An argument present in docstring does not exist in the actual argument.'
+        info += '\nLacked argument name: %s' % param_arg_name
+        info_dict = _make_info_dict(
+            module_path=module_path,
+            func_name=func_name,
+            info_id=INFO_ID_LACKED_ARGUMENT,
+            info=info,
+        )
+    pass
+
+
+def _make_info_dict(module_path, func_name, info_id, info):
+    """
+    Make a dictionaly of check result information.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    info_id : int
+        The Id of the information defined by the constants in
+        this module.
+    info : str
+        Information of check result.
+
+    Returns
+    -------
+    info_dict : dict
+        Dictionary with check results information. The keys with
+        the following constants will be set.
+        - INFO_KEY_MODULE_PATH : str
+        - INFO_KEY_FUNC_NAME : str
+        - INFO_KEY_INFO_ID : int
+        - INFO_KEY_INFO : str
+    """
+    info_dict = {
+        INFO_KEY_MODULE_PATH: module_path,
+        INFO_KEY_FUNC_NAME: func_name,
+        INFO_KEY_INFO_ID: info_id,
+        INFO_KEY_INFO: info,
+    }
+    return info_dict
 
 
 def _check_module_exists(py_module_path):
