@@ -57,6 +57,7 @@ def check_python_module(py_module_path):
 
 
 INFO_ID_LACKED_ARGUMENT = 1
+INFO_ID_LACKED_DOCSTRING_PARAM = 2
 
 INFO_KEY_MODULE_PATH = 'module_path'
 INFO_KEY_FUNC_NAME = 'func_name'
@@ -149,7 +150,25 @@ def _check_lacked_param(
             info_id=INFO_ID_LACKED_ARGUMENT,
             info=info,
         )
-    pass
+        info_list.append(info_dict)
+
+    param_info_arg_name_list = \
+        [param_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
+            for param_dict in param_info_list]
+    for arg_name in arg_name_list:
+        is_in = arg_name in param_info_arg_name_list
+        if is_in:
+            continue
+        info = 'There is an argument whose explanation does not exist in docstring.'
+        info += '\nTarget argument name: %s' % arg_name
+        info_dict = _make_info_dict(
+            module_path=module_path,
+            func_name=func_name,
+            info_id=INFO_ID_LACKED_DOCSTRING_PARAM,
+            info=info)
+        info_list.append(info_dict)
+
+    return info_list
 
 
 def _make_info_dict(module_path, func_name, info_id, info):
