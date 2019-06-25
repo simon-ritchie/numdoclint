@@ -104,3 +104,44 @@ def test__check_lacked_docstring_param_type():
         },
         required=True)
     schema(info_list[0])
+
+
+def test__check_docstring_param_order():
+    expected_module_path = 'test/module/path.py'
+    expected_func_name = 'test_func_name'
+    arg_name_list = ['price', 'name']
+    param_info_list = [{
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'price',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample price.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'name',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'str',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample name.',
+    }]
+    info_list = check_py_module._check_docstring_param_order(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        arg_name_list=arg_name_list,
+        param_info_list=param_info_list)
+    assert info_list == []
+
+    arg_name_list = reversed(arg_name_list)
+    info_list = check_py_module._check_docstring_param_order(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        arg_name_list=arg_name_list,
+        param_info_list=param_info_list)
+    assert len(info_list) == 1
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema(info_list[0])
