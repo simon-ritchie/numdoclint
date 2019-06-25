@@ -455,3 +455,36 @@ def get_param_docstring(docstring):
             param_docstring += pre_line_str
         pre_line_str = line_str
     return param_docstring
+
+
+def get_func_description_from_docstring(docstring):
+    """
+    Get the string of the function's description in docstring.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring.
+
+    Returns
+    ----------
+    func_description : str
+        Description of the function in docstring.
+    """
+    if docstring == '':
+        return ''
+    last_line_num = 0
+    line_splitted_list = docstring.split('\n')
+    for line_str in line_splitted_list:
+        is_hyphen_line = '----' in line_str
+        if is_hyphen_line:
+            last_line_num -= 1
+            break
+        last_line_num += 1
+    if last_line_num <= 0:
+        return ''
+    func_description = '\n'.join(line_splitted_list[:last_line_num])
+    func_description = func_description.rstrip()
+    if not func_description.startswith('    '):
+        func_description = '    %s' % func_description
+    return func_description

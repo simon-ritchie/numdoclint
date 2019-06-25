@@ -398,3 +398,27 @@ def test_get_docstring_param_info_list():
         },
         required=True)
     schema_2(param_info_list[1])
+
+
+def test_get_func_description_from_docstring():
+    func_description = helper.get_func_description_from_docstring(
+        docstring='')
+    assert func_description == ''
+
+    func_description = helper.get_func_description_from_docstring(
+        docstring='------\nSample Docstring.')
+    assert func_description == ''
+
+    docstring = """Sample docstring.
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    func_description = helper.get_func_description_from_docstring(
+        docstring=docstring)
+    expected_description = """    Sample docstring.
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit."""
+    assert func_description == expected_description
