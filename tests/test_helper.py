@@ -409,6 +409,16 @@ def test_get_func_description_from_docstring():
         docstring='------\nSample Docstring.')
     assert func_description == ''
 
+    docstring = """
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    func_description = helper.get_func_description_from_docstring(
+        docstring=docstring)
+    assert func_description == ''
+
     docstring = """Sample docstring.
     Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 

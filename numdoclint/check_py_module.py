@@ -60,6 +60,7 @@ INFO_ID_LACKED_ARGUMENT = 1
 INFO_ID_LACKED_DOCSTRING_PARAM = 2
 INFO_ID_LACKED_DOCSTRING_PARAM_TYPE = 3
 INFO_ID_DIFFERENT_PARAM_ORDER = 4
+INFO_ID_LACKED_FUNC_DESCRIPTION = 5
 
 INFO_KEY_MODULE_PATH = 'module_path'
 INFO_KEY_FUNC_NAME = 'func_name'
@@ -99,6 +100,11 @@ def _get_single_func_info_list(module_path, module_str, func_name):
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
 
+    unit_info_list = _check_func_description(
+        module_path=module_path, func_name=func_name,
+        docstring=docstring)
+    info_list.extend(unit_info_list)
+
     unit_info_list = _check_lacked_param(
         module_path=module_path, func_name=func_name,
         arg_name_list=arg_name_list, param_info_list=param_info_list)
@@ -114,6 +120,48 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         arg_name_list=arg_name_list, param_info_list=param_info_list)
     info_list.extend(unit_info_list)
     pass
+
+
+def _check_func_description(module_path, func_name, docstring):
+    """
+    Check that the target docstring has a function description.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    docstring : str
+        Docstring to be checked.
+
+    Returns
+    -------
+    info_list : list of dict
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+
+    Notes
+    -----
+    Test function will not be checked.
+    """
+    if func_name.startswith('test_'):
+        return []
+    func_description = helper.get_func_description_from_docstring(
+        docstring=docstring)
+    if func_description != '':
+        return []
+    info = 'The function description is not set to docstring.'
+    info_dict = _make_info_dict(
+        module_path=module_path,
+        func_name=func_name,
+        info_id=INFO_ID_LACKED_FUNC_DESCRIPTION,
+        info=info)
+    return [info_dict]
 
 
 def _check_docstring_param_order(

@@ -484,7 +484,9 @@ def get_func_description_from_docstring(docstring):
     if last_line_num <= 0:
         return ''
     func_description = '\n'.join(line_splitted_list[:last_line_num])
-    func_description = func_description.rstrip()
+    func_description = func_description.strip()
+    if func_description.replace(' ', '') == '':
+        return ''
     if not func_description.startswith('    '):
         func_description = '    %s' % func_description
     return func_description

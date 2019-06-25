@@ -145,3 +145,49 @@ def test__check_docstring_param_order():
         },
         required=True)
     schema(info_list[0])
+
+
+def test__check_func_description():
+    expected_module_path = 'sample/module/path.py'
+    expected_func_name = 'sample_func'
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    info_list = check_py_module._check_func_description(
+        module_path=expected_module_path,
+        func_name='test_func',
+        docstring=docstring)
+    assert info_list == []
+
+    info_list = check_py_module._check_func_description(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        docstring=docstring)
+    assert info_list == []
+
+    docstring = """
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    info_list = check_py_module._check_func_description(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        docstring=docstring)
+    assert len(info_list) == 1
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema(info_list[0])
