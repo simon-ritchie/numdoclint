@@ -533,5 +533,27 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
     default_val_info_dict : dict
         A dctionary that stores argument names in keys and default
         values in values.
+
+    Notes
+    -----
+    The default value stored in the dictionary will be set
+    as a string.
     """
-    pass
+    args_str = _get_args_str(
+        py_module_str=py_module_str, func_name=func_name)
+    if args_str == '':
+        return {}
+    splitted_arg_list = args_str.split(',')
+    default_val_info_dict = {}
+    for arg_str in splitted_arg_list:
+        arg_str = arg_str.replace(' ', '')
+        arg_str = arg_str.split(':')[0]
+        default_val_exists = '=' in arg_str
+        if not default_val_exists:
+            default_val_info_dict[arg_str] = ''
+            continue
+        name_and_default_val_list = arg_str.split('=')
+        arg_name = name_and_default_val_list[0]
+        default_val = name_and_default_val_list[1]
+        default_val_info_dict[arg_name] = default_val
+    return default_val_info_dict

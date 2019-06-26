@@ -484,3 +484,39 @@ def test__get_args_str():
     args_str = helper._get_args_str(
         py_module_str=py_module_str, func_name='sample_func_6')
     assert args_str == 'prince = 100, location_id = 200'
+
+
+def test_get_arg_default_val_info_dict():
+    py_module_str = """
+    def sample_func_1():
+        print(100)
+
+
+    def sample_func_2(price, location_id=100, season=3):
+        print(200)
+
+
+    def sample_func_3(
+            price: int, location_id=100: int) -> str:
+        print(300)
+    """
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=py_module_str, func_name='sample_func_1')
+    assert default_val_info_dict == {}
+
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=py_module_str, func_name='sample_func_2')
+    expected_dict = {
+        'price': '',
+        'location_id': '100',
+        'season': '3',
+    }
+    assert default_val_info_dict == expected_dict
+
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=py_module_str, func_name='sample_func_3')
+    expected_dict = {
+        'price': '',
+        'location_id': '100',
+    }
+    assert default_val_info_dict == expected_dict
