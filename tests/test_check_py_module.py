@@ -191,3 +191,61 @@ def test__check_func_description():
         },
         required=True)
     schema(info_list[0])
+
+
+def test__check_lacked_default_value():
+    expected_module_path = 'sample/module/path.py'
+    expected_func_name = 'sample_func'
+
+    param_info_list = [{
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'price',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample price.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'location_id',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '100',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample location id.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'season',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '3',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample season type.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'tax',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '5',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample tax value.',
+    }]
+    default_val_info_dict = {
+        'price': '200',
+        'location_id': '',
+        'tax': '5',
+    }
+    info_list = check_py_module._check_lacked_default_value(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        param_info_list=param_info_list,
+        default_val_info_dict=default_val_info_dict)
+    assert len(info_list) == 2
+    schema_1 = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema_1(info_list[0])
+    schema_2 = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema_2(info_list[1])

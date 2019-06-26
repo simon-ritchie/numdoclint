@@ -61,6 +61,8 @@ INFO_ID_LACKED_DOCSTRING_PARAM = 2
 INFO_ID_LACKED_DOCSTRING_PARAM_TYPE = 3
 INFO_ID_DIFFERENT_PARAM_ORDER = 4
 INFO_ID_LACKED_FUNC_DESCRIPTION = 5
+INFO_ID_LACKED_ARG_DEFAULT_VALUE = 6
+INFO_ID_LACKED_DOC_DEFAULT_VALUE = 7
 
 INFO_KEY_MODULE_PATH = 'module_path'
 INFO_KEY_FUNC_NAME = 'func_name'
@@ -97,6 +99,8 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         py_module_str=module_str, func_name=func_name)
     arg_name_list = helper.get_arg_name_list(
         py_module_str=module_str, func_name=func_name)
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=module_str, func_name=func_name)
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
 
@@ -119,7 +123,84 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         module_path=module_path, func_name=func_name,
         arg_name_list=arg_name_list, param_info_list=param_info_list)
     info_list.extend(unit_info_list)
+
+    unit_info_list = _check_lacked_default_value(
+        module_path=module_path, func_name=func_name,
+        param_info_list=param_info_list,
+        default_val_info_dict=default_val_info_dict)
+    info_list.extend(unit_info_list)
     pass
+
+
+def _check_lacked_default_value(
+        module_path, func_name, param_info_list, default_val_info_dict):
+    """
+    Check that the default value of the argument is not missing.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    param_info_list : list of dicts
+        A list containing argument information of docstring.
+        The dictionary needs a key with the following constants:
+        - helper.DOC_PARAM_INFO_KEY_ARG_NAME : str
+        - helper.DOC_PARAM_INFO_KEY_TYPE_NAME : str
+        - helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL : str
+        - helper.DOC_PARAM_INFO_KEY_DESCRIPTION : str
+    default_val_info_dict : dict
+        A dctionary that stores argument names in keys and default
+        values in values.
+
+    Returns
+    -------
+    info_list : list
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    """
+    info_list = []
+    for param_info_dict in param_info_list:
+        param_info_arg_name = param_info_dict[
+            helper.DOC_PARAM_INFO_KEY_ARG_NAME]
+        param_info_default_val = param_info_dict[
+            helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL]
+        has_key = param_info_arg_name in default_val_info_dict
+        if not has_key:
+            continue
+
+        if param_info_default_val == '':
+            if default_val_info_dict[param_info_arg_name] == '':
+                continue
+            info = 'While there is no description of default value in docstring, there is a default value on the argument side.'
+            info += '\nArgument name: %s' % param_info_arg_name
+            info += '\nArgument default value: %s' \
+                % default_val_info_dict[param_info_arg_name]
+            info_dict = _make_info_dict(
+                module_path=module_path,
+                func_name=func_name,
+                info_id=INFO_ID_LACKED_DOC_DEFAULT_VALUE,
+                info=info)
+            info_list.append(info_dict)
+            continue
+
+        if default_val_info_dict[param_info_arg_name] != '':
+            continue
+        info = 'The default value described in docstring does not exist in the actual argument.'
+        info += '\nArgment name: %s' % param_info_arg_name
+        info += '\nDocstring default value: %s' % param_info_default_val
+        info_dict = _make_info_dict(
+            module_path=module_path,
+            func_name=func_name,
+            info_id=INFO_ID_LACKED_ARG_DEFAULT_VALUE,
+            info=info)
+        info_list.append(info_dict)
+    return info_list
 
 
 def _check_func_description(module_path, func_name, docstring):
