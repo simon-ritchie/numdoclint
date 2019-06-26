@@ -432,3 +432,55 @@ def test_get_func_description_from_docstring():
     expected_description = """    Sample docstring.
     Lorem ipsum dolor sit amet, consectetur adipiscing elit."""
     assert func_description == expected_description
+
+
+def test__get_args_str():
+    py_module_str = """
+    def sample_func_1():
+        print(100)
+
+
+    def sample_func_2(price, location_id):
+        print(200)
+
+
+    def sample_func_3(price, location_id=200):
+        print(300)
+
+
+    def sample_func_4(price=100: int, location_id=200: int) -> str:
+        print(400)
+
+
+    def sample_func_5(
+            price, location_id,
+            season):
+        print(500)
+
+
+    def sample_func_6( prince = 100, location_id = 200 ):
+        print(600)
+    """
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func_1')
+    assert args_str == ''
+
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func_2')
+    assert args_str == 'price, location_id'
+
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func_3')
+    assert args_str == 'price, location_id=200'
+
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func_4')
+    assert args_str == 'price=100: int, location_id=200: int'
+
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func_5')
+    assert args_str == 'price, location_id, season'
+
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func_6')
+    assert args_str == 'prince = 100, location_id = 200'

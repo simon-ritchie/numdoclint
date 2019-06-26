@@ -48,6 +48,38 @@ def get_func_name_list(py_module_str):
     return func_name_list
 
 
+def _get_args_str(py_module_str, func_name):
+    """
+    Get the string of the arguments.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    args_str : str
+        String of arguments. e.g., 'location_id, price=100'
+    """
+    search_pattern = 'def %s' % func_name
+    search_pattern = search_pattern + r'.*\(.*\)'
+    py_module_str = re.sub(pattern=r'\n', repl='', string=py_module_str)
+    searched_result_list = re.findall(
+        pattern=search_pattern, string=py_module_str)
+    searched_result_str = searched_result_list[0]
+
+    args_str = searched_result_str.split('def ')[1]
+    args_str = args_str.split('(')[1]
+    args_str = args_str.split(')')[0]
+    args_str = args_str.strip()
+    while args_str.find('  ') != -1:
+        args_str = args_str.replace('  ', ' ')
+    return args_str
+
+
 def get_arg_name_list(py_module_str, func_name):
     """
     Get a list of argument names of the target function.
@@ -64,16 +96,8 @@ def get_arg_name_list(py_module_str, func_name):
     arg_name_list : list of str
         List of argument names of target function.
     """
-    search_pattern = 'def %s' % func_name
-    search_pattern = search_pattern + r'.*\(.*\)'
-    py_module_str = re.sub(pattern=r'\n', repl='', string=py_module_str)
-    searched_result_list = re.findall(
-        pattern=search_pattern, string=py_module_str)
-    searched_result_str = searched_result_list[0]
-
-    args_str = searched_result_str.split('def ')[1]
-    args_str = args_str.split('(')[1]
-    args_str = args_str.split(')')[0]
+    args_str = _get_args_str(
+        py_module_str=py_module_str, func_name=func_name)
     splitted_arg_name_list = args_str.split(',')
     arg_name_list = []
     for arg_name in splitted_arg_name_list:
@@ -490,3 +514,24 @@ def get_func_description_from_docstring(docstring):
     if not func_description.startswith('    '):
         func_description = '    %s' % func_description
     return func_description
+
+
+def get_arg_default_val_info_dict(py_module_str, func_name):
+    """
+    Get a dictionary containing information on default values
+    of arguments.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    default_val_info_dict : dict
+        A dctionary that stores argument names in keys and default
+        values in values.
+    """
+    pass
