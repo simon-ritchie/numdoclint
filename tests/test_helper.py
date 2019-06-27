@@ -713,3 +713,51 @@ sample_str = 'apple'
         c = a * b
         return c"""
     assert func_str == expected_func_str
+
+
+def test_return_val_exists_in_func():
+    module_str = '''
+sample_int = 100
+
+
+def sample_func_1(price):
+    """
+    Sample func.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    a = 1
+    b = 2
+    c = a + b
+    return c
+
+
+def sample_func_2():
+    a = 1
+    b = 2
+    print(a + b)
+
+
+def sample_func_3():
+    for i in range(10):
+        if i == 3:
+            return
+    '''
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_1')
+    assert result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_2')
+    assert not result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_3')
+    assert not result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_4')
+    assert not result_bool

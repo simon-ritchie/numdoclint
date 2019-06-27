@@ -103,6 +103,8 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         py_module_str=module_str, func_name=func_name)
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
+    return_val_info_list = helper.get_docstring_return_val_info_list(
+        docstring=docstring)
 
     unit_info_list = _check_func_description(
         module_path=module_path, func_name=func_name,
@@ -130,10 +132,34 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         default_val_info_dict=default_val_info_dict)
     info_list.extend(unit_info_list)
 
-    # unit_info_list = _check_lacked_return_doc(
-    #     module_path=module_path, func_name=func_name)
-    # info_list.extend(unit_info_list)
+    unit_info_list = _check_lacked_return_doc(
+        module_path=module_path, func_name=func_name,
+        return_val_info_list=return_val_info_list)
+    info_list.extend(unit_info_list)
 
+    pass
+
+
+def _check_lacked_return_doc(
+        module_path, func_name, return_val_info_list):
+    """
+    Check if the return value docstring is lacked.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    return_val_info_list : list of dicts
+        List containing return value information.
+        Values are set in the dictionary with the following keys.
+        - helper.DOC_RETURN_INFO_KEY_NAME : str -> Return value name.
+        - helper.DOC_RETURN_INFO_KEY_TYPE_NAME : str -> Type name of
+            return value.
+        - helper.DOC_RETURN_INFO_KEY_DESCRIPTION : str ->
+            Description of the return value.
+    """
     pass
 
 

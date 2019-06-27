@@ -808,4 +808,17 @@ def return_val_exists_in_func(module_str, func_name):
         statement does not return a value, False will be set.
     """
     func_str = get_func_str(module_str=module_str, func_name=func_name)
-    pass
+    if func_str == '':
+        return False
+    line_splitted_list = func_str.split('\n')
+    for line_str in line_splitted_list:
+        return_statement_exists = 'return' in line_str
+        if not return_statement_exists:
+            continue
+        return_val_str = re.sub(
+            pattern=r'^.*return', repl='', string=line_str)
+        return_val_str = return_val_str.strip()
+        if return_val_str == '':
+            continue
+        return True
+    return False
