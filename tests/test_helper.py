@@ -636,3 +636,80 @@ def test_get_docstring_return_val_info_list():
                 '        Sample location id.',
         }, required=True)
     schema_2(return_val_info_list[1])
+
+
+def test_get_func_str():
+    func_str = helper.get_func_str(
+        module_str='', func_name='sample_func')
+    assert func_str == ''
+
+    module_str = '''
+sample_int = 100
+
+
+def sample_func_1(price):
+    """
+    Sample func.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+
+    Returns
+    -------
+    c : int
+        Sample value.
+    """
+    a = 1
+    b = 2
+    c = a + b
+    return c
+
+
+class SampleClass:
+
+    def __init__(self):
+        pass
+
+    def sample_func_2(location_id):
+        a = 1
+        b = 2
+        c = a * b
+        return c
+
+
+sample_str = 'apple'
+    '''
+    func_str = helper.get_func_str(
+        module_str=module_str,
+        func_name='sample_func_1')
+    expected_func_str = '''def sample_func_1(price):
+    """
+    Sample func.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+
+    Returns
+    -------
+    c : int
+        Sample value.
+    """
+    a = 1
+    b = 2
+    c = a + b
+    return c'''
+    assert func_str == expected_func_str
+
+    func_str = helper.get_func_str(
+        module_str=module_str,
+        func_name='sample_func_2')
+    expected_func_str = """    def sample_func_2(location_id):
+        a = 1
+        b = 2
+        c = a * b
+        return c"""
+    assert func_str == expected_func_str

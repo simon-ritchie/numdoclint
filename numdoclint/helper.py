@@ -735,3 +735,77 @@ def _get_return_value_docstring(docstring):
     if not docstring.startswith('    '):
         docstring = '    %s' % docstring
     return docstring
+
+
+def get_func_str(module_str, func_name):
+    """
+    Get the entire function string including docstring and content.
+
+    Parameters
+    ----------
+    module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    func_str : str
+        The entire function string including docstring and content.
+    """
+    if module_str == '':
+        return ''
+    line_splitted_list = module_str.split('\n')
+    start_line_idx = None
+    last_line_idx = None
+    def_line_str = 'def %s' % func_name
+    for i, line_str in enumerate(line_splitted_list):
+        is_def_line_str = def_line_str in line_str
+        if not is_def_line_str:
+            continue
+        func_indent_baseline_num = get_line_indent_num(
+            line_str=line_str)
+        start_line_idx = i
+        break
+    if start_line_idx is None:
+        return ''
+
+    for i, line_str in enumerate(line_splitted_list):
+        if i <= start_line_idx:
+            continue
+        line_indent_num = get_line_indent_num(
+            line_str=line_str)
+        if line_indent_num > func_indent_baseline_num:
+            continue
+        line_str = line_str.strip()
+        if line_str == '':
+            continue
+        last_line_idx = i
+        break
+
+    func_str = '\n'.join(
+        line_splitted_list[start_line_idx:last_line_idx])
+    func_str = func_str.rstrip()
+    return func_str
+
+
+def return_val_exists_in_func(module_str, func_name):
+    """
+    Get a boolean value of whether or not there is a return
+    value in the functions.
+
+    Parameters
+    ----------
+    module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    ----------
+    result_bool : bool
+        If there is no return statement, or if the return
+        statement does not return a value, False will be set.
+    """
+    func_str = get_func_str(module_str=module_str, func_name=func_name)
+    pass
