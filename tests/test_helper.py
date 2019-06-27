@@ -520,3 +520,119 @@ def test_get_arg_default_val_info_dict():
         'location_id': '100',
     }
     assert default_val_info_dict == expected_dict
+
+
+def test__get_return_value_docstring():
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+
+    Returns
+    -------
+    name : str
+        Sample name.
+    location_id : int
+        Sample location id.
+
+    Notes
+    -----
+    - Sample notes 1.
+    - Sample notes 2.
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring)
+    expected_return_value_docstring = """    name : str
+        Sample name.
+    location_id : int
+        Sample location id."""
+    assert return_value_docstring, expected_return_value_docstring
+
+
+def test_append_return_value_info_unit_dict():
+    expected_name = 'sample_name'
+    expected_type_name = 'str'
+    expected_description = '        Sample description.'
+    return_val_info_list = helper._append_return_value_info_unit_dict(
+        name=expected_name,
+        type_name=expected_type_name,
+        description=expected_description,
+        return_val_info_list=[])
+    assert len(return_val_info_list) == 1
+    schema = Schema(
+        schema={
+            helper.DOC_RETURN_INFO_KEY_NAME: expected_name,
+            helper.DOC_RETURN_INFO_KEY_TYPE_NAME: expected_type_name,
+            helper.DOC_RETURN_INFO_KEY_DESCRIPTION: expected_description,
+        },
+        required=True)
+    schema(return_val_info_list[0])
+
+
+def test__get_return_value_name_from_line():
+    line_str = '        price : int'
+    return_value_name = helper._get_return_value_name_from_line(
+        line_str=line_str)
+    assert return_value_name == 'price'
+
+
+def test__get_return_value_type_name_from_line():
+    line_str = '        price : int'
+    return_value_type_name = helper._get_return_value_type_name_from_line(
+        line_str=line_str)
+    assert return_value_type_name == 'int'
+
+
+def test_get_docstring_return_val_info_list():
+    docstring = """
+    Sample docstring.
+
+    Paramters
+    ---------
+    price : int
+        Sample price.
+    """
+    return_val_info_list = helper.get_docstring_return_val_info_list(
+        docstring=docstring)
+    assert return_val_info_list == []
+
+    docstring = """
+    Sample docstring.
+
+    Paramters
+    ---------
+    price : int
+        Sample price.
+
+    Returns
+    -------
+    name : str
+        Sample name.
+        Sample text.
+    location_id : int or None
+        Sample location id.
+    """
+    return_val_info_list = helper.get_docstring_return_val_info_list(
+        docstring=docstring)
+    assert len(return_val_info_list) == 2
+    expected_description = """        Sample name.
+        Sample text."""
+    schema_1 = Schema(
+        schema={
+            helper.DOC_RETURN_INFO_KEY_NAME: 'name',
+            helper.DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
+            helper.DOC_RETURN_INFO_KEY_DESCRIPTION: expected_description,
+        },
+        required=True)
+    schema_1(return_val_info_list[0])
+    schema_2 = Schema(
+        schema={
+            helper.DOC_RETURN_INFO_KEY_NAME: 'location_id',
+            helper.DOC_RETURN_INFO_KEY_TYPE_NAME: 'int or None',
+            helper.DOC_RETURN_INFO_KEY_DESCRIPTION: \
+                '        Sample location id.',
+        }, required=True)
+    schema_2(return_val_info_list[1])

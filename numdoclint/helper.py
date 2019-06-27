@@ -282,7 +282,7 @@ def get_docstring_param_info_list(docstring):
     Returns
     -------
     param_info_list : list of dicts
-        Lit containing argument information.
+        List containing argument information.
         Values are set in the dictionary with the following keys.
         - DOC_PARAM_INFO_KEY_ARG_NAME : str -> Argument name.
         - DOC_PARAM_INFO_KEY_TYPE_NAME : str -> Name of the type.
@@ -557,3 +557,181 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
         default_val = name_and_default_val_list[1]
         default_val_info_dict[arg_name] = default_val
     return default_val_info_dict
+
+
+DOC_RETURN_INFO_KEY_NAME = 'name'
+DOC_RETURN_INFO_KEY_TYPE_NAME = 'type_name'
+DOC_RETURN_INFO_KEY_DESCRIPTION = 'description'
+
+
+def get_docstring_return_val_info_list(docstring):
+    """
+    Get a list of return value information in docstring.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring string.
+
+    Returns
+    -------
+    return_val_info_list : list of dicts
+        List containing return value information.
+        Values are set in the dictionary with the following keys.
+        - DOC_RETURN_INFO_KEY_NAME : str -> Return value name.
+        - DOC_RETURN_INFO_KEY_TYPE_NAME : str -> Type name of
+            return value.
+        - DOC_RETURN_INFO_KEY_DESCRIPTION : str -> Description of
+            the return value.
+    """
+    return_value_docstring = _get_return_value_docstring(
+        docstring=docstring)
+    if return_value_docstring == '':
+        return []
+    line_splitted_list = return_value_docstring.split('\n')
+    name = ''
+    type_name = ''
+    description = ''
+    return_val_info_list = []
+    for line_str in line_splitted_list:
+        line_indent_num = get_line_indent_num(line_str=line_str)
+        if line_indent_num == 1 and name != '':
+            return_val_info_list = _append_return_value_info_unit_dict(
+                name=name, type_name=type_name, description=description,
+                return_val_info_list=return_val_info_list)
+        if line_indent_num == 1:
+            name = _get_return_value_name_from_line(line_str=line_str)
+            type_name = _get_return_value_type_name_from_line(
+                line_str=line_str)
+            description = ''
+            continue
+        if line_indent_num == 2:
+            if description != '':
+                description += '\n'
+            description += line_str
+            continue
+    if name != '':
+        return_val_info_list = _append_return_value_info_unit_dict(
+            name=name, type_name=type_name, description=description,
+            return_val_info_list=return_val_info_list)
+    return return_val_info_list
+
+
+def _append_return_value_info_unit_dict(
+        name, type_name, description, return_val_info_list):
+    """
+    Add a return value docstring information dictionary
+    to the list.
+
+    Parameters
+    ----------
+    name : str
+        Return value name.
+    type_name : str
+        Type name of return value.
+    description : str
+        Description of the return value.
+    return_val_info_list : list of dicts
+        List containing return value information.
+
+    Returns
+    ----------
+    return_val_info_list : list of dicts
+        List containing return value information.
+        Values are set in the dictionary with the following keys.
+        - DOC_RETURN_INFO_KEY_NAME : str
+        - DOC_RETURN_INFO_KEY_TYPE_NAME : str
+        - DOC_RETURN_INFO_KEY_DESCRIPTION : str
+    """
+    return_value_info_dict = {
+        DOC_RETURN_INFO_KEY_NAME: name,
+        DOC_RETURN_INFO_KEY_TYPE_NAME: type_name,
+        DOC_RETURN_INFO_KEY_DESCRIPTION: description,
+    }
+    return_val_info_list.append(return_value_info_dict)
+    return return_val_info_list
+
+
+def _get_return_value_name_from_line(line_str):
+    """
+    Get the return value name from the target line string.
+
+    Parameters
+    ----------
+    line_str : str
+        Target line string. e.g., 'price : int'
+
+    Returns
+    -------
+    return_value_name : str
+        Return value name.
+    """
+    return_value_name = line_str.split(':')[0]
+    return_value_name = return_value_name.strip()
+    return return_value_name
+
+
+def _get_return_value_type_name_from_line(line_str):
+    """
+    Get the type name of return value from the target line string.
+
+    Parameters
+    ----------
+    line_str : str
+        Target line string.
+
+    Returns
+    ----------
+    return_value_type_name : str
+        Type name of return value.
+    """
+    colon_exists = ':' in line_str
+    if not colon_exists:
+        return ''
+    return_value_type_name = line_str.split(':')[1]
+    return_value_type_name = return_value_type_name.strip()
+    return return_value_type_name
+
+
+def _get_return_value_docstring(docstring):
+    """
+    Get the string of docstring's return value part.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring string.
+
+    Returns
+    -------
+    return_value_docstring : str
+        String of docstring return value information.
+    """
+    if docstring == '':
+        return ''
+    start_line_idx = 0
+    last_line_idx = 0
+    line_splitted_list = docstring.split('\n')
+    for i, line_str in enumerate(line_splitted_list):
+        is_in = 'Returns' in line_str
+        if not is_in:
+            continue
+        start_line_idx = i + 2
+        break
+    if start_line_idx == 0:
+        return ''
+    for i, line_str in enumerate(line_splitted_list):
+        if i < start_line_idx:
+            continue
+        last_line_idx = i
+        is_hyphen_line = '----' in line_str
+        if not is_hyphen_line:
+            continue
+        last_line_idx -= 2
+        break
+    docstring = '\n'.join(
+        line_splitted_list[start_line_idx:last_line_idx])
+    docstring = docstring.strip()
+    if not docstring.startswith('    '):
+        docstring = '    %s' % docstring
+    return docstring

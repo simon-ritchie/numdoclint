@@ -129,6 +129,11 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         param_info_list=param_info_list,
         default_val_info_dict=default_val_info_dict)
     info_list.extend(unit_info_list)
+
+    # unit_info_list = _check_lacked_return_doc(
+    #     module_path=module_path, func_name=func_name)
+    # info_list.extend(unit_info_list)
+
     pass
 
 
