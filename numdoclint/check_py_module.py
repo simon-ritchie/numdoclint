@@ -128,6 +128,11 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         param_info_list=param_info_list)
     info_list.extend(unit_info_list)
 
+    unit_info_list = _check_lacked_docstring_param_description(
+        module_path=module_path, func_name=func_name,
+        param_info_list=param_info_list)
+    info_list.extend(unit_info_list)
+
     unit_info_list = _check_docstring_param_order(
         module_path=module_path, func_name=func_name,
         arg_name_list=arg_name_list, param_info_list=param_info_list)
@@ -149,7 +154,58 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         module_path=module_path, func_name=func_name,
         return_val_info_list=return_val_info_list)
     info_list.extend(unit_info_list)
-    pass
+
+    return info_list
+
+
+def _check_lacked_docstring_param_description(
+        module_path, func_name, param_info_list):
+    """
+    Check that the docstring argument description is not lacked.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    param_info_list : list of dicts
+        A list containing argument information of docstring.
+        The dictionary needs a key with the following constants:
+        - helper.DOC_PARAM_INFO_KEY_ARG_NAME : str
+        - helper.DOC_PARAM_INFO_KEY_TYPE_NAME : str
+        - helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL : str
+        - helper.DOC_PARAM_INFO_KEY_DESCRIPTION : str
+
+    Returns
+    -------
+    info_list : list
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    """
+    if not param_info_list:
+        return []
+
+    info_list = []
+    for param_info_dict in param_info_list:
+        arg_name = param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
+        description = param_info_dict[
+            helper.DOC_PARAM_INFO_KEY_DESCRIPTION]
+        if description != '':
+            continue
+        info = 'Missing docstring argument information.'
+        info += '\nArgument name: %s' % arg_name
+        info_dict = _make_info_dict(
+            module_path=module_path,
+            func_name=func_name,
+            info_id=INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
+            info=info)
+        info_list.append(info_dict)
+    return info_list
 
 
 def _check_lacked_return_docstring_type(

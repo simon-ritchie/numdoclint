@@ -355,3 +355,49 @@ def test__check_lacked_return_docstring_type():
         schema(info_dict)
     assert 'price' in info_list[0][check_py_module.INFO_KEY_INFO]
     assert 'name' in info_list[1][check_py_module.INFO_KEY_INFO]
+
+
+def test__check_lacked_docstring_param_description():
+    expected_module_path = 'sample/module/path.py'
+    expected_func_name = 'sample_func'
+
+    info_list = check_py_module._check_lacked_docstring_param_description(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        param_info_list=[])
+    assert info_list == []
+
+    param_info_list = [{
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'price',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: '',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'name',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'str',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: 'Apple',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: '',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'location_id',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample location id.',
+    }]
+    info_list = check_py_module._check_lacked_docstring_param_description(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        param_info_list=param_info_list)
+    assert len(info_list) == 2
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    for info_dict in info_list:
+        schema(info_dict)
+    assert 'price' in info_list[0][check_py_module.INFO_KEY_INFO]
+    assert 'name' in info_list[1][check_py_module.INFO_KEY_INFO]
