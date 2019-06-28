@@ -59,13 +59,15 @@ def check_python_module(py_module_path):
 INFO_ID_LACKED_ARGUMENT = 1
 INFO_ID_LACKED_DOCSTRING_PARAM = 2
 INFO_ID_LACKED_DOCSTRING_PARAM_TYPE = 3
-INFO_ID_DIFFERENT_PARAM_ORDER = 4
-INFO_ID_LACKED_FUNC_DESCRIPTION = 5
-INFO_ID_LACKED_ARG_DEFAULT_VALUE = 6
-INFO_ID_LACKED_DOC_DEFAULT_VALUE = 7
-INFO_ID_LACKED_DOCSTRING_RETURN = 8
-INFO_ID_LACKED_DOCSTRING_RETURN_TYPE = 9
-INFO_ID_LACKED_RETURN_VAL = 10
+INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION = 4
+INFO_ID_DIFFERENT_PARAM_ORDER = 5
+INFO_ID_LACKED_FUNC_DESCRIPTION = 6
+INFO_ID_LACKED_ARG_DEFAULT_VALUE = 7
+INFO_ID_LACKED_DOC_DEFAULT_VALUE = 8
+INFO_ID_LACKED_DOCSTRING_RETURN = 9
+INFO_ID_LACKED_DOCSTRING_RETURN_TYPE = 10
+INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION = 11
+INFO_ID_LACKED_RETURN_VAL = 12
 
 INFO_KEY_MODULE_PATH = 'module_path'
 INFO_KEY_FUNC_NAME = 'func_name'
@@ -143,7 +145,63 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         return_val_exists_in_func=return_val_exists_in_func)
     info_list.extend(unit_info_list)
 
+    unit_info_list = _check_lacked_return_docstring_type(
+        module_path=module_path, func_name=func_name,
+        return_val_info_list=return_val_info_list)
+    info_list.extend(unit_info_list)
     pass
+
+
+def _check_lacked_return_docstring_type(
+        module_path, func_name, return_val_info_list):
+    """
+    Check that the type specification is not lacked in the
+    return value's docstring.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    return_val_info_list : list of dicts
+        List containing return value information.
+        Values are set in the dictionary with the following keys.
+        - helper.DOC_RETURN_INFO_KEY_NAME : str -> Return value name.
+        - helper.DOC_RETURN_INFO_KEY_TYPE_NAME : str -> Type name of
+            return value.
+        - helper.DOC_RETURN_INFO_KEY_DESCRIPTION : str ->
+            Description of the return value.
+
+    Returns
+    -------
+    info_list : list
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    """
+    if not return_val_info_list:
+        return []
+    info_list = []
+    for return_val_info_dict in return_val_info_list:
+        return_value_name = return_val_info_dict[
+            helper.DOC_RETURN_INFO_KEY_NAME]
+        type_name = return_val_info_dict[
+            helper.DOC_RETURN_INFO_KEY_TYPE_NAME]
+        if type_name != '':
+            continue
+        info = 'Missing docstring type information.'
+        info += 'Return value name: %s' % return_value_name
+        info_dict = _make_info_dict(
+            module_path=module_path,
+            func_name=func_name,
+            info_id=INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
+            info=info)
+        info_list.append(info_dict)
+    return info_list
 
 
 def _check_lacked_return(
