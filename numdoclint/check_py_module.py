@@ -63,6 +63,9 @@ INFO_ID_DIFFERENT_PARAM_ORDER = 4
 INFO_ID_LACKED_FUNC_DESCRIPTION = 5
 INFO_ID_LACKED_ARG_DEFAULT_VALUE = 6
 INFO_ID_LACKED_DOC_DEFAULT_VALUE = 7
+INFO_ID_LACKED_DOCSTRING_RETURN = 8
+INFO_ID_LACKED_DOCSTRING_RETURN_TYPE = 9
+INFO_ID_LACKED_RETURN_VAL = 10
 
 INFO_KEY_MODULE_PATH = 'module_path'
 INFO_KEY_FUNC_NAME = 'func_name'
@@ -105,6 +108,8 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         docstring=docstring)
     return_val_info_list = helper.get_docstring_return_val_info_list(
         docstring=docstring)
+    return_val_exists_in_func = helper.return_val_exists_in_func(
+        module_str=module_str, func_name=func_name)
 
     unit_info_list = _check_func_description(
         module_path=module_path, func_name=func_name,
@@ -132,18 +137,20 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         default_val_info_dict=default_val_info_dict)
     info_list.extend(unit_info_list)
 
-    unit_info_list = _check_lacked_return_doc(
+    unit_info_list = _check_lacked_return(
         module_path=module_path, func_name=func_name,
-        return_val_info_list=return_val_info_list)
+        return_val_info_list=return_val_info_list,
+        return_val_exists_in_func=return_val_exists_in_func)
     info_list.extend(unit_info_list)
 
     pass
 
 
-def _check_lacked_return_doc(
-        module_path, func_name, return_val_info_list):
+def _check_lacked_return(
+        module_path, func_name, return_val_info_list,
+        return_val_exists_in_func):
     """
-    Check if the return value docstring is lacked.
+    Check if the return value or docstring is lacked.
 
     Parameters
     ----------
@@ -159,8 +166,42 @@ def _check_lacked_return_doc(
             return value.
         - helper.DOC_RETURN_INFO_KEY_DESCRIPTION : str ->
             Description of the return value.
+    return_val_exists_in_func : bool
+        Boolean value whether the return value exists in the function.
+
+    Returns
+    -------
+    info_list : list
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
     """
-    pass
+    if not return_val_exists_in_func and not return_val_info_list:
+        return []
+
+    if return_val_exists_in_func and return_val_info_list:
+        return []
+
+    if return_val_exists_in_func and not return_val_info_list:
+        info = 'While the return value exists in the function, the return value document does not exist in docstring.'
+        info_dict = _make_info_dict(
+            module_path=module_path, func_name=func_name,
+            info_id=INFO_ID_LACKED_DOCSTRING_RETURN,
+            info=info)
+        return [info_dict]
+
+    if not return_val_exists_in_func and return_val_info_list:
+        info = 'While the return value document exists in docstring, the return value does not exist in the function.'
+        info_dict = _make_info_dict(
+            module_path=module_path, func_name=func_name,
+            info_id=INFO_ID_LACKED_RETURN_VAL,
+            info=info)
+        return [info_dict]
+
+    return []
 
 
 def _check_lacked_default_value(

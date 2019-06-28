@@ -4,7 +4,9 @@ from voluptuous import Schema
 from numdoclint import check_py_module
 from numdoclint.helper import (
     DOC_PARAM_INFO_KEY_ARG_NAME, DOC_PARAM_INFO_KEY_TYPE_NAME,
-    DOC_PARAM_INFO_KEY_DEFAULT_VAL, DOC_PARAM_INFO_KEY_DESCRIPTION)
+    DOC_PARAM_INFO_KEY_DEFAULT_VAL, DOC_PARAM_INFO_KEY_DESCRIPTION,
+    DOC_RETURN_INFO_KEY_NAME, DOC_RETURN_INFO_KEY_TYPE_NAME,
+    DOC_RETURN_INFO_KEY_DESCRIPTION)
 
 
 def test__check_module_exists():
@@ -249,3 +251,64 @@ def test__check_lacked_default_value():
         },
         required=True)
     schema_2(info_list[1])
+
+
+def test__check_lacked_return():
+    expected_module_path = 'sample/module/path.py'
+    expected_func_name = 'sample_func'
+    info_list = check_py_module._check_lacked_return(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        return_val_info_list=[],
+        return_val_exists_in_func=False)
+    assert info_list == []
+
+    return_val_info_list = [{
+        DOC_RETURN_INFO_KEY_NAME: 'price',
+        DOC_RETURN_INFO_KEY_TYPE_NAME: 'int',
+        DOC_RETURN_INFO_KEY_DESCRIPTION: 'Sample price.',
+    }, {
+        DOC_RETURN_INFO_KEY_NAME: 'name',
+        DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
+        DOC_RETURN_INFO_KEY_DESCRIPTION: 'Sample name.',
+    }]
+    info_list = check_py_module._check_lacked_return(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        return_val_info_list=return_val_info_list,
+        return_val_exists_in_func=True)
+    assert info_list == []
+
+    info_list = check_py_module._check_lacked_return(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        return_val_info_list=[],
+        return_val_exists_in_func=True)
+    assert len(info_list) == 1
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema(info_list[0])
+
+    info_list = check_py_module._check_lacked_return(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        return_val_info_list=return_val_info_list,
+        return_val_exists_in_func=False)
+    assert len(info_list) == 1
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_RETURN_VAL,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
+    schema(info_list[0])
