@@ -155,6 +155,61 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         return_val_info_list=return_val_info_list)
     info_list.extend(unit_info_list)
 
+    unit_info_list = _check_lacked_return_docstring_description(
+        module_path=module_path, func_name=func_name,
+        return_val_info_list=return_val_info_list)
+    info_list.extend(unit_info_list)
+
+    return info_list
+
+
+def _check_lacked_return_docstring_description(
+        module_path, func_name, return_val_info_list):
+    """
+    Check if the docstring description for the return value is lacked.
+
+    Parameters
+    ----------
+    module_path : str
+        Path of target module.
+    func_name : str
+        Target function name.
+    return_val_info_list : list of dicts
+        List containing return value information.
+        Values are set in the dictionary with the following keys.
+        - helper.DOC_RETURN_INFO_KEY_NAME : str -> Return value name.
+        - helper.DOC_RETURN_INFO_KEY_TYPE_NAME : str -> Type name of
+            return value.
+        - helper.DOC_RETURN_INFO_KEY_DESCRIPTION : str ->
+            Description of the return value.
+
+    Returns
+    ----------
+    info_list : list
+        A list of check results for one function.
+        The following keys are set in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    """
+    if not return_val_info_list:
+        return []
+    info_list = []
+    for return_val_info_dict in return_val_info_list:
+        name = return_val_info_dict[helper.DOC_RETURN_INFO_KEY_NAME]
+        description = return_val_info_dict[
+            helper.DOC_RETURN_INFO_KEY_DESCRIPTION]
+        if description != '':
+            continue
+        info = 'Docstring description of return value is missing.'
+        info += '\nReturn value name: %s' % name
+        info_dict = _make_info_dict(
+            module_path=module_path,
+            func_name=func_name,
+            info_id=INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
+            info=info)
+        info_list.append(info_dict)
     return info_list
 
 

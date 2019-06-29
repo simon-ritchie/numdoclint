@@ -401,3 +401,42 @@ def test__check_lacked_docstring_param_description():
         schema(info_dict)
     assert 'price' in info_list[0][check_py_module.INFO_KEY_INFO]
     assert 'name' in info_list[1][check_py_module.INFO_KEY_INFO]
+
+
+def test__check_lacked_return_docstring_description():
+    expected_module_path = 'sample/module/path.py'
+    expected_func_name = 'sample_func'
+
+    info_list = check_py_module._check_lacked_return_docstring_description(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        return_val_info_list=[])
+    assert info_list == []
+
+    return_val_info_list = [{
+        DOC_RETURN_INFO_KEY_NAME: 'price',
+        DOC_RETURN_INFO_KEY_TYPE_NAME: 'int',
+        DOC_RETURN_INFO_KEY_DESCRIPTION: '',
+    }, {
+        DOC_RETURN_INFO_KEY_NAME: 'name',
+        DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
+        DOC_RETURN_INFO_KEY_DESCRIPTION: '',
+    }, {
+        DOC_RETURN_INFO_KEY_NAME: 'location_id',
+        DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
+        DOC_RETURN_INFO_KEY_DESCRIPTION: 'Sample location id.',
+    }]
+    info_list = check_py_module._check_lacked_return_docstring_description(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        return_val_info_list=return_val_info_list)
+    assert len(info_list) == 2
+    schema = Schema(
+        schema={
+            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            check_py_module.INFO_KEY_INFO_ID: \
+                check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
+            check_py_module.INFO_KEY_INFO: str,
+        },
+        required=True)
