@@ -103,6 +103,7 @@ def get_arg_name_list(py_module_str, func_name):
     for arg_name in splitted_arg_name_list:
         arg_name = arg_name.replace(' ', '')
         arg_name = arg_name.split(':')[0]
+        arg_name = arg_name.split('=')[0]
         if arg_name == '':
             continue
         arg_name_list.append(arg_name)
@@ -458,6 +459,7 @@ def get_param_docstring(docstring):
     line_splitted_docstring_list = docstring.split('\n')
     param_docstring = ''
     pre_line_str = ''
+    second_hyphen_exists = False
     for line_str in line_splitted_docstring_list:
         if line_str == '    Parameters':
             param_part_started = True
@@ -471,6 +473,7 @@ def get_param_docstring(docstring):
         if not initial_hyphen_appeared:
             continue
         if is_hyphen_line:
+            second_hyphen_exists = True
             break
 
         if pre_line_str != '':
@@ -478,6 +481,11 @@ def get_param_docstring(docstring):
                 param_docstring += '\n'
             param_docstring += pre_line_str
         pre_line_str = line_str
+
+    if not second_hyphen_exists:
+        if param_docstring != '':
+            param_docstring += '\n'
+        param_docstring += pre_line_str
     return param_docstring
 
 
@@ -594,6 +602,8 @@ def get_docstring_return_val_info_list(docstring):
     description = ''
     return_val_info_list = []
     for line_str in line_splitted_list:
+        if line_str.replace(' ', '') == '':
+            continue
         line_indent_num = get_line_indent_num(line_str=line_str)
         if line_indent_num == 1 and name != '':
             return_val_info_list = _append_return_value_info_unit_dict(
@@ -720,6 +730,8 @@ def _get_return_value_docstring(docstring):
         break
     if start_line_idx == 0:
         return ''
+
+    second_hyphen_exists = False
     for i, line_str in enumerate(line_splitted_list):
         if i < start_line_idx:
             continue
@@ -728,7 +740,10 @@ def _get_return_value_docstring(docstring):
         if not is_hyphen_line:
             continue
         last_line_idx -= 2
+        second_hyphen_exists = True
         break
+    if not second_hyphen_exists:
+        last_line_idx += 1
     docstring = '\n'.join(
         line_splitted_list[start_line_idx:last_line_idx])
     docstring = docstring.strip()

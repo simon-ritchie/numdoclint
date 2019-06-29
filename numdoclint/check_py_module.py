@@ -517,6 +517,8 @@ def _check_docstring_param_order(
         - info_id : int
         - info : str
     """
+    if len(arg_name_list) != len(param_info_list):
+        return []
     param_info_arg_name_list = [
         param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
             for param_info_dict in param_info_list]
@@ -623,7 +625,7 @@ def _check_lacked_param(
         is_in = param_arg_name in arg_name_list
         if is_in:
             continue
-        info = 'An argument present in docstring does not exist in the actual argument.'
+        info = 'An argument exists in docstring does not exists in the actual argument.'
         info += '\nLacked argument name: %s' % param_arg_name
         info_dict = _make_info_dict(
             module_path=module_path,

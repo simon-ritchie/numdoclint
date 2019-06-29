@@ -38,6 +38,10 @@ def sample_func_4(
         apple, orange,
         melon):
     pass
+
+
+def sample_func_5(price=100, name='apple'):
+    pass
     """
 
     arg_name_list = helper.get_arg_name_list(
@@ -55,6 +59,10 @@ def sample_func_4(
     arg_name_list = helper.get_arg_name_list(
         py_module_str=py_module_str, func_name='sample_func_4')
     assert arg_name_list == ['apple', 'orange', 'melon']
+
+    arg_name_list = helper.get_arg_name_list(
+        py_module_str=py_module_str, func_name='sample_func_5')
+    assert arg_name_list == ['price', 'name']
 
 
 def test_get_func_indent_num():
@@ -261,6 +269,16 @@ def test_get_param_docstring():
     """
     param_docstring = helper.get_param_docstring(docstring=docstring)
     assert param_docstring == ''
+
+    docstring = """
+    Parameters
+    ----------
+    price : int
+        Sample price."""
+    param_docstring = helper.get_param_docstring(docstring=docstring)
+    expected_docstring = """    price : int
+        Sample price."""
+    assert param_docstring == expected_docstring
 
 
 def test_get_splitted_param_doc_list():
@@ -550,6 +568,52 @@ def test__get_return_value_docstring():
     location_id : int
         Sample location id."""
     assert return_value_docstring, expected_return_value_docstring
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    price : int
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring)
+    expected_return_value_docstring = """    price : int"""
+    assert return_value_docstring == expected_return_value_docstring
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    x : int
+        Sample value.
+    y : int
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring)
+    expected_return_value_docstring = """    x : int
+        Sample value.
+    y : int"""
+    assert return_value_docstring == expected_return_value_docstring
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    x : int
+        Sample value.
+    y : int
+        Sample value.
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring)
+    expected_return_value_docstring = """    x : int
+        Sample value.
+    y : int
+        Sample value."""
+    assert return_value_docstring == expected_return_value_docstring
 
 
 def test_append_return_value_info_unit_dict():
