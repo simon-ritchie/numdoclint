@@ -55,6 +55,69 @@ def check_python_module(py_module_path):
     return info_list
 
 
+def check_python_module_recursively(dir_path):
+    """
+    Check Python module docstring recursively.
+
+    Parameters
+    ----------
+    dir_path : str
+        Target directory path.
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing information on check results.
+        The following values are set in the dictionary key:
+        - module_path : str -> Path of target module.
+        - func_name : str -> Target function name.
+        - info_id : int -> Identification number of which information.
+        - info : str -> Information of check result.
+    """
+    info_list = _check_python_module_recursively(
+        dir_path=dir_path, info_list=[])
+    return info_list
+
+
+def _check_python_module_recursively(dir_path, info_list):
+    """
+    Check Python module docstring recursively.
+
+    Parameters
+    ----------
+    dir_path : str
+        Target directory path.
+    info_list : list of dicts
+        List to add check results to.
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing information on check results.
+        The following values are set in the dictionary key:
+        - module_path : str -> Path of target module.
+        - func_name : str -> Target function name.
+        - info_id : int -> Identification number of which information.
+        - info : str -> Information of check result.
+    """
+    file_or_folder_name_list = os.listdir(dir_path)
+    if not file_or_folder_name_list:
+        return info_list
+    for file_or_folder_name in file_or_folder_name_list:
+        path = os.path.join(dir_path, file_or_folder_name)
+        path = path.replace('\\', '/')
+        if os.path.isdir(path):
+            info_list = _check_python_module_recursively(
+                dir_path=path, info_list=info_list)
+            continue
+        if not path.endswith('.py'):
+            continue
+        unit_info_list = check_python_module(
+            py_module_path=path)
+        info_list.extend(unit_info_list)
+    return info_list
+
+
 INFO_ID_LACKED_ARGUMENT = 1
 INFO_ID_LACKED_DOCSTRING_PARAM = 2
 INFO_ID_LACKED_DOCSTRING_PARAM_TYPE = 3

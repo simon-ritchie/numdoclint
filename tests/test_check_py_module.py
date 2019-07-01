@@ -840,3 +840,70 @@ def sample_func_1(price=100: int, name='apple': str) -> int:
     info_list = check_py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH)
     assert info_list == []
+
+
+def test__check_python_module_recursively():
+    child_dir_path = os.path.join(TMP_TEST_MODULE_DIR, 'child_dir/')
+    if not os.path.exists(child_dir_path):
+        os.makedirs(child_dir_path)
+    child_dir_init_path = os.path.join(child_dir_path, '__init__.py')
+    with open(child_dir_init_path, 'w') as f:
+        f.write('\n')
+
+    module_str_1 = '''
+def sample_func_1(name):
+    """
+    Sample function.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    return 100
+    '''
+    with open(TMP_TEST_MODULE_PATH, 'w') as f:
+        f.write(module_str_1)
+
+    module_str_2 = '''
+import os
+import sys
+
+
+def sample_func_2(price=100, name='apple'):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    name : str
+        Saple name.
+    """
+    return 100, 200
+    '''
+    module_path_2 = os.path.join(child_dir_path, 'test_module_2.py')
+    with open(module_path_2, 'w') as f:
+        f.write(module_str_2)
+
+    module_str_3 = '''
+import os
+import sys
+
+x = 100
+y = 200
+    '''
+    module_path_3 = os.path.join(child_dir_path, 'test_module_3.py')
+    with open(module_path_3, 'w') as f:
+        f.write(module_str_3)
+
+    info_list = check_py_module.check_python_module_recursively(
+        dir_path=TMP_TEST_MODULE_DIR)
+    _check_info_list_schema(info_list=info_list)
+    module_path_list = [
+        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        for info_dict in info_list]
+    assert TMP_TEST_MODULE_PATH in module_path_list
+    assert module_path_2 in module_path_list
+    assert not module_path_3 in module_path_list
