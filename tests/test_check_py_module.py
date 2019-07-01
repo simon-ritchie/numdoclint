@@ -780,3 +780,63 @@ def sample_func_13(price: int, name='apple': str) -> int:
 
     info_list = _exec_target_func(func_name='sample_func_13')
     assert info_list == []
+
+
+def test_check_python_module():
+    module_str = """
+price = 100
+name = 'apple'
+location_id = 10
+"""
+    with open(TMP_TEST_MODULE_PATH, 'w') as f:
+        f.write(module_str)
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH)
+    assert info_list == []
+
+    module_str = '''
+def sample_func_1(price):
+    """
+    Sample function.
+    """
+    return 100
+'''
+    with open(TMP_TEST_MODULE_PATH, 'w') as f:
+        f.write(module_str)
+
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH)
+    assert len(info_list) > 0
+    _check_info_list_schema(info_list=info_list)
+
+    module_str = '''
+def sample_func_1(price=100: int, name='apple': str) -> int:
+    """
+    Sample func.
+
+    Parameters
+    ----------
+    price : int, default 100
+        Sample price.
+    name : str, default 'apple'
+        Sample name.
+
+    Returns
+    -------
+    x : int
+        Sample value.
+    y : int
+        Sample value.
+
+    Notes
+    -----
+    1. Sample note.
+    2. Sample note.
+    """
+    return 100, 200
+    '''
+    with open(TMP_TEST_MODULE_PATH, 'w') as f:
+        f.write(module_str)
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH)
+    assert info_list == []

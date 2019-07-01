@@ -52,8 +52,7 @@ def check_python_module(py_module_path):
             func_name=func_name,
         )
         info_list.extend(single_func_info_list)
-        pass
-    pass
+    return info_list
 
 
 INFO_ID_LACKED_ARGUMENT = 1
