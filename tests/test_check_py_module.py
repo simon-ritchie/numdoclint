@@ -936,3 +936,21 @@ def test__print_info_list():
         assert module_path in printed_str
         assert func_name in printed_str
         assert info in printed_str
+
+
+def test__is_func_name_to_ignore():
+    ignore_func_name_suffix_list = ['test_', 'sample_']
+    result_bool = check_py_module._is_func_name_to_ignore(
+        func_name='test_get_name',
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+    assert result_bool
+
+    result_bool = check_py_module._is_func_name_to_ignore(
+        func_name='sample_get_name',
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+    assert result_bool
+
+    result_bool = check_py_module._is_func_name_to_ignore(
+        func_name='get_name',
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+    assert not result_bool

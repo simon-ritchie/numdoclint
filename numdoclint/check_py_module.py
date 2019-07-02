@@ -6,7 +6,8 @@ import os
 from numdoclint import helper
 
 
-def check_python_module(py_module_path, verbose=1):
+def check_python_module(
+        py_module_path, verbose=1, ignore_func_name_suffix_list=['test_']):
     """
     Check docstring of single Python module.
 
@@ -18,6 +19,8 @@ def check_python_module(py_module_path, verbose=1):
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
+    ignore_func_name_suffix_list : list of str, default ['test_']
+        A suffix list of function name conditions to ignore.
 
     Notes
     -----
@@ -50,6 +53,11 @@ def check_python_module(py_module_path, verbose=1):
         return []
     info_list = []
     for func_name in func_name_list:
+        is_func_name_to_ignore = _is_func_name_to_ignore(
+            func_name=func_name,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+        if is_func_name_to_ignore:
+            continue
         single_func_info_list = _get_single_func_info_list(
             module_path=py_module_path,
             module_str=module_str,
@@ -86,6 +94,28 @@ def check_python_module_recursively(dir_path, verbose=1):
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose)
     return info_list
+
+
+def _is_func_name_to_ignore(func_name, ignore_func_name_suffix_list):
+    """
+    Get boolean value of function name which should be ignored.
+
+    Parameters
+    ----------
+    func_name : str
+        Target function name.
+    ignore_func_name_suffix_list : list of str
+        A suffix list of function name conditions to ignore.
+
+    Returns
+    -------
+    result_bool : bool
+        The boolean value of function name which should be ignored.
+    """
+    for ignore_func_name_suffix in ignore_func_name_suffix_list:
+        if func_name.startswith(ignore_func_name_suffix):
+            return True
+    return False
 
 
 def _print_info_list(info_list, verbose):
