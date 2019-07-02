@@ -37,13 +37,21 @@ def get_func_name_list(py_module_str):
     func_name_list : list of str
         List containing function names.
     """
-    search_pattern = r'def .*\(.*\)'
+    py_module_str = py_module_str.replace('\n', '')
+    search_pattern = r'def .*?\(.*?\)'
     searched_result_list = re.findall(
         pattern=search_pattern, string=py_module_str)
     func_name_list = []
     for searched_result_str in searched_result_list:
         func_name = searched_result_str.replace('def ', '')
         func_name = func_name.split('(')[0]
+        not_func_str = False
+        for char in func_name:
+            if not char.isalnum() and char != '_':
+                not_func_str = True
+                break
+        if not_func_str:
+            continue
         func_name_list.append(func_name)
     return func_name_list
 
@@ -175,7 +183,7 @@ def get_line_indent_num(line_str):
 
 def get_func_overall_docstring(py_module_str, func_name):
     """
-    Get the target docstring fo the target function.
+    Get the target docstring of the target function.
 
     Parameters
     ----------
@@ -189,7 +197,8 @@ def get_func_overall_docstring(py_module_str, func_name):
     docstring : str
         Target docstring string.
     """
-    match = re.search('def %s' % func_name, py_module_str)
+    pattern = 'def %s' % func_name
+    match = re.search(pattern, py_module_str)
     if match is None:
         return ''
     func_indent_num = get_func_indent_num(
@@ -212,8 +221,10 @@ def get_func_overall_docstring(py_module_str, func_name):
             break
         func_str += '\n%s' % line_str
 
-    double_quote_doc_exists = '"""' in func_str
-    single_quote_doc_exists = "'''" in func_str
+    stripped_func_str = func_str.replace(' ', '')
+    stripped_func_str = stripped_func_str.replace('\n', '')
+    double_quote_doc_exists = ':"""' in stripped_func_str
+    single_quote_doc_exists = ":'''" in stripped_func_str
     if not double_quote_doc_exists and not single_quote_doc_exists:
         return ''
 

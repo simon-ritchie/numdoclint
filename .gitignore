@@ -1,3 +1,5 @@
 *.pyc
 /.vscode
 /tests/tmp/*
+/.ipynb_checkpoints/tmp-checkpoint.ipynb
+/tmp.ipynb

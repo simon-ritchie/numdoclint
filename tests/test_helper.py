@@ -12,12 +12,29 @@ def test_read_file_str():
 
 
 def test_get_func_name_list():
-    py_module_str = helper.read_file_str(
-        file_path='./tests/test_helper.py')
+    py_module_str = """
+def sample_func_1():
+    pass
+
+
+def sample_func_2(
+        name='apple', price=100):
+
+    def sample_func_3(
+            location_id=30):
+        pass
+
+    pass
+
+
+sample_str = r'def .*?\\(.*?\\)'
+    """
     func_name_list = helper.get_func_name_list(
         py_module_str=py_module_str)
-    assert 'test_read_file_str' in func_name_list
-    assert 'test_get_func_name_list' in func_name_list
+    assert len(func_name_list) == 3
+    assert 'sample_func_1' in func_name_list
+    assert 'sample_func_2' in func_name_list
+    assert 'sample_func_3' in func_name_list
 
 
 def test_get_arg_name_list():
@@ -146,7 +163,7 @@ def sample_func_3(orange):
     price : int
         Sample price.
     """
-
+    pass
 
     def sample_func_4(orange):
         """
@@ -157,6 +174,12 @@ def sample_func_3(orange):
         price : int
             Sample price.
         """
+        pass
+
+
+def sample_func_5(price):
+    sample_str = """Sample str.
+    """
     '''
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
@@ -197,6 +220,10 @@ def sample_func_3(orange):
     price : int
         Sample price."""
     assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_5')
+    assert docstring == ''
 
 
 def test__set_docstring_indent_number_to_one():
