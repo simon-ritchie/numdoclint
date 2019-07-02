@@ -907,3 +907,32 @@ y = 200
     assert TMP_TEST_MODULE_PATH in module_path_list
     assert module_path_2 in module_path_list
     assert not module_path_3 in module_path_list
+
+
+def test__print_info_list():
+    info_list = [{
+        check_py_module.INFO_KEY_MODULE_PATH: 'sample/module/path_1.py',
+        check_py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
+        check_py_module.INFO_KEY_INFO_ID: 1,
+        check_py_module.INFO_KEY_INFO: 'Sample information 1.',
+    }, {
+        check_py_module.INFO_KEY_MODULE_PATH: 'sample/module/path_2.py',
+        check_py_module.INFO_KEY_FUNC_NAME: 'sample_func_2',
+        check_py_module.INFO_KEY_INFO_ID: 2,
+        check_py_module.INFO_KEY_INFO: 'Sample information 2.',
+    }]
+    printed_str = check_py_module._print_info_list(
+        info_list=info_list,
+        verbose=0)
+    assert printed_str == ''
+
+    printed_str = check_py_module._print_info_list(
+        info_list=info_list, verbose=1)
+    assert printed_str != ''
+    for info_dict in info_list:
+        module_path = info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        func_name = info_dict[check_py_module.INFO_KEY_FUNC_NAME]
+        info = info_dict[check_py_module.INFO_KEY_INFO]
+        assert module_path in printed_str
+        assert func_name in printed_str
+        assert info in printed_str

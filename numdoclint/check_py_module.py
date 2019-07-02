@@ -6,7 +6,7 @@ import os
 from numdoclint import helper
 
 
-def check_python_module(py_module_path):
+def check_python_module(py_module_path, verbose=1):
     """
     Check docstring of single Python module.
 
@@ -14,6 +14,10 @@ def check_python_module(py_module_path):
     ----------
     py_module_path : str
         Path of target module.
+    verbose : int, default 1
+        Log settings of stdout. Specify one of the following numbers:
+        - 0 -> Do not output log.
+        - 1 -> Output the check result.
 
     Notes
     -----
@@ -52,10 +56,11 @@ def check_python_module(py_module_path):
             func_name=func_name,
         )
         info_list.extend(single_func_info_list)
+    _print_info_list(info_list=info_list, verbose=verbose)
     return info_list
 
 
-def check_python_module_recursively(dir_path):
+def check_python_module_recursively(dir_path, verbose=1):
     """
     Check Python module docstring recursively.
 
@@ -63,6 +68,10 @@ def check_python_module_recursively(dir_path):
     ----------
     dir_path : str
         Target directory path.
+    verbose : int, default 1
+        Log settings of stdout. Specify one of the following numbers:
+        - 0 -> Do not output log.
+        - 1 -> Output the check result.
 
     Returns
     -------
@@ -75,11 +84,50 @@ def check_python_module_recursively(dir_path):
         - info : str -> Information of check result.
     """
     info_list = _check_python_module_recursively(
-        dir_path=dir_path, info_list=[])
+        dir_path=dir_path, info_list=[], verbose=verbose)
     return info_list
 
 
-def _check_python_module_recursively(dir_path, info_list):
+def _print_info_list(info_list, verbose):
+    """
+    Print check result.
+
+    Parameters
+    ----------
+    info_list : list of dicts
+        A list containing information on check results.
+        The following values are set in the dictionary key:
+        - module_path : str -> Path of target module.
+        - func_name : str -> Target function name.
+        - info_id : int -> Identification number of which information.
+        - info : str -> Information of check result.
+    verbose : int, default 1
+        Log settings of stdout. Specify one of the following numbers:
+        - 0 -> Do not output log.
+        - 1 -> Output the check result.
+
+    Returns
+    -------
+    printed_str : str
+        Printed string.
+    """
+    if not info_list:
+        return ''
+    if verbose != 1:
+        return ''
+    printed_str = ''
+    for info_dict in info_list:
+        if printed_str != '':
+            printed_str += '\n\n'
+        printed_str += '{module_path}::{func_name}\n{info}'.format(
+            module_path=info_dict[INFO_KEY_MODULE_PATH],
+            func_name=info_dict[INFO_KEY_FUNC_NAME],
+            info=info_dict[INFO_KEY_INFO])
+    print(printed_str)
+    return printed_str
+
+
+def _check_python_module_recursively(dir_path, info_list, verbose=1):
     """
     Check Python module docstring recursively.
 
@@ -89,6 +137,10 @@ def _check_python_module_recursively(dir_path, info_list):
         Target directory path.
     info_list : list of dicts
         List to add check results to.
+    verbose : int, default 1
+        Log settings of stdout. Specify one of the following numbers:
+        - 0 -> Do not output log.
+        - 1 -> Output the check result.
 
     Returns
     -------
@@ -108,12 +160,12 @@ def _check_python_module_recursively(dir_path, info_list):
         path = path.replace('\\', '/')
         if os.path.isdir(path):
             info_list = _check_python_module_recursively(
-                dir_path=path, info_list=info_list)
+                dir_path=path, info_list=info_list, verbose=verbose)
             continue
         if not path.endswith('.py'):
             continue
         unit_info_list = check_python_module(
-            py_module_path=path)
+            py_module_path=path, verbose=verbose)
         info_list.extend(unit_info_list)
     return info_list
 
