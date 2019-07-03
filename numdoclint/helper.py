@@ -868,3 +868,34 @@ def return_val_exists_in_func(module_str, func_name):
             continue
         return True
     return False
+
+
+def get_optional_arg_name_list(docstring):
+    """
+    Get a list of argument names specified as optional.
+
+    Parameters
+    ----------
+    docstring : str
+        Target docstring.
+
+    Returns
+    -------
+    optional_arg_name_list : list of str
+        A list of argument names specified as optional.
+    """
+    if docstring == '':
+        return []
+    if not _parameters_exists_in_docstring(docstring=docstring):
+        return []
+    splitted_param_doc_list = get_splitted_param_doc_list(
+        docstring=docstring)
+    optional_arg_name_list = []
+    for splitted_param_doc in splitted_param_doc_list:
+        first_line_str = splitted_param_doc.split('\n')[0]
+        optional_str_exists = 'optional' in first_line_str
+        if not optional_str_exists:
+            continue
+        arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
+        optional_arg_name_list.append(arg_name)
+    return optional_arg_name_list

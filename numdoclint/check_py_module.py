@@ -262,6 +262,8 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         py_module_str=module_str, func_name=func_name)
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
+    optional_arg_name_list = helper.get_optional_arg_name_list(
+        docstring=docstring)
     return_val_info_list = helper.get_docstring_return_val_info_list(
         docstring=docstring)
     return_val_exists_in_func = helper.return_val_exists_in_func(
@@ -295,7 +297,8 @@ def _get_single_func_info_list(module_path, module_str, func_name):
     unit_info_list = _check_lacked_default_value(
         module_path=module_path, func_name=func_name,
         param_info_list=param_info_list,
-        default_val_info_dict=default_val_info_dict)
+        default_val_info_dict=default_val_info_dict,
+        optional_arg_name_list=optional_arg_name_list)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_return(
@@ -528,7 +531,8 @@ def _check_lacked_return(
 
 
 def _check_lacked_default_value(
-        module_path, func_name, param_info_list, default_val_info_dict):
+        module_path, func_name, param_info_list, default_val_info_dict,
+        optional_arg_name_list):
     """
     Check that the default value of the argument is not missing.
 
@@ -548,6 +552,8 @@ def _check_lacked_default_value(
     default_val_info_dict : dict
         A dctionary that stores argument names in keys and default
         values in values.
+    optional_arg_name_list : list of str
+        A list of argument names specified as optional in docstring.
 
     Returns
     -------
@@ -567,6 +573,10 @@ def _check_lacked_default_value(
             helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL]
         has_key = param_info_arg_name in default_val_info_dict
         if not has_key:
+            continue
+
+        is_optional_arg = param_info_arg_name in optional_arg_name_list
+        if is_optional_arg:
             continue
 
         if param_info_default_val == '':

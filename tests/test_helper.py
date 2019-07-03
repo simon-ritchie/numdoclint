@@ -883,3 +883,39 @@ def test__parameters_exists_in_docstring():
     result_bool = helper._parameters_exists_in_docstring(
         docstring=docstring)
     assert not result_bool
+
+
+def test_get_optional_arg_name_list():
+    optional_arg_name_list = helper.get_optional_arg_name_list(
+        docstring='')
+    assert optional_arg_name_list == []
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    optional_arg_name_list = helper.get_optional_arg_name_list(
+        docstring=docstring)
+    assert optional_arg_name_list == []
+
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    price : int, optional
+        Sample price.
+    name : str
+        Sample name.
+    location_id : int, optional
+        Sample location id.
+    """
+    optional_arg_name_list = helper.get_optional_arg_name_list(
+        docstring=docstring)
+    assert len(optional_arg_name_list) == 2
+    assert 'price' in optional_arg_name_list
+    assert 'location_id' in optional_arg_name_list

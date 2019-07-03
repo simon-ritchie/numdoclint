@@ -260,7 +260,8 @@ def test__check_lacked_default_value():
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=param_info_list,
-        default_val_info_dict=default_val_info_dict)
+        default_val_info_dict=default_val_info_dict,
+        optional_arg_name_list=[])
     assert len(info_list) == 2
     schema_1 = Schema(
         schema={
@@ -282,6 +283,14 @@ def test__check_lacked_default_value():
         },
         required=True)
     schema_2(info_list[1])
+
+    info_list = check_py_module._check_lacked_default_value(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        param_info_list=param_info_list,
+        default_val_info_dict=default_val_info_dict,
+        optional_arg_name_list=['price'])
+    assert len(info_list) == 1
 
 
 def test__check_lacked_return():
