@@ -68,7 +68,8 @@ def check_python_module(
     return info_list
 
 
-def check_python_module_recursively(dir_path, verbose=1):
+def check_python_module_recursively(
+        dir_path, verbose=1, ignore_func_name_suffix_list=['test_']):
     """
     Check Python module docstring recursively.
 
@@ -80,6 +81,8 @@ def check_python_module_recursively(dir_path, verbose=1):
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
+    ignore_func_name_suffix_list : list of str, default ['test_']
+        A suffix list of function name conditions to ignore.
 
     Returns
     -------
@@ -92,7 +95,8 @@ def check_python_module_recursively(dir_path, verbose=1):
         - info : str -> Information of check result.
     """
     info_list = _check_python_module_recursively(
-        dir_path=dir_path, info_list=[], verbose=verbose)
+        dir_path=dir_path, info_list=[], verbose=verbose,
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     return info_list
 
 
@@ -157,7 +161,9 @@ def _print_info_list(info_list, verbose):
     return printed_str
 
 
-def _check_python_module_recursively(dir_path, info_list, verbose=1):
+def _check_python_module_recursively(
+        dir_path, info_list, verbose=1,
+        ignore_func_name_suffix_list=['test_']):
     """
     Check Python module docstring recursively.
 
@@ -171,6 +177,8 @@ def _check_python_module_recursively(dir_path, info_list, verbose=1):
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
+    ignore_func_name_suffix_list : list of str
+        A suffix list of function name conditions to ignore.
 
     Returns
     -------
@@ -190,12 +198,14 @@ def _check_python_module_recursively(dir_path, info_list, verbose=1):
         path = path.replace('\\', '/')
         if os.path.isdir(path):
             info_list = _check_python_module_recursively(
-                dir_path=path, info_list=info_list, verbose=verbose)
+                dir_path=path, info_list=info_list, verbose=verbose,
+                ignore_func_name_suffix_list=ignore_func_name_suffix_list)
             continue
         if not path.endswith('.py'):
             continue
         unit_info_list = check_python_module(
-            py_module_path=path, verbose=verbose)
+            py_module_path=path, verbose=verbose,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list)
         info_list.extend(unit_info_list)
     return info_list
 

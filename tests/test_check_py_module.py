@@ -803,11 +803,15 @@ def sample_func_1(price):
 '''
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-
     info_list = check_py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH)
     assert len(info_list) > 0
     _check_info_list_schema(info_list=info_list)
+
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH,
+        ignore_func_name_suffix_list=['sample_'])
+    assert not info_list
 
     module_str = '''
 def sample_func_1(price=100: int, name='apple': str) -> int:
@@ -842,7 +846,7 @@ def sample_func_1(price=100: int, name='apple': str) -> int:
     assert info_list == []
 
 
-def test__check_python_module_recursively():
+def test_check_python_module_recursively():
     child_dir_path = os.path.join(TMP_TEST_MODULE_DIR, 'child_dir/')
     if not os.path.exists(child_dir_path):
         os.makedirs(child_dir_path)
@@ -907,6 +911,11 @@ y = 200
     assert TMP_TEST_MODULE_PATH in module_path_list
     assert module_path_2 in module_path_list
     assert not module_path_3 in module_path_list
+
+    info_list = check_py_module.check_python_module_recursively(
+        dir_path=TMP_TEST_MODULE_DIR,
+        ignore_func_name_suffix_list=['sample_'])
+    assert not info_list
 
 
 def test__print_info_list():
