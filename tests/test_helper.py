@@ -852,3 +852,34 @@ def sample_func_3():
     result_bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_4')
     assert not result_bool
+
+
+def test__parameters_exists_in_docstring():
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+
+    Returns
+    -------
+    name : str
+        Sample name.
+    """
+    result_bool = helper._parameters_exists_in_docstring(
+        docstring=docstring)
+    assert result_bool
+
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    name : str
+        Sample name.
+    """
+    result_bool = helper._parameters_exists_in_docstring(
+        docstring=docstring)
+    assert not result_bool

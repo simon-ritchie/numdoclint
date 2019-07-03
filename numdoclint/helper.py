@@ -305,8 +305,7 @@ def get_docstring_param_info_list(docstring):
     """
     if docstring == '':
         return []
-    is_in = 'Parameters\n    ---' in docstring
-    if not is_in:
+    if not _parameters_exists_in_docstring(docstring=docstring):
         return []
     splitted_param_doc_list = get_splitted_param_doc_list(
         docstring=docstring
@@ -326,6 +325,27 @@ def get_docstring_param_info_list(docstring):
         }
         param_info_list.append(param_info_dict)
     return param_info_list
+
+
+def _parameters_exists_in_docstring(docstring):
+    """
+    Get boolean of whether Parater part exists in docstring
+    or not.
+
+    Parameters
+    ----------
+    docstring : str
+        Docstring to be checked.
+
+    Returns
+    -------
+    result_bool : bool
+        If exists, True will be set.
+    """
+    is_in = 'Parameters\n    ---' in docstring
+    if not is_in:
+        return False
+    return True
 
 
 def _get_docstring_var_description(var_doc):
@@ -366,7 +386,7 @@ def _get_docstring_default_value(var_doc):
         Description of the defautl value.
     """
     default_val = var_doc.split('\n')[0]
-    is_in = 'default' in default_val
+    is_in = ', default' in default_val
     if not is_in:
         return ''
     default_val = default_val.split('default')[1]

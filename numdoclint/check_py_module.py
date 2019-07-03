@@ -135,7 +135,7 @@ def _print_info_list(info_list, verbose):
         - func_name : str -> Target function name.
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
-    verbose : int, default 1
+    verbose : int
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
@@ -177,7 +177,7 @@ def _check_python_module_recursively(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str
+    ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
 
     Returns
