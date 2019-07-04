@@ -180,6 +180,21 @@ def sample_func_3(orange):
 def sample_func_5(price):
     sample_str = """Sample str.
     """
+    pass
+
+
+def sample_func_6(price):
+    """
+    Sample docstring.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    \'\'\'
+    sample_str = \'\'\'apple
+    orange
     '''
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
@@ -224,6 +239,16 @@ def sample_func_5(price):
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_5')
     assert docstring == ''
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_6')
+    expected_docstring = """    Sample docstring.
+
+    Parameters
+    ----------
+    price : int
+        Sample price."""
+    assert docstring == expected_docstring
 
 
 def test__set_docstring_indent_number_to_one():

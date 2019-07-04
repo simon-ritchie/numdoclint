@@ -301,7 +301,6 @@ def _get_single_func_info_list(
         docstring=docstring)
     return_val_exists_in_func = helper.return_val_exists_in_func(
         module_str=module_str, func_name=func_name)
-
     unit_info_list = _check_func_description(
         module_path=module_path, func_name=func_name,
         docstring=docstring)

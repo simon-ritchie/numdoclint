@@ -234,7 +234,7 @@ def get_func_overall_docstring(py_module_str, func_name):
             string=func_str, flags=re.DOTALL)
         docstring = match.group()
         docstring = docstring.replace('"""', '')
-    if single_quote_doc_exists:
+    elif single_quote_doc_exists:
         match = re.search(
             pattern=r"'''.*?'''",
             string=func_str, flags=re.DOTALL)
