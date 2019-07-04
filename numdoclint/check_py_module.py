@@ -7,7 +7,8 @@ from numdoclint import helper
 
 
 def check_python_module(
-        py_module_path, verbose=1, ignore_func_name_suffix_list=['test_']):
+        py_module_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        enable_default_or_optional_doc_check=False):
     """
     Check docstring of single Python module.
 
@@ -21,6 +22,13 @@ def check_python_module(
         - 1 -> Output the check result.
     ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
+    enable_default_or_optional_doc_check : bool, default False
+        If True specified, the `defalt` and `optional` string
+        in docstring will be checked.
+        i.e., if there is an argument containing a default value,
+        docstring's argument needs to describe default or optional.
+        e.g., `price : int, default is 100`, `price : int, default 100`,
+        `price : int, optional`.
 
     Notes
     -----
@@ -62,6 +70,8 @@ def check_python_module(
             module_path=py_module_path,
             module_str=module_str,
             func_name=func_name,
+            enable_default_or_optional_doc_check=\
+                enable_default_or_optional_doc_check,
         )
         info_list.extend(single_func_info_list)
     _print_info_list(info_list=info_list, verbose=verbose)
@@ -69,7 +79,8 @@ def check_python_module(
 
 
 def check_python_module_recursively(
-        dir_path, verbose=1, ignore_func_name_suffix_list=['test_']):
+        dir_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        enable_default_or_optional_doc_check=False):
     """
     Check Python module docstring recursively.
 
@@ -83,6 +94,13 @@ def check_python_module_recursively(
         - 1 -> Output the check result.
     ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
+    enable_default_or_optional_doc_check : bool, default False
+        If True specified, the `defalt` and `optional` string
+        in docstring will be checked.
+        i.e., if there is an argument containing a default value,
+        docstring's argument needs to describe default or optional.
+        e.g., `price : int, default is 100`, `price : int, default 100`,
+        `price : int, optional`.
 
     Returns
     -------
@@ -96,7 +114,9 @@ def check_python_module_recursively(
     """
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        enable_default_or_optional_doc_check=\
+            enable_default_or_optional_doc_check)
     return info_list
 
 
@@ -163,7 +183,8 @@ def _print_info_list(info_list, verbose):
 
 def _check_python_module_recursively(
         dir_path, info_list, verbose=1,
-        ignore_func_name_suffix_list=['test_']):
+        ignore_func_name_suffix_list=['test_'],
+        enable_default_or_optional_doc_check=False):
     """
     Check Python module docstring recursively.
 
@@ -179,6 +200,9 @@ def _check_python_module_recursively(
         - 1 -> Output the check result.
     ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
+    enable_default_or_optional_doc_check : bool, default False
+        If True specified, the `defalt` and `optional` string
+        in docstring will be checked.
 
     Returns
     -------
@@ -199,13 +223,17 @@ def _check_python_module_recursively(
         if os.path.isdir(path):
             info_list = _check_python_module_recursively(
                 dir_path=path, info_list=info_list, verbose=verbose,
-                ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+                ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                enable_default_or_optional_doc_check=\
+                    enable_default_or_optional_doc_check)
             continue
         if not path.endswith('.py'):
             continue
         unit_info_list = check_python_module(
             py_module_path=path, verbose=verbose,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            enable_default_or_optional_doc_check=\
+                enable_default_or_optional_doc_check)
         info_list.extend(unit_info_list)
     return info_list
 
@@ -229,7 +257,9 @@ INFO_KEY_INFO_ID = 'info_id'
 INFO_KEY_INFO = 'info'
 
 
-def _get_single_func_info_list(module_path, module_str, func_name):
+def _get_single_func_info_list(
+        module_path, module_str, func_name,
+        enable_default_or_optional_doc_check):
     """
     Get a list that stores the check result information for
     one function.
@@ -242,6 +272,9 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         String of target Python module.
     func_name : str
         Target function name.
+    enable_default_or_optional_doc_check : bool
+        If True specified, the `defalt` and `optional` string
+        in docstring will be checked.
 
     Returns
     -------
@@ -294,12 +327,13 @@ def _get_single_func_info_list(module_path, module_str, func_name):
         arg_name_list=arg_name_list, param_info_list=param_info_list)
     info_list.extend(unit_info_list)
 
-    unit_info_list = _check_lacked_default_value(
-        module_path=module_path, func_name=func_name,
-        param_info_list=param_info_list,
-        default_val_info_dict=default_val_info_dict,
-        optional_arg_name_list=optional_arg_name_list)
-    info_list.extend(unit_info_list)
+    if enable_default_or_optional_doc_check:
+        unit_info_list = _check_lacked_default_value(
+            module_path=module_path, func_name=func_name,
+            param_info_list=param_info_list,
+            default_val_info_dict=default_val_info_dict,
+            optional_arg_name_list=optional_arg_name_list)
+        info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_return(
         module_path=module_path, func_name=func_name,

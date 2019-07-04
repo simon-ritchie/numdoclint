@@ -694,7 +694,8 @@ def sample_func_13(price: int, name='apple': str) -> int:
     return 100, 200
 '''
 
-    def _exec_target_func(func_name):
+    def _exec_target_func(
+            func_name, enable_default_or_optional_doc_check=True):
         """
         Execute the function to be tested and get the return value.
 
@@ -702,11 +703,16 @@ def sample_func_13(price: int, name='apple': str) -> int:
         ----------
         func_name : str
             Target function name.
+        enable_default_or_optional_doc_check : bool, default True
+            If True specified, the `defalt` and `optional` string
+            in docstring will be checked.
         """
         info_list = check_py_module._get_single_func_info_list(
             module_path=TMP_TEST_MODULE_PATH,
             module_str=module_str,
-            func_name=func_name)
+            func_name=func_name,
+            enable_default_or_optional_doc_check=\
+                enable_default_or_optional_doc_check)
         return info_list
 
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
@@ -755,6 +761,11 @@ def sample_func_13(price: int, name='apple': str) -> int:
         expected_info_id=check_py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
         info_list=info_list)
 
+    info_list = _exec_target_func(
+        func_name='sample_func_7',
+        enable_default_or_optional_doc_check=False)
+    assert info_list == []
+
     info_list = _exec_target_func(func_name='sample_func_8')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
@@ -800,7 +811,8 @@ location_id = 10
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
     info_list = check_py_module.check_python_module(
-        py_module_path=TMP_TEST_MODULE_PATH)
+        py_module_path=TMP_TEST_MODULE_PATH,
+        enable_default_or_optional_doc_check=True)
     assert info_list == []
 
     module_str = '''
@@ -819,7 +831,8 @@ def sample_func_1(price):
 
     info_list = check_py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
-        ignore_func_name_suffix_list=['sample_'])
+        ignore_func_name_suffix_list=['sample_'],
+        enable_default_or_optional_doc_check=True)
     assert not info_list
 
     module_str = '''
@@ -851,8 +864,32 @@ def sample_func_1(price=100: int, name='apple': str) -> int:
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
     info_list = check_py_module.check_python_module(
-        py_module_path=TMP_TEST_MODULE_PATH)
+        py_module_path=TMP_TEST_MODULE_PATH,
+        enable_default_or_optional_doc_check=True)
     assert info_list == []
+
+    module_str = '''
+def sample_func(price=100):
+    """
+    Sample docstring.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    pass
+    '''
+    with open(TMP_TEST_MODULE_PATH, 'w') as f:
+        f.write(module_str)
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH,
+        enable_default_or_optional_doc_check=False)
+    assert info_list == []
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH,
+        enable_default_or_optional_doc_check=True)
+    assert info_list != []
 
 
 def test_check_python_module_recursively():
@@ -912,7 +949,8 @@ y = 200
         f.write(module_str_3)
 
     info_list = check_py_module.check_python_module_recursively(
-        dir_path=TMP_TEST_MODULE_DIR)
+        dir_path=TMP_TEST_MODULE_DIR,
+        enable_default_or_optional_doc_check=True)
     _check_info_list_schema(info_list=info_list)
     module_path_list = [
         info_dict[check_py_module.INFO_KEY_MODULE_PATH]
@@ -923,8 +961,33 @@ y = 200
 
     info_list = check_py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
-        ignore_func_name_suffix_list=['sample_'])
+        ignore_func_name_suffix_list=['sample_'],
+        enable_default_or_optional_doc_check=True)
     assert not info_list
+
+    module_str_4 = '''
+def sample_func_3(price=100):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    pass
+    '''
+    module_path_4 = os.path.join(child_dir_path, 'test_module_4.py')
+    with open(module_path_4, 'w') as f:
+        f.write(module_str_4)
+    info_list = check_py_module.check_python_module_recursively(
+        dir_path=TMP_TEST_MODULE_DIR,
+        ignore_func_name_suffix_list=['sample_'],
+        enable_default_or_optional_doc_check=False)
+    module_path_list = [
+        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        for info_dict in info_list]
+    assert not module_path_4 in module_path_list
 
 
 def test__print_info_list():
