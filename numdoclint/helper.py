@@ -3,6 +3,12 @@
 
 import re
 
+ARG_NAME_LIST_TO_IGNORE = [
+    'self',
+    '*args',
+    '**kwargs',
+]
+
 
 def read_file_str(file_path):
     """
@@ -113,6 +119,9 @@ def get_arg_name_list(py_module_str, func_name):
         arg_name = arg_name.split(':')[0]
         arg_name = arg_name.split('=')[0]
         if arg_name == '':
+            continue
+        is_in = arg_name in ARG_NAME_LIST_TO_IGNORE
+        if is_in:
             continue
         arg_name_list.append(arg_name)
     return arg_name_list

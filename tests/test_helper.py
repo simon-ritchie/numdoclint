@@ -59,6 +59,12 @@ def sample_func_4(
 
 def sample_func_5(price=100, name='apple'):
     pass
+
+
+class SampleClass:
+
+    def sample_func_6(self, price, name, *args, **kwargs):
+        pass
     """
 
     arg_name_list = helper.get_arg_name_list(
@@ -79,6 +85,10 @@ def sample_func_5(price=100, name='apple'):
 
     arg_name_list = helper.get_arg_name_list(
         py_module_str=py_module_str, func_name='sample_func_5')
+    assert arg_name_list == ['price', 'name']
+
+    arg_name_list = helper.get_arg_name_list(
+        py_module_str=py_module_str, func_name='sample_func_6')
     assert arg_name_list == ['price', 'name']
 
 
