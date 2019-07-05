@@ -205,6 +205,19 @@ def sample_func_6(price):
     \'\'\'
     sample_str = \'\'\'apple
     orange
+
+
+def sample_func_7():
+    r"""
+    Sample docstring.
+    """
+    pass
+
+
+def sample_func_8():
+    r\'\'\'
+    Sample docstring.
+    \'\'\'
     '''
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
@@ -270,6 +283,16 @@ def sample_func_6(price):
     ----------
     price : int
         Sample price."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_7')
+    expected_docstring = """    Sample docstring."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_8')
+    expected_docstring = """    Sample docstring."""
     assert docstring == expected_docstring
 
 
@@ -1099,7 +1122,6 @@ def sample_func_5(price):
         func_str=func_str,
         module_str=module_str,
         func_name='sample_func_5')
-    print('func_str', func_str)
     expected_func_str = """def sample_func_5(price):
     pass"""
     assert func_str == expected_func_str

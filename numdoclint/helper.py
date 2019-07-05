@@ -235,8 +235,12 @@ def get_func_overall_docstring(
 
     stripped_func_str = func_str.replace(' ', '')
     stripped_func_str = stripped_func_str.replace('\n', '')
-    double_quote_doc_exists = ':"""' in stripped_func_str
-    single_quote_doc_exists = ":'''" in stripped_func_str
+    double_quote_doc_exists = (
+        ':"""' in stripped_func_str
+        or ':r"""' in stripped_func_str)
+    single_quote_doc_exists = (
+        ":'''" in stripped_func_str
+        or ":r'''" in stripped_func_str)
     if not double_quote_doc_exists and not single_quote_doc_exists:
         return ''
 
