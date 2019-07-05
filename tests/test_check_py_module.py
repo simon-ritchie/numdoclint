@@ -706,6 +706,11 @@ def sample_func_13(price: int, name='apple': str) -> int:
         enable_default_or_optional_doc_check : bool, default True
             If True specified, the `defalt` and `optional` string
             in docstring will be checked.
+
+        Returns
+        -------
+        info_list : list of dicts
+            Return value after function execution.
         """
         info_list = check_py_module._get_single_func_info_list(
             module_path=TMP_TEST_MODULE_PATH,

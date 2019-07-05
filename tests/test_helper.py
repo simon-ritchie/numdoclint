@@ -247,6 +247,18 @@ def sample_func_6(price):
     assert docstring == expected_docstring
 
     docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str,
+        func_name='sample_func_4',
+        set_indent_to_1=False)
+    expected_docstring = """        sample_func_4.
+
+        Returns
+        -------
+        price : int
+            Sample price."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_5')
     assert docstring == ''
 
@@ -871,6 +883,22 @@ def sample_func_3():
     for i in range(10):
         if i == 3:
             return
+
+
+def sample_func_5():
+    """
+    Sample function that return sample func.
+    """
+    pass
+
+
+class SampleClass:
+
+    def sample_func_6():
+        """
+        Sample function that return sample func.
+        """
+        pass
     '''
     result_bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_1')
@@ -886,6 +914,14 @@ def sample_func_3():
 
     result_bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_4')
+    assert not result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_5')
+    assert not result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_6')
     assert not result_bool
 
 
@@ -954,3 +990,116 @@ def test_get_optional_arg_name_list():
     assert len(optional_arg_name_list) == 2
     assert 'price' in optional_arg_name_list
     assert 'location_id' in optional_arg_name_list
+
+
+def test__remove_docstring_from_func_str():
+    module_str = '''
+def sample_func_1(price):
+    """
+    Sample func.
+
+    Parameters
+    ----------
+    price : int
+        Sample price
+    """
+    pass
+
+
+def sample_func_2(price):
+    \'\'\'
+    Sample func.
+
+    Parameters
+    ----------
+    price : int
+        Sample price
+    \'\'\'
+    pass
+
+
+class SampleClass:
+
+    def sample_func_3(name):
+        """
+        Sample func.
+
+        Parameters
+        ----------
+        name : str
+            Sample name.
+        """
+        pass
+
+    def sample_func_4(name):
+        \'\'\'
+        Sample func.
+
+        Parameters
+        ----------
+        name : str
+            Sample name.
+        \'\'\'
+        pass
+
+def sample_func_5(price):
+    """Sample func.
+
+    Parameters
+    ----------
+    price : int
+        Sample price
+    """
+    pass
+    '''
+
+    func_str = helper.get_func_str(
+        module_str=module_str, func_name='sample_func_1')
+    func_str = helper._remove_docstring_from_func_str(
+        func_str=func_str,
+        module_str=module_str,
+        func_name='sample_func_1')
+    expected_func_str = """def sample_func_1(price):
+    pass"""
+    assert func_str == expected_func_str
+
+    func_str = helper.get_func_str(
+        module_str=module_str, func_name='sample_func_2')
+    func_str = helper._remove_docstring_from_func_str(
+        func_str=func_str,
+        module_str=module_str,
+        func_name='sample_func_2')
+    expected_func_str = """def sample_func_2(price):
+    pass"""
+    assert func_str == expected_func_str
+
+    func_str = helper.get_func_str(
+        module_str=module_str, func_name='sample_func_3')
+    func_str = helper._remove_docstring_from_func_str(
+        func_str=func_str,
+        module_str=module_str,
+        func_name='sample_func_3')
+    expected_func_str = """    def sample_func_3(name):
+        pass"""
+    assert func_str == expected_func_str
+
+    func_str = helper.get_func_str(
+        module_str=module_str, func_name='sample_func_4')
+    func_str = helper._remove_docstring_from_func_str(
+        func_str=func_str,
+        module_str=module_str,
+        func_name='sample_func_4')
+    expected_func_str = """    def sample_func_4(name):
+        pass"""
+    assert func_str == expected_func_str
+
+    func_str = helper.get_func_str(
+        module_str=module_str, func_name='sample_func_5')
+    func_str = helper._remove_docstring_from_func_str(
+        func_str=func_str,
+        module_str=module_str,
+        func_name='sample_func_5')
+    print('func_str', func_str)
+    expected_func_str = """def sample_func_5(price):
+    pass"""
+    assert func_str == expected_func_str

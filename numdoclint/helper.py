@@ -190,7 +190,8 @@ def get_line_indent_num(line_str):
     return line_indent_num
 
 
-def get_func_overall_docstring(py_module_str, func_name):
+def get_func_overall_docstring(
+        py_module_str, func_name, set_indent_to_1=True):
     """
     Get the target docstring of the target function.
 
@@ -200,6 +201,8 @@ def get_func_overall_docstring(py_module_str, func_name):
         String of target Python module.
     func_name : str
         Target function name.
+    set_indent_to_1 : bool, default True
+        Whether set indent to one.
 
     Returns
     -------
@@ -252,10 +255,11 @@ def get_func_overall_docstring(py_module_str, func_name):
     docstring = docstring.strip()
     if not docstring.startswith('    '):
         docstring = '    ' * func_indent_num + docstring
-    docstring = _set_docstring_indent_number_to_one(
-        docstring=docstring,
-        indent_num=func_indent_num,
-    )
+    if set_indent_to_1:
+        docstring = _set_docstring_indent_number_to_one(
+            docstring=docstring,
+            indent_num=func_indent_num,
+        )
     return docstring
 
 
@@ -863,6 +867,8 @@ def return_val_exists_in_func(module_str, func_name):
         statement does not return a value, False will be set.
     """
     func_str = get_func_str(module_str=module_str, func_name=func_name)
+    func_str = _remove_docstring_from_func_str(
+        func_str=func_str, module_str=module_str, func_name=func_name)
     if func_str == '':
         return False
     line_splitted_list = func_str.split('\n')
@@ -877,6 +883,51 @@ def return_val_exists_in_func(module_str, func_name):
             continue
         return True
     return False
+
+
+def _remove_docstring_from_func_str(func_str, module_str, func_name):
+    """
+    Remove the doctring from the function string.
+
+    Parameters
+    ----------
+    func_str : str
+        Target function string.
+    module_str : str
+        String of the whole target module.
+    func_name : str
+        Target function name.
+
+    Returns
+    ----------
+    func_str : str
+        Function string after processing.
+    """
+    docstring = get_func_overall_docstring(
+        py_module_str=module_str, func_name=func_name,
+        set_indent_to_1=False)
+    func_str = func_str.replace(docstring, '')
+    func_str = func_str.replace(
+        docstring.replace('    ', '', 1), '')
+    line_splitted_list = func_str.split('\n')
+    if len(line_splitted_list) >= 4:
+        double_quote_idx_1_exists = '"""' in line_splitted_list[1]
+        double_quote_idx_2_exists = '"""' in line_splitted_list[2]
+        double_quote_idx_3_exists = '"""' in line_splitted_list[3]
+        single_quote_idx_1_exists = "'''" in line_splitted_list[1]
+        single_quote_idx_2_exists = "'''" in line_splitted_list[2]
+        single_quote_idx_3_exists = "'''" in line_splitted_list[3]
+        pop_index_list = []
+        if ((double_quote_idx_1_exists and double_quote_idx_2_exists)
+                or single_quote_idx_1_exists and single_quote_idx_2_exists):
+            pop_index_list = [2, 1]
+        if ((double_quote_idx_1_exists and double_quote_idx_3_exists)
+                or single_quote_idx_1_exists and single_quote_idx_3_exists):
+            pop_index_list = [3, 2, 1]
+        for pop_index in pop_index_list:
+            line_splitted_list.pop(pop_index)
+    func_str = '\n'.join(line_splitted_list)
+    return func_str
 
 
 def get_optional_arg_name_list(docstring):
