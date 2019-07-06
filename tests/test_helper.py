@@ -869,6 +869,14 @@ class SampleClass:
         return c
 
 
+    def sample_func_3(
+            price,
+            name
+    ):
+        a = 1
+        return a
+
+
 sample_str = 'apple'
     '''
     func_str = helper.get_func_str(
@@ -902,6 +910,16 @@ sample_str = 'apple'
         b = 2
         c = a * b
         return c"""
+    assert func_str == expected_func_str
+
+    func_str = helper.get_func_str(
+        module_str=module_str, func_name='sample_func_3')
+    expected_func_str = """    def sample_func_3(
+            price,
+            name
+    ):
+        a = 1
+        return a"""
     assert func_str == expected_func_str
 
 

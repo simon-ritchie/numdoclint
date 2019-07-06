@@ -494,8 +494,9 @@ def _check_lacked_return_docstring_type(
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME]
         if type_name != '':
             continue
-        info = 'Missing docstring type information.'
-        info += 'Return value name: %s' % return_value_name
+        info = 'Missing docstring type information, or maybe missing '\
+        'return value name (colon not exists).'
+        info += '\nReturn value name: %s' % return_value_name
         info_dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
@@ -545,7 +546,8 @@ def _check_lacked_return(
         return []
 
     if return_val_exists_in_func and not return_val_info_list:
-        info = 'While the return value exists in the function, the return value document does not exist in docstring.'
+        info = 'While the return value exists in the function, '\
+            'the return value document does not exist in docstring.'
         info_dict = _make_info_dict(
             module_path=module_path, func_name=func_name,
             info_id=INFO_ID_LACKED_DOCSTRING_RETURN,
@@ -553,7 +555,8 @@ def _check_lacked_return(
         return [info_dict]
 
     if not return_val_exists_in_func and return_val_info_list:
-        info = 'While the return value document exists in docstring, the return value does not exist in the function.'
+        info = 'While the return value document exists in docstring, '\
+            'the return value does not exist in the function.'
         info_dict = _make_info_dict(
             module_path=module_path, func_name=func_name,
             info_id=INFO_ID_LACKED_RETURN_VAL,

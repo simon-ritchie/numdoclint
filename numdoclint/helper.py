@@ -845,6 +845,8 @@ def get_func_str(module_str, func_name):
         line_str = line_str.strip()
         if line_str == '':
             continue
+        if line_str.strip() == '):':
+            continue
         last_line_idx = i
         break
 
