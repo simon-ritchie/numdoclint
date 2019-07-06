@@ -218,6 +218,24 @@ def sample_func_8():
     r\'\'\'
     Sample docstring.
     \'\'\'
+
+
+class SampleClass1:
+
+    def sample_func_9(
+        price=100,
+        name='apple'
+    ):
+        """
+        Sample docstring.
+        Parameters
+        ----------
+        price : int, default 100
+            Sample price.
+        name : str, default 'apple'
+            Sample name.
+        """
+        pass
     '''
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
@@ -293,6 +311,17 @@ def sample_func_8():
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_8')
     expected_docstring = """    Sample docstring."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_9')
+    expected_docstring = """    Sample docstring.
+    Parameters
+    ----------
+    price : int, default 100
+        Sample price.
+    name : str, default 'apple'
+        Sample name."""
     assert docstring == expected_docstring
 
 

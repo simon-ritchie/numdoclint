@@ -229,7 +229,8 @@ def get_func_overall_docstring(
             func_str += line_str
             continue
         line_indent_num = get_line_indent_num(line_str=line_str)
-        if line_indent_num < indent_num and line_str != '':
+        if (line_indent_num < indent_num and line_str != ''
+                and line_str.strip() !='):'):
             break
         func_str += '\n%s' % line_str
 
