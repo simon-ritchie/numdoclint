@@ -63,7 +63,7 @@ def sample_func_5(price=100, name='apple'):
 
 class SampleClass:
 
-    def sample_func_6(self, price, name, *args, **kwargs):
+    def sample_func_6(self, cls, price, name, *args, **kwargs):
         pass
     """
 

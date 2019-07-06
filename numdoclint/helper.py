@@ -5,6 +5,7 @@ import re
 
 ARG_NAME_LIST_TO_IGNORE = [
     'self',
+    'cls',
     '*args',
     '**kwargs',
 ]
