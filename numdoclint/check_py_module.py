@@ -177,7 +177,6 @@ def _print_info_list(info_list, verbose):
             module_path=info_dict[INFO_KEY_MODULE_PATH],
             func_name=info_dict[INFO_KEY_FUNC_NAME],
             info=info_dict[INFO_KEY_INFO])
-    print(printed_str)
     return printed_str
 
 

@@ -668,6 +668,8 @@ def get_docstring_return_val_info_list(docstring):
         List containing return value information.
         Values are set in the dictionary with the following keys.
         - DOC_RETURN_INFO_KEY_NAME : str -> Return value name.
+            If the style only describes the type name, blank string
+            will be set.
         - DOC_RETURN_INFO_KEY_TYPE_NAME : str -> Type name of
             return value.
         - DOC_RETURN_INFO_KEY_DESCRIPTION : str -> Description of
@@ -701,7 +703,7 @@ def get_docstring_return_val_info_list(docstring):
                 description += '\n'
             description += line_str
             continue
-    if name != '':
+    if name != '' or type_name != '' or description != '':
         return_val_info_list = _append_return_value_info_unit_dict(
             name=name, type_name=type_name, description=description,
             return_val_info_list=return_val_info_list)
@@ -755,9 +757,14 @@ def _get_return_value_name_from_line(line_str):
     Returns
     -------
     return_value_name : str
-        Return value name.
+        Return value name. If colon character not exists in
+        line string, a blank string will be set.
     """
-    return_value_name = line_str.split(':')[0]
+    colon_exists = ':' in line_str
+    if colon_exists:
+        return_value_name = line_str.split(':')[0]
+    else:
+        return_value_name = ''
     return_value_name = return_value_name.strip()
     return return_value_name
 
@@ -778,8 +785,9 @@ def _get_return_value_type_name_from_line(line_str):
     """
     colon_exists = ':' in line_str
     if not colon_exists:
-        return ''
-    return_value_type_name = line_str.split(':')[1]
+        return_value_type_name = line_str.split(':')[0]
+    else:
+        return_value_type_name = line_str.split(':')[1]
     return_value_type_name = return_value_type_name.strip()
     return return_value_type_name
 

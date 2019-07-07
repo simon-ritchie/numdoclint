@@ -706,7 +706,7 @@ def sample_func_11():
 
     Returns
     -------
-    price
+    price :
         Sample price.
     """
     return 100
@@ -742,6 +742,23 @@ def sample_func_13(price: int, name='apple': str) -> int:
         Sample value.
     """
     return 100, 200
+
+
+def sample_func_14(price):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+
+    Returns
+    -------
+    str
+        Sample name.
+    """
+    return 'apple'
 '''
 
     def _exec_target_func(
@@ -854,6 +871,9 @@ def sample_func_13(price: int, name='apple': str) -> int:
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_13')
+    assert info_list == []
+
+    info_list = _exec_target_func(func_name='sample_func_14')
     assert info_list == []
 
 

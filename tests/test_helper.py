@@ -774,12 +774,22 @@ def test__get_return_value_name_from_line():
         line_str=line_str)
     assert return_value_name == 'price'
 
+    line_str = '    DataFrame'
+    return_value_name = helper._get_return_value_name_from_line(
+        line_str=line_str)
+    assert return_value_name == ''
+
 
 def test__get_return_value_type_name_from_line():
     line_str = '        price : int'
     return_value_type_name = helper._get_return_value_type_name_from_line(
         line_str=line_str)
     assert return_value_type_name == 'int'
+
+    line_str = '    DataFrame'
+    return_value_type_name = helper._get_return_value_type_name_from_line(
+        line_str=line_str)
+    assert return_value_type_name == 'DataFrame'
 
 
 def test_get_docstring_return_val_info_list():
