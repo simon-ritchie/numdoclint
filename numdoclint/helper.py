@@ -360,7 +360,6 @@ def get_docstring_param_info_list(docstring):
     splitted_param_doc_list = get_splitted_param_doc_list(
         docstring=docstring
     )
-    print('splitted_param_doc_list', splitted_param_doc_list)
     param_info_list = []
     for splitted_param_doc in splitted_param_doc_list:
         arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
@@ -864,6 +863,11 @@ def _get_return_value_docstring(docstring):
         is_in = 'Returns' in line_str
         if not is_in:
             continue
+        hyphens_exists_next_line = _hyphens_exists_next_line(
+            line_splitted_list=line_splitted_list,
+            next_line_idx=i + 1)
+        if not hyphens_exists_next_line:
+            continue
         start_line_idx = i + 2
         break
     if start_line_idx == 0:
@@ -888,6 +892,32 @@ def _get_return_value_docstring(docstring):
     if not docstring.startswith('    '):
         docstring = '    %s' % docstring
     return docstring
+
+
+def _hyphens_exists_next_line(line_splitted_list, next_line_idx):
+    """
+    Get the boolean value of whether there are multiple hyphen
+    characters on the next line.
+
+    Parameters
+    ----------
+    line_splitted_list : list of str
+        A list containing line-by-line strings.
+    next_line_idx : int
+        Next line index.
+
+    Returns
+    -------
+    result_bool : bool
+        If exists, True will be set.
+    """
+    if len(line_splitted_list) < next_line_idx + 1:
+        return False
+    next_line_str = line_splitted_list[next_line_idx]
+    is_in = '----' in next_line_str
+    if is_in:
+        return True
+    return False
 
 
 def get_func_str(module_str, func_name):

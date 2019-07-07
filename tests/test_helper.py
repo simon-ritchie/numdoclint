@@ -574,7 +574,6 @@ def test_get_docstring_param_info_list():
     """
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
-    print('param_info_list', param_info_list)
     assert len(param_info_list) == 2
     expected_arg_name_list = ['one', 'two']
     for i, expected_arg_name in enumerate(expected_arg_name_list):
@@ -770,6 +769,29 @@ def test__get_return_value_docstring():
 
     docstring = """
     Sample docstring.
+
+    Returns
+    -------
+    x : int
+        Sample value.
+    y : int
+        Sample value.
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring)
+    expected_return_value_docstring = """    x : int
+        Sample value.
+    y : int
+        Sample value."""
+    assert return_value_docstring == expected_return_value_docstring
+
+    docstring = """
+    Returns sample values.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
 
     Returns
     -------
@@ -1298,3 +1320,27 @@ def test__append_param_info_to_list():
         },
         required=True)
         schema(param_info_list[i])
+
+
+def test__hyphens_exists_next_line():
+    line_splitted_list = [
+        'Sample docstring',
+        '',
+        'Parameters',
+        '----------',
+    ]
+
+    result_bool = helper._hyphens_exists_next_line(
+        line_splitted_list=line_splitted_list,
+        next_line_idx=4)
+    assert not result_bool
+
+    result_bool = helper._hyphens_exists_next_line(
+        line_splitted_list=line_splitted_list,
+        next_line_idx=1)
+    assert not result_bool
+
+    result_bool = helper._hyphens_exists_next_line(
+        line_splitted_list=line_splitted_list,
+        next_line_idx=3)
+    assert result_bool
