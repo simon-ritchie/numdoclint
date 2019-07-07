@@ -77,7 +77,8 @@ def test__check_lacked_param():
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list,
-        param_info_list=param_info_list)
+        param_info_list=param_info_list,
+        kwargs_exists=False)
     assert len(info_list) == 2
     schema_1 = Schema(
         schema={
@@ -98,6 +99,15 @@ def test__check_lacked_param():
         },
         required=True)
     schema_2(info_list[1])
+
+    arg_name_list = ['name']
+    info_list = check_py_module._check_lacked_param(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        arg_name_list=arg_name_list,
+        param_info_list=param_info_list,
+        kwargs_exists=True)
+    assert info_list == []
 
 
 def test__check_lacked_docstring_param_type():
@@ -129,6 +139,8 @@ def test__check_lacked_docstring_param_type():
         },
         required=True)
     schema(info_list[0])
+
+
 
 
 def test__check_docstring_param_order():

@@ -301,6 +301,9 @@ def _get_single_func_info_list(
         docstring=docstring)
     return_val_exists_in_func = helper.return_val_exists_in_func(
         module_str=module_str, func_name=func_name)
+    kwargs_exists = helper.kwargs_exists(
+        py_module_str=module_str, func_name=func_name)
+
     unit_info_list = _check_func_description(
         module_path=module_path, func_name=func_name,
         docstring=docstring)
@@ -308,7 +311,8 @@ def _get_single_func_info_list(
 
     unit_info_list = _check_lacked_param(
         module_path=module_path, func_name=func_name,
-        arg_name_list=arg_name_list, param_info_list=param_info_list)
+        arg_name_list=arg_name_list, param_info_list=param_info_list,
+        kwargs_exists=kwargs_exists)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_docstring_param_type(
@@ -788,7 +792,8 @@ def _check_lacked_docstring_param_type(
 
 
 def _check_lacked_param(
-        module_path, func_name, arg_name_list, param_info_list):
+        module_path, func_name, arg_name_list, param_info_list,
+        kwargs_exists):
     """
     Check for missing arguments between arguments and docstring.
 
@@ -807,6 +812,8 @@ def _check_lacked_param(
         - helper.DOC_PARAM_INFO_KEY_TYPE_NAME : str
         - helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL : str
         - helper.DOC_PARAM_INFO_KEY_DESCRIPTION : str
+    kwargs_exists : bool
+        A boolean value of whether `**kwargs` exists in the arguments.
 
     Returns
     -------
@@ -821,6 +828,8 @@ def _check_lacked_param(
     info_list = []
 
     for param_info_dict in param_info_list:
+        if kwargs_exists:
+            continue
         param_arg_name = param_info_dict[
             helper.DOC_PARAM_INFO_KEY_ARG_NAME]
         is_in = param_arg_name in arg_name_list
