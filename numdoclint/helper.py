@@ -360,6 +360,7 @@ def get_docstring_param_info_list(docstring):
     splitted_param_doc_list = get_splitted_param_doc_list(
         docstring=docstring
     )
+    print('splitted_param_doc_list', splitted_param_doc_list)
     param_info_list = []
     for splitted_param_doc in splitted_param_doc_list:
         arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
@@ -367,13 +368,61 @@ def get_docstring_param_info_list(docstring):
         default_val = _get_docstring_default_value(var_doc=splitted_param_doc)
         description = _get_docstring_var_description(
             var_doc=splitted_param_doc)
-        param_info_dict = {
+        param_info_list = _append_param_info_to_list(
+            param_info_list=param_info_list,
+            arg_name=arg_name,
+            type_name=type_name,
+            default_val=default_val,
+            description=description)
+    return param_info_list
+
+
+def _append_param_info_to_list(
+        param_info_list, arg_name, type_name, default_val, description):
+    """
+    Add docstring argument information to the list.
+
+    Notes
+    -----
+    If the argument name contains a comma, it will be split
+    and add to the list.
+
+    Parameters
+    ----------
+    param_info_list : list of dicts
+        The list to add to.
+    arg_name : str
+        Target argument name.
+    type_name : str
+        Target type name.
+    default_val : str
+        Target default value.
+    description : str
+        Argument description.
+
+    Returns
+    ----------
+    param_info_list : list of dicts
+        List after dict addition.
+    """
+    comma_exists = ',' in arg_name
+    if not comma_exists:
+        param_info_list.append({
             DOC_PARAM_INFO_KEY_ARG_NAME: arg_name,
             DOC_PARAM_INFO_KEY_TYPE_NAME: type_name,
             DOC_PARAM_INFO_KEY_DEFAULT_VAL: default_val,
             DOC_PARAM_INFO_KEY_DESCRIPTION: description,
-        }
-        param_info_list.append(param_info_dict)
+        })
+        return param_info_list
+    arg_name_list = arg_name.split(',')
+    for arg_name in arg_name_list:
+        arg_name = arg_name.strip()
+        param_info_list.append({
+            DOC_PARAM_INFO_KEY_ARG_NAME: arg_name,
+            DOC_PARAM_INFO_KEY_TYPE_NAME: type_name,
+            DOC_PARAM_INFO_KEY_DEFAULT_VAL: default_val,
+            DOC_PARAM_INFO_KEY_DESCRIPTION: description,
+        })
     return param_info_list
 
 
@@ -510,13 +559,13 @@ def get_splitted_param_doc_list(docstring):
     for line_str in line_splitted_param_doc_list:
         indent_num = get_line_indent_num(line_str=line_str)
         if indent_num == 1:
-            if single_param_doc != '':
+            if single_param_doc.strip() != '':
                 splitted_param_doc_list.append(single_param_doc)
             single_param_doc = ''
         if single_param_doc != '':
             single_param_doc += '\n'
         single_param_doc += line_str
-    if single_param_doc != '':
+    if single_param_doc.strip() != '':
         splitted_param_doc_list.append(single_param_doc)
     return splitted_param_doc_list
 

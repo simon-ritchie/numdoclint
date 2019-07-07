@@ -440,6 +440,21 @@ def test_get_splitted_param_doc_list():
         Sample id."""
     assert splitted_param_doc_list[1] == expected_param_doc
 
+    docstring = """
+    Sample function.
+
+    Parameters
+    ----------
+    name : str
+        Sample name.
+    """
+    splitted_param_doc_list = helper.get_splitted_param_doc_list(
+        docstring=docstring)
+    assert len(splitted_param_doc_list) == 1
+    expected_param_doc = """    name : str
+        Sample name."""
+    assert splitted_param_doc_list[0] == expected_param_doc
+
 
 def test__get_docstring_var_name():
     var_doc = """    price : int
@@ -548,6 +563,30 @@ def test_get_docstring_param_info_list():
         },
         required=True)
     schema_2(param_info_list[1])
+
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    one, two : int
+        Sample two argument.
+    """
+    param_info_list = helper.get_docstring_param_info_list(
+        docstring=docstring)
+    print('param_info_list', param_info_list)
+    assert len(param_info_list) == 2
+    expected_arg_name_list = ['one', 'two']
+    for i, expected_arg_name in enumerate(expected_arg_name_list):
+        schema = Schema(
+            schema={
+                helper.DOC_PARAM_INFO_KEY_ARG_NAME: expected_arg_name,
+                helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+                helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+                helper.DOC_PARAM_INFO_KEY_DESCRIPTION: \
+                    '        Sample two argument.',
+            }, required=True)
+        schema(param_info_list[i])
 
 
 def test_get_func_description_from_docstring():
@@ -1221,3 +1260,41 @@ def test_args_or_kwargs_str_in_param_name():
     result_bool = helper.args_or_kwargs_str_in_param_name(
         param_arg_name='**kwargs')
     assert result_bool
+
+
+def test__append_param_info_to_list():
+    param_info_list = helper._append_param_info_to_list(
+        param_info_list=[],
+        arg_name='price',
+        type_name='int',
+        default_val='',
+        description='Sample price.')
+    assert len(param_info_list) == 1
+    schema = Schema(
+        schema={
+            helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'price',
+            helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+            helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+            helper.DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample price.'
+        },
+        required=True)
+    schema(param_info_list[0])
+
+    param_info_list = helper._append_param_info_to_list(
+        param_info_list=[],
+        arg_name='one, two',
+        type_name='int',
+        default_val='',
+        description='Sample arguments.')
+    assert len(param_info_list) == 2
+    expected_arg_name_list = ['one', 'two']
+    for i, expected_arg_name in enumerate(expected_arg_name_list):
+        schema = Schema(
+        schema={
+            helper.DOC_PARAM_INFO_KEY_ARG_NAME: expected_arg_name,
+            helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+            helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+            helper.DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample arguments.'
+        },
+        required=True)
+        schema(param_info_list[i])

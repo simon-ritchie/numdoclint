@@ -177,6 +177,7 @@ def _print_info_list(info_list, verbose):
             module_path=info_dict[INFO_KEY_MODULE_PATH],
             func_name=info_dict[INFO_KEY_FUNC_NAME],
             info=info_dict[INFO_KEY_INFO])
+    print(printed_str)
     return printed_str
 
 
@@ -391,12 +392,15 @@ def _check_lacked_return_docstring_description(
     info_list = []
     for return_val_info_dict in return_val_info_list:
         name = return_val_info_dict[helper.DOC_RETURN_INFO_KEY_NAME]
+        type_name = return_val_info_dict[
+            helper.DOC_RETURN_INFO_KEY_TYPE_NAME]
         description = return_val_info_dict[
             helper.DOC_RETURN_INFO_KEY_DESCRIPTION]
         if description != '':
             continue
         info = 'Docstring description of return value is missing.'
         info += '\nReturn value name: %s' % name
+        info += '\nReturn value type: %s' % type_name
         info_dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
