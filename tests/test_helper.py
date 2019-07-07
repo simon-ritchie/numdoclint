@@ -1344,3 +1344,55 @@ def test__hyphens_exists_next_line():
         line_splitted_list=line_splitted_list,
         next_line_idx=3)
     assert result_bool
+
+
+def test__get_func_start_line_index():
+    line_splitted_list = [
+        'price = 100',
+        'def sample_func_1():',
+        '    return 100',
+        '',
+        'def sample_func_2():',
+        '    return 200',
+    ]
+
+    func_start_line_index = helper._get_func_start_line_index(
+        line_splitted_list=line_splitted_list,
+        func_name='sample_func_1')
+    assert func_start_line_index == 1
+
+    func_start_line_index = helper._get_func_start_line_index(
+        line_splitted_list=line_splitted_list,
+        func_name='sample_func_2')
+    assert func_start_line_index == 4
+
+    func_start_line_index = helper._get_func_start_line_index(
+        line_splitted_list=line_splitted_list,
+        func_name='sample_func_3')
+    assert func_start_line_index == -1
+
+
+def test_get_decorator_names():
+    py_module_str = """
+price = 100
+
+
+def sample_func_1(price=100):
+    return 100
+
+
+@Substitution('')
+@Appender
+def sample_func_2(price=100):
+    return 200
+    """
+
+    decorator_names = helper.get_decorator_names(
+        py_module_str=py_module_str, func_name='sample_func_1')
+    assert decorator_names == []
+
+    decorator_names = helper.get_decorator_names(
+        py_module_str=py_module_str, func_name='sample_func_2')
+    assert len(decorator_names) == 2
+    assert "@Substitution('')" in decorator_names
+    assert '@Appender' in decorator_names

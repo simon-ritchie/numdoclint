@@ -759,10 +759,16 @@ def sample_func_14(price):
         Sample name.
     """
     return 'apple'
+
+
+@Appender
+def sample_func_15(price):
+    pass
 '''
 
     def _exec_target_func(
-            func_name, enable_default_or_optional_doc_check=True):
+            func_name, enable_default_or_optional_doc_check=True,
+            skip_decorator_name_list=['Appender']):
         """
         Execute the function to be tested and get the return value.
 
@@ -773,6 +779,9 @@ def sample_func_14(price):
         enable_default_or_optional_doc_check : bool, default True
             If True specified, the `defalt` and `optional` string
             in docstring will be checked.
+        skip_decorator_name_list : list of str, default ['Appender']
+            If a decorator name in this list is set to function,
+            that function will not be checked.
 
         Returns
         -------
@@ -784,7 +793,8 @@ def sample_func_14(price):
             module_str=module_str,
             func_name=func_name,
             enable_default_or_optional_doc_check=\
-                enable_default_or_optional_doc_check)
+                enable_default_or_optional_doc_check,
+            skip_decorator_name_list=skip_decorator_name_list)
         return info_list
 
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
@@ -876,6 +886,13 @@ def sample_func_14(price):
     info_list = _exec_target_func(func_name='sample_func_14')
     assert info_list == []
 
+    info_list = _exec_target_func(
+        func_name='sample_func_15', skip_decorator_name_list=[])
+    assert len(info_list) != 0
+    info_list = _exec_target_func(
+        func_name='sample_func_15')
+    assert len(info_list) == 0
+
 
 def test_check_python_module():
     module_str = """
@@ -965,6 +982,24 @@ def sample_func(price=100):
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=True)
     assert info_list != []
+
+    module_str = """
+@Appender
+def sample_func(price):
+    return 100
+    """
+    with open(TMP_TEST_MODULE_PATH, 'w') as f:
+        f.write(module_str)
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH,
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=['Appender'])
+    assert len(info_list) == 0
+    info_list = check_py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH,
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=[])
+    assert len(info_list) != 0
 
 
 def test_check_python_module_recursively():
@@ -1063,6 +1098,27 @@ def sample_func_3(price=100):
         info_dict[check_py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
     assert not module_path_4 in module_path_list
+
+    module_str_5 = '''
+@Appender
+def sample_func_4(price):
+    pass
+    '''
+    module_path_5 = os.path.join(child_dir_path, 'test_module_5.py')
+    with open(module_path_5, 'w') as f:
+        f.write(module_str_5)
+    info_list = check_py_module.check_python_module_recursively(
+        dir_path=TMP_TEST_MODULE_DIR, skip_decorator_name_list=['Appender'])
+    module_path_list = [
+        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        for info_dict in info_list]
+    assert not module_path_5 in module_path_list
+    info_list = check_py_module.check_python_module_recursively(
+        dir_path=TMP_TEST_MODULE_DIR, skip_decorator_name_list=[])
+    module_path_list = [
+        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        for info_dict in info_list]
+    assert module_path_5 in module_path_list
 
 
 def test__print_info_list():

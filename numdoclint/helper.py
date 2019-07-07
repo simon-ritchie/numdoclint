@@ -1108,3 +1108,62 @@ def args_or_kwargs_str_in_param_name(param_arg_name):
     if is_in:
         return True
     return False
+
+
+def get_decorator_names(py_module_str, func_name):
+    """
+    Get a list of decorator names set in the target function.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    decorator_names : list of str
+        A list of decorator names.
+    """
+    line_splitted_list = py_module_str.split('\n')
+    func_start_line_index = _get_func_start_line_index(
+        line_splitted_list=line_splitted_list, func_name=func_name)
+    if func_start_line_index == -1:
+        return []
+    decorator_names = []
+    current_target_line_idx = func_start_line_index - 1
+    while current_target_line_idx >= 0:
+        line_str = line_splitted_list[current_target_line_idx]
+        at_exists = '@' in line_str
+        if not at_exists:
+            break
+        decorator_names.append(line_str.strip())
+        current_target_line_idx -= 1
+    return decorator_names
+
+
+def _get_func_start_line_index(line_splitted_list, func_name):
+    """
+    Get the start line index of the target function.
+
+    Parameters
+    ----------
+    line_splitted_list : list of str
+        A list of strings separated by line.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    func_start_line_index : int
+        The start line index of the target function. If target
+        function name not found, -1 will be set.
+    """
+    search_str = 'def %s' % func_name
+    for i, line_str in enumerate(line_splitted_list):
+        is_in = search_str in line_str
+        if not is_in:
+            continue
+        return i
+    return -1

@@ -8,7 +8,8 @@ from numdoclint import helper
 
 def check_python_module(
         py_module_path, verbose=1, ignore_func_name_suffix_list=['test_'],
-        enable_default_or_optional_doc_check=False):
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=['Appender']):
     """
     Check docstring of single Python module.
 
@@ -29,6 +30,10 @@ def check_python_module(
         docstring's argument needs to describe default or optional.
         e.g., `price : int, default is 100`, `price : int, default 100`,
         `price : int, optional`.
+    skip_decorator_name_list : list, default ['Appender']
+        If a decorator name in this list is set to function, that
+        function will not be checked. Specify if necessary for
+        docstring-related decorators (`Appender` is used by Pandas).
 
     Notes
     -----
@@ -72,6 +77,7 @@ def check_python_module(
             func_name=func_name,
             enable_default_or_optional_doc_check=\
                 enable_default_or_optional_doc_check,
+            skip_decorator_name_list=skip_decorator_name_list,
         )
         info_list.extend(single_func_info_list)
     _print_info_list(info_list=info_list, verbose=verbose)
@@ -80,7 +86,8 @@ def check_python_module(
 
 def check_python_module_recursively(
         dir_path, verbose=1, ignore_func_name_suffix_list=['test_'],
-        enable_default_or_optional_doc_check=False):
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=['Appender']):
     """
     Check Python module docstring recursively.
 
@@ -101,6 +108,10 @@ def check_python_module_recursively(
         docstring's argument needs to describe default or optional.
         e.g., `price : int, default is 100`, `price : int, default 100`,
         `price : int, optional`.
+    skip_decorator_name_list : list, default ['Appender']
+        If a decorator name in this list is set to function, that
+        function will not be checked. Specify if necessary for
+        docstring-related decorators (`Appender` is used by Pandas).
 
     Returns
     -------
@@ -116,7 +127,8 @@ def check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
         ignore_func_name_suffix_list=ignore_func_name_suffix_list,
         enable_default_or_optional_doc_check=\
-            enable_default_or_optional_doc_check)
+            enable_default_or_optional_doc_check,
+        skip_decorator_name_list=skip_decorator_name_list)
     return info_list
 
 
@@ -184,7 +196,8 @@ def _print_info_list(info_list, verbose):
 def _check_python_module_recursively(
         dir_path, info_list, verbose=1,
         ignore_func_name_suffix_list=['test_'],
-        enable_default_or_optional_doc_check=False):
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=['Appender']):
     """
     Check Python module docstring recursively.
 
@@ -203,6 +216,9 @@ def _check_python_module_recursively(
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
+    skip_decorator_name_list : list, default ['Appender']
+        If a decorator name in this list is set to function, that
+        function will not be checked.
 
     Returns
     -------
@@ -225,7 +241,8 @@ def _check_python_module_recursively(
                 dir_path=path, info_list=info_list, verbose=verbose,
                 ignore_func_name_suffix_list=ignore_func_name_suffix_list,
                 enable_default_or_optional_doc_check=\
-                    enable_default_or_optional_doc_check)
+                    enable_default_or_optional_doc_check,
+                skip_decorator_name_list=skip_decorator_name_list)
             continue
         if not path.endswith('.py'):
             continue
@@ -233,7 +250,8 @@ def _check_python_module_recursively(
             py_module_path=path, verbose=verbose,
             ignore_func_name_suffix_list=ignore_func_name_suffix_list,
             enable_default_or_optional_doc_check=\
-                enable_default_or_optional_doc_check)
+                enable_default_or_optional_doc_check,
+            skip_decorator_name_list=skip_decorator_name_list)
         info_list.extend(unit_info_list)
     return info_list
 
@@ -259,7 +277,8 @@ INFO_KEY_INFO = 'info'
 
 def _get_single_func_info_list(
         module_path, module_str, func_name,
-        enable_default_or_optional_doc_check):
+        enable_default_or_optional_doc_check,
+        skip_decorator_name_list):
     """
     Get a list that stores the check result information for
     one function.
@@ -275,6 +294,9 @@ def _get_single_func_info_list(
     enable_default_or_optional_doc_check : bool
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
+    skip_decorator_name_list : list
+        If a decorator name in this list is set to function, that
+        function will not be checked.
 
     Returns
     -------
@@ -303,6 +325,13 @@ def _get_single_func_info_list(
         module_str=module_str, func_name=func_name)
     kwargs_exists = helper.kwargs_exists(
         py_module_str=module_str, func_name=func_name)
+    decorator_names = helper.get_decorator_names(
+        py_module_str=module_str, func_name=func_name)
+    joined_decorator_names = ' '.join(decorator_names)
+    for skip_decorator_name in skip_decorator_name_list:
+        is_in = skip_decorator_name in joined_decorator_names
+        if is_in:
+            return []
 
     unit_info_list = _check_func_description(
         module_path=module_path, func_name=func_name,
