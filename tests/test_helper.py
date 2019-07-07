@@ -91,6 +91,12 @@ class SampleClass:
         py_module_str=py_module_str, func_name='sample_func_6')
     assert arg_name_list == ['price', 'name']
 
+    arg_name_list = helper.get_arg_name_list(
+        py_module_str=py_module_str, func_name='sample_func_6',
+        exclude_ignoring_args=False)
+    assert arg_name_list == [
+        'self', 'cls', 'price', 'name', '*args', '**kwargs']
+
 
 def test_get_func_indent_num():
     py_module_str = """
@@ -1172,3 +1178,22 @@ def sample_func_5(price):
     expected_func_str = """def sample_func_5(price):
     pass"""
     assert func_str == expected_func_str
+
+
+def test_kwargs_exists():
+    py_module_str = """
+def sample_func_1(price, **kwargs):
+    pass
+
+
+def sample_func_2(price):
+    pass
+    """
+
+    result_bool = helper.kwargs_exists(
+        py_module_str=py_module_str, func_name='sample_func_1')
+    assert result_bool
+
+    result_bool = helper.kwargs_exists(
+        py_module_str=py_module_str, func_name='sample_func_2')
+    assert not result_bool

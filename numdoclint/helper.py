@@ -95,7 +95,8 @@ def _get_args_str(py_module_str, func_name):
     return args_str
 
 
-def get_arg_name_list(py_module_str, func_name):
+def get_arg_name_list(
+        py_module_str, func_name, exclude_ignoring_args=True):
     """
     Get a list of argument names of the target function.
 
@@ -105,6 +106,9 @@ def get_arg_name_list(py_module_str, func_name):
         String of target Python module.
     func_name : str
         Target function name.
+    exclude_ignoring_args : bool, default True
+        Whether to exclude the argument of the ignoring argument
+        name setting.
 
     Returns
     -------
@@ -121,11 +125,38 @@ def get_arg_name_list(py_module_str, func_name):
         arg_name = arg_name.split('=')[0]
         if arg_name == '':
             continue
-        is_in = arg_name in ARG_NAME_LIST_TO_IGNORE
-        if is_in:
-            continue
+        if exclude_ignoring_args:
+            is_in = arg_name in ARG_NAME_LIST_TO_IGNORE
+            if is_in:
+                continue
         arg_name_list.append(arg_name)
     return arg_name_list
+
+
+def kwargs_exists(py_module_str, func_name):
+    """
+    Get a boolean value of whether `**kwargs` exists in the arguments.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    ----------
+    result_bool : bool
+        If exists, True will be set.
+    """
+    arg_name_list = get_arg_name_list(
+        py_module_str=py_module_str,
+        func_name=func_name,
+        exclude_ignoring_args=False)
+    is_in = '**kwargs' in arg_name_list
+    if is_in:
+        return True
+    return False
 
 
 def get_func_indent_num(py_module_str, func_name):

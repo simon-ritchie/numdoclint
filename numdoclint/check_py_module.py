@@ -819,6 +819,7 @@ def _check_lacked_param(
         - info : str
     """
     info_list = []
+
     for param_info_dict in param_info_list:
         param_arg_name = param_info_dict[
             helper.DOC_PARAM_INFO_KEY_ARG_NAME]
