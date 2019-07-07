@@ -780,6 +780,10 @@ def _check_lacked_docstring_param_type(
         type_name = param_info_dict[helper.DOC_PARAM_INFO_KEY_TYPE_NAME]
         if type_name != '':
             continue
+        is_in = helper.args_or_kwargs_str_in_param_name(
+            param_arg_name=arg_name)
+        if is_in:
+            continue
         info = 'Missing docstring argument type information.'
         info += '\nTarget argument: %s' % arg_name
         info_dict = _make_info_dict(
