@@ -835,7 +835,11 @@ def _check_lacked_param(
         is_in = param_arg_name in arg_name_list
         if is_in:
             continue
-        info = 'An argument exists in docstring does not exists in the actual argument.'
+        is_in = '*args' in param_arg_name or '**kwargs' in param_arg_name
+        if is_in:
+            continue
+        info = 'An argument exists in docstring does not exists in '\
+            'the actual argument.'
         info += '\nLacked argument name: %s' % param_arg_name
         info_dict = _make_info_dict(
             module_path=module_path,

@@ -109,6 +109,30 @@ def test__check_lacked_param():
         kwargs_exists=True)
     assert info_list == []
 
+    param_info_list = [{
+        DOC_PARAM_INFO_KEY_ARG_NAME: 'name',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: 'str',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample name.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: '*args',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: '',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample arguments.',
+    }, {
+        DOC_PARAM_INFO_KEY_ARG_NAME: '**kwargs',
+        DOC_PARAM_INFO_KEY_TYPE_NAME: '',
+        DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+        DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample keyword arguments.',
+    }]
+    info_list = check_py_module._check_lacked_param(
+        module_path=expected_module_path,
+        func_name=expected_func_name,
+        arg_name_list=arg_name_list,
+        param_info_list=param_info_list,
+        kwargs_exists=False)
+    assert info_list == []
+
 
 def test__check_lacked_docstring_param_type():
     expected_module_path = 'test/path/to/module.py'
