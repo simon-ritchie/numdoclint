@@ -998,3 +998,26 @@ def get_optional_arg_name_list(docstring):
         arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
         optional_arg_name_list.append(arg_name)
     return optional_arg_name_list
+
+
+def args_or_kwargs_str_in_param_name(param_arg_name):
+    """
+    Get a boolean value of whether the string of `*args`
+    or `**kwargs` is included in the docstring argument
+    name information.
+
+    Parameters
+    ----------
+    param_arg_name : str
+        The docstring argument name information.
+
+    Returns
+    ----------
+    result_bool : bool
+        If included, True will be set.
+    """
+
+    is_in = '*args' in param_arg_name or '**kwargs' in param_arg_name
+    if is_in:
+        return True
+    return False

@@ -781,7 +781,7 @@ def _check_lacked_docstring_param_type(
         if type_name != '':
             continue
         info = 'Missing docstring argument type information.'
-        info = '\nTarget argument: %s' % arg_name
+        info += '\nTarget argument: %s' % arg_name
         info_dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
@@ -835,7 +835,8 @@ def _check_lacked_param(
         is_in = param_arg_name in arg_name_list
         if is_in:
             continue
-        is_in = '*args' in param_arg_name or '**kwargs' in param_arg_name
+        is_in = helper.args_or_kwargs_str_in_param_name(
+            param_arg_name=param_arg_name)
         if is_in:
             continue
         info = 'An argument exists in docstring does not exists in '\

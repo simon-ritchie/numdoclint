@@ -1197,3 +1197,17 @@ def sample_func_2(price):
     result_bool = helper.kwargs_exists(
         py_module_str=py_module_str, func_name='sample_func_2')
     assert not result_bool
+
+
+def test_args_or_kwargs_str_in_param_name():
+    result_bool = helper.args_or_kwargs_str_in_param_name(
+        param_arg_name='price')
+    assert not result_bool
+
+    result_bool = helper.args_or_kwargs_str_in_param_name(
+        param_arg_name='*args')
+    assert result_bool
+
+    result_bool = helper.args_or_kwargs_str_in_param_name(
+        param_arg_name='**kwargs')
+    assert result_bool
