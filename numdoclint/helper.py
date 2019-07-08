@@ -241,8 +241,8 @@ def get_func_overall_docstring(
     docstring : str
         Target docstring string.
     """
-    pattern = 'def %s' % func_name
-    match = re.search(pattern, py_module_str)
+    match = _get_func_match(
+        py_module_str=py_module_str, func_name=func_name)
     if match is None:
         return ''
     func_indent_num = get_func_indent_num(
@@ -298,6 +298,35 @@ def get_func_overall_docstring(
             indent_num=func_indent_num,
         )
     return docstring
+
+
+def _get_func_match(py_module_str, func_name):
+    """
+    Get a Match object of search result of target function.
+
+    Parameters
+    ----------
+    py_module_str : str
+        String of target Python module.
+    func_name : str
+        Target function name.
+
+    Returns
+    -------
+    match : Match or None
+        Search result. If not found, None will be set.
+    """
+    pattern = 'def %s' % func_name
+    for match in re.finditer(pattern=pattern, string=py_module_str):
+        match_start_idx = match.start()
+        match_end_idx = match.end()
+        func_str = py_module_str[match_start_idx:match_end_idx + 10]
+        func_str = func_str.replace('\n', '')
+        is_in = 'def %s(' % func_name in func_str
+        if not is_in:
+            continue
+        return match
+    return None
 
 
 def _set_docstring_indent_number_to_one(docstring, indent_num):

@@ -226,6 +226,13 @@ def sample_func_8():
     \'\'\'
 
 
+def sample():
+    """
+    Sample docstring (foward match).
+    """
+    pass
+
+
 class SampleClass1:
 
     def sample_func_9(
@@ -328,6 +335,11 @@ class SampleClass1:
         Sample price.
     name : str, default 'apple'
         Sample name."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample')
+    expected_docstring = """    Sample docstring (foward match)."""
     assert docstring == expected_docstring
 
 
@@ -1396,3 +1408,46 @@ def sample_func_2(price=100):
     assert len(decorator_names) == 2
     assert "@Substitution('')" in decorator_names
     assert '@Appender' in decorator_names
+
+
+def test__get_func_match():
+    py_module_str = """
+price = 100
+
+
+def sample_func_1():
+    pass
+
+
+def sample_func_2
+(
+    price,
+    name
+):
+    pass
+
+
+def sample_func
+(
+    price
+):
+    pass
+    """
+
+    match = helper._get_func_match(
+        py_module_str=py_module_str, func_name='sample_func_1')
+    start_idx = match.start()
+    expected_func_str = 'def sample_func_1():'
+    assert py_module_str[start_idx:start_idx + 20] == expected_func_str
+
+    match = helper._get_func_match(
+        py_module_str=py_module_str, func_name='sample_func_2')
+    start_idx = match.start()
+    expected_func_str = 'def sample_func_2\n('
+    assert py_module_str[start_idx:start_idx + 19] == expected_func_str
+
+    match = helper._get_func_match(
+        py_module_str=py_module_str, func_name='sample_func')
+    start_idx = match.start()
+    expected_func_str = 'def sample_func\n('
+    assert py_module_str[start_idx:start_idx + 17] == expected_func_str
