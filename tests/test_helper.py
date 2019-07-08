@@ -943,6 +943,23 @@ def test_get_docstring_return_val_info_list():
         }, required=True)
     schema_2(return_val_info_list[1])
 
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    name : str
+        Sample name.
+
+    .. versionadded::0.0.1
+    """
+    return_val_info_list = helper.get_docstring_return_val_info_list(
+        docstring=docstring)
+    assert len(return_val_info_list) == 1
+    return_val_name = return_val_info_list[
+        0][helper.DOC_RETURN_INFO_KEY_NAME]
+    assert return_val_name == 'name'
+
 
 def test_get_func_str():
     func_str = helper.get_func_str(
@@ -1486,3 +1503,12 @@ def sample_func
     start_idx = match.start()
     expected_func_str = 'def sample_func\n('
     assert py_module_str[start_idx:start_idx + 17] == expected_func_str
+
+
+def test__is_additional_info_str():
+    result_bool = helper._is_additional_info_str(
+        target_str='    .. versionadded::0.0.1')
+    assert result_bool
+
+    result_bool = helper._is_additional_info_str(target_str='price')
+    assert not result_bool

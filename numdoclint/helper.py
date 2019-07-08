@@ -777,7 +777,9 @@ def get_docstring_return_val_info_list(docstring):
         if line_str.replace(' ', '') == '':
             continue
         line_indent_num = get_line_indent_num(line_str=line_str)
-        if line_indent_num == 1 and name != '':
+        if (line_indent_num == 1
+                and name != ''
+                and not _is_additional_info_str(target_str=name)):
             return_val_info_list = _append_return_value_info_unit_dict(
                 name=name, type_name=type_name, description=description,
                 return_val_info_list=return_val_info_list)
@@ -793,10 +795,33 @@ def get_docstring_return_val_info_list(docstring):
             description += line_str
             continue
     if name != '' or type_name != '' or description != '':
-        return_val_info_list = _append_return_value_info_unit_dict(
-            name=name, type_name=type_name, description=description,
-            return_val_info_list=return_val_info_list)
+        if not _is_additional_info_str(target_str=name):
+            return_val_info_list = _append_return_value_info_unit_dict(
+                name=name, type_name=type_name, description=description,
+                return_val_info_list=return_val_info_list)
     return return_val_info_list
+
+
+def _is_additional_info_str(target_str):
+    """
+    Get a boolean value whether the target string is additional
+    infomation string (e.g., `.. versionadded:: 0.0.1`).
+
+    Parameters
+    ----------
+    target_str : str
+        The target string.
+
+    Returns
+    -------
+    result_bool : bool
+        If the target string is additional information, then True
+        will be set.
+    """
+    target_str = target_str.strip()
+    if target_str.startswith('.. '):
+        return True
+    return False
 
 
 def _append_return_value_info_unit_dict(
