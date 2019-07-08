@@ -80,11 +80,21 @@ def _get_args_str(py_module_str, func_name):
         String of arguments. e.g., 'location_id, price=100'
     """
     search_pattern = 'def %s' % func_name
-    search_pattern = search_pattern + r'.*\(.*\)'
+    search_pattern = search_pattern + r'.*?\(.*?\)'
     py_module_str = re.sub(pattern=r'\n', repl='', string=py_module_str)
     searched_result_list = re.findall(
         pattern=search_pattern, string=py_module_str)
-    searched_result_str = searched_result_list[0]
+    searched_result_str = ''
+    for searched_str_unit in searched_result_list:
+        searched_func_name = searched_str_unit.split('(')[0]
+        searched_func_name = searched_func_name.replace(
+            'def ', '')
+        searched_func_name = searched_func_name.strip()
+        if searched_func_name == func_name:
+            searched_result_str = searched_str_unit
+            break
+    if searched_result_str == '':
+        return searched_result_str
 
     args_str = searched_result_str.split('def ')[1]
     args_str = args_str.split('(')[1]
@@ -181,20 +191,22 @@ def get_func_indent_num(py_module_str, func_name):
     ValueError
         If the target function can not be found.
     """
-    pattern = 'def %s' % func_name
-    pattern = r'\n.*' + pattern
-    match = re.search(pattern=pattern, string=py_module_str)
+    match = _get_func_match(
+        py_module_str=py_module_str, func_name=func_name)
     if match is None:
         err_msg = 'Target function not found: %s' % func_name
         raise ValueError(err_msg)
     start_idx = match.start()
-    func_str = py_module_str[start_idx:]
-    func_str = func_str.replace('\n', '')
     space_num = 0
-    for func_char in func_str:
-        if func_char != ' ':
+    current_idx = start_idx - 1
+    while True:
+        if current_idx < 0:
+            break
+        target_char = py_module_str[current_idx]
+        if target_char != ' ':
             break
         space_num += 1
+        current_idx -= 1
     indent_num = space_num // 4 + 1
     return indent_num
 
@@ -1189,9 +1201,19 @@ def _get_func_start_line_index(line_splitted_list, func_name):
         The start line index of the target function. If target
         function name not found, -1 will be set.
     """
+    # i = 3, len = 4
     search_str = 'def %s' % func_name
     for i, line_str in enumerate(line_splitted_list):
         is_in = search_str in line_str
+        if not is_in:
+            continue
+        if i + 1 >= len(line_splitted_list):
+            continue
+        next_line_str = line_splitted_list[i + 1]
+        concatenated_str = line_str + next_line_str
+        concatenated_str = concatenated_str.replace('\n', '')
+        concatenated_str = concatenated_str.strip()
+        is_in = 'def %s(' % func_name in concatenated_str
         if not is_in:
             continue
         return i

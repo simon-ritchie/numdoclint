@@ -27,14 +27,22 @@ def sample_func_2(
     pass
 
 
+def sample_func
+(
+    price, name
+):
+    pass
+
+
 sample_str = r'def .*?\\(.*?\\)'
     """
     func_name_list = helper.get_func_name_list(
         py_module_str=py_module_str)
-    assert len(func_name_list) == 3
+    assert len(func_name_list) == 4
     assert 'sample_func_1' in func_name_list
     assert 'sample_func_2' in func_name_list
     assert 'sample_func_3' in func_name_list
+    assert 'sample_func' in func_name_list
 
 
 def test_get_arg_name_list():
@@ -108,6 +116,9 @@ def sample_func_1(apple):
         def sample_func_3(orange):
             pass
 
+    def sample_func(price):
+        pass
+
     pass
 
 
@@ -136,6 +147,10 @@ class Apple:
 
     indent_num = helper.get_func_indent_num(
         py_module_str=py_module_str, func_name='sample_func_4')
+    assert indent_num == 2
+
+    indent_num = helper.get_func_indent_num(
+        py_module_str=py_module_str, func_name='sample_func')
     assert indent_num == 2
 
 
@@ -660,6 +675,14 @@ def test__get_args_str():
 
     def sample_func_6( prince = 100, location_id = 200 ):
         print(600)
+
+
+    def sample_func
+    (
+        price,
+        name
+    ):
+        pass
     """
     args_str = helper._get_args_str(
         py_module_str=py_module_str, func_name='sample_func_1')
@@ -684,6 +707,10 @@ def test__get_args_str():
     args_str = helper._get_args_str(
         py_module_str=py_module_str, func_name='sample_func_6')
     assert args_str == 'prince = 100, location_id = 200'
+
+    args_str = helper._get_args_str(
+        py_module_str=py_module_str, func_name='sample_func')
+    assert args_str == 'price, name'
 
 
 def test_get_arg_default_val_info_dict():
@@ -1366,6 +1393,9 @@ def test__get_func_start_line_index():
         '',
         'def sample_func_2():',
         '    return 200',
+        '',
+        'def sample_func():',
+        '    pass'
     ]
 
     func_start_line_index = helper._get_func_start_line_index(
@@ -1377,6 +1407,11 @@ def test__get_func_start_line_index():
         line_splitted_list=line_splitted_list,
         func_name='sample_func_2')
     assert func_start_line_index == 4
+
+    func_start_line_index = helper._get_func_start_line_index(
+        line_splitted_list=line_splitted_list,
+        func_name='sample_func')
+    assert func_start_line_index == 7
 
     func_start_line_index = helper._get_func_start_line_index(
         line_splitted_list=line_splitted_list,
