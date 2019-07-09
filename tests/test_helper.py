@@ -867,6 +867,30 @@ def test__get_return_value_docstring():
 
     return_value_docstring = helper._get_return_value_docstring(
         docstring=docstring, drop_additional_info=True)
+    expected_return_value_docstring = """    x : int
+        Sample value."""
+    assert return_value_docstring == expected_return_value_docstring
+
+    docstring = """
+    Sample docstring.
+
+    Parameters
+    ----------
+    x : int
+        Sample value.
+
+        .. deprecated:: 0.0.1
+
+    Returns
+    -------
+    price : int
+        Sample price.
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring, drop_additional_info=True)
+    expected_return_value_docstring = """    price : int
+        Sample price."""
+    assert return_value_docstring == expected_return_value_docstring
 
 
 def test_append_return_value_info_unit_dict():

@@ -931,12 +931,6 @@ def _get_return_value_docstring(docstring, drop_additional_info=True):
     """
     if docstring == '':
         return ''
-    if drop_additional_info:
-        for additional_info_suffix in ADDITIONAL_INFO_SUFFIX_LIST:
-            is_in = additional_info_suffix in docstring
-            if not is_in:
-                continue
-            docstring = docstring.split(additional_info_suffix)[0]
     start_line_idx = 0
     last_line_idx = 0
     line_splitted_list = docstring.split('\n')
@@ -970,8 +964,18 @@ def _get_return_value_docstring(docstring, drop_additional_info=True):
     docstring = '\n'.join(
         line_splitted_list[start_line_idx:last_line_idx])
     docstring = docstring.strip()
+
+    if drop_additional_info:
+        for additional_info_suffix in ADDITIONAL_INFO_SUFFIX_LIST:
+            is_in = additional_info_suffix in docstring
+            if not is_in:
+                continue
+            docstring = docstring.split(additional_info_suffix)[0]
+            docstring = docstring.strip()
+
     if not docstring.startswith('    '):
         docstring = '    %s' % docstring
+
     return docstring
 
 
