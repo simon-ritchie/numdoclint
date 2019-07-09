@@ -1218,9 +1218,27 @@ def get_decorator_names(py_module_str, func_name):
         return []
     decorator_names = []
     current_target_line_idx = func_start_line_index - 1
+
+    in_bracket = False
     while current_target_line_idx >= 0:
         line_str = line_splitted_list[current_target_line_idx]
         at_exists = '@' in line_str
+        if in_bracket and not at_exists:
+            current_target_line_idx -= 1
+            continue
+
+        if in_bracket and at_exists:
+            decorator_names.append(line_str.strip())
+            current_target_line_idx -= 1
+            in_bracket = False
+            continue
+
+        right_bracket_exists = ')' in line_str
+        if right_bracket_exists and not at_exists:
+            in_bracket = True
+            current_target_line_idx -= 1
+            continue
+
         if not at_exists:
             break
         decorator_names.append(line_str.strip())

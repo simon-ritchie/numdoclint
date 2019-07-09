@@ -1494,6 +1494,18 @@ def sample_func_1(price=100):
 @Appender
 def sample_func_2(price=100):
     return 200
+
+
+@Appender(
+    sample_value_1=100,
+    sample_value_2=200,
+    sample_value_3=(
+        100, 200,
+    ),
+)
+@Substitution('')
+def sample_func_3(price):
+    pass
     """
 
     decorator_names = helper.get_decorator_names(
@@ -1505,6 +1517,12 @@ def sample_func_2(price=100):
     assert len(decorator_names) == 2
     assert "@Substitution('')" in decorator_names
     assert '@Appender' in decorator_names
+
+    decorator_names = helper.get_decorator_names(
+        py_module_str=py_module_str, func_name='sample_func_3')
+    assert len(decorator_names) == 2
+    assert '@Appender(' in decorator_names
+    assert "@Substitution('')" in decorator_names
 
 
 def test__get_func_match():
