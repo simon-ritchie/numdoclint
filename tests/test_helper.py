@@ -847,6 +847,27 @@ def test__get_return_value_docstring():
         Sample value."""
     assert return_value_docstring == expected_return_value_docstring
 
+    docstring = """
+    Sample docstring.
+
+    Returns
+    -------
+    x : int
+        Sample value.
+
+    .. deprecated:: 0.0.1
+    """
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring, drop_additional_info=False)
+    expected_return_value_docstring = """    x : int
+        Sample value.
+
+    .. deprecated:: 0.0.1"""
+    assert return_value_docstring == expected_return_value_docstring
+
+    return_value_docstring = helper._get_return_value_docstring(
+        docstring=docstring, drop_additional_info=True)
+
 
 def test_append_return_value_info_unit_dict():
     expected_name = 'sample_name'

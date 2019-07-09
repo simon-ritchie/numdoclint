@@ -10,6 +10,12 @@ ARG_NAME_LIST_TO_IGNORE = [
     '**kwargs',
 ]
 
+ADDITIONAL_INFO_SUFFIX_LIST = [
+    '.. versionadded',
+    '.. deprecated',
+    '.. versionchanged',
+]
+
 
 def read_file_str(file_path):
     """
@@ -819,8 +825,9 @@ def _is_additional_info_str(target_str):
         will be set.
     """
     target_str = target_str.strip()
-    if target_str.startswith('.. '):
-        return True
+    for additional_info_suffix in ADDITIONAL_INFO_SUFFIX_LIST:
+        if target_str.startswith(additional_info_suffix):
+            return True
     return False
 
 
@@ -906,7 +913,7 @@ def _get_return_value_type_name_from_line(line_str):
     return return_value_type_name
 
 
-def _get_return_value_docstring(docstring):
+def _get_return_value_docstring(docstring, drop_additional_info=True):
     """
     Get the string of docstring's return value part.
 
@@ -914,6 +921,8 @@ def _get_return_value_docstring(docstring):
     ----------
     docstring : str
         Target docstring string.
+    drop_additional_info : bool, default True
+        Whether to drop additional information (e.g., versionadded).
 
     Returns
     -------
@@ -922,6 +931,12 @@ def _get_return_value_docstring(docstring):
     """
     if docstring == '':
         return ''
+    if drop_additional_info:
+        for additional_info_suffix in ADDITIONAL_INFO_SUFFIX_LIST:
+            is_in = additional_info_suffix in docstring
+            if not is_in:
+                continue
+            docstring = docstring.split(additional_info_suffix)[0]
     start_line_idx = 0
     last_line_idx = 0
     line_splitted_list = docstring.split('\n')
