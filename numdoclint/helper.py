@@ -70,6 +70,10 @@ def get_func_name_list(py_module_str):
                 break
         if not_func_str:
             continue
+        match = _get_func_match(
+            py_module_str=py_module_str, func_name=func_name)
+        if match is None:
+            continue
         func_name_list.append(func_name)
     return func_name_list
 
@@ -343,6 +347,15 @@ def _get_func_match(py_module_str, func_name):
     for match in re.finditer(pattern=pattern, string=py_module_str):
         match_start_idx = match.start()
         match_end_idx = match.end()
+
+        is_interactive_shell_example_line_ = \
+            is_interactive_shell_example_line(
+                func_start_index=match_start_idx,
+                py_module_str=py_module_str
+            )
+        if is_interactive_shell_example_line_:
+            continue
+
         func_str = py_module_str[match_start_idx:match_end_idx + 10]
         func_str = func_str.replace('\n', '')
         is_in = 'def %s(' % func_name in func_str
@@ -350,6 +363,35 @@ def _get_func_match(py_module_str, func_name):
             continue
         return match
     return None
+
+
+def is_interactive_shell_example_line(func_start_index, py_module_str):
+    """
+    Get a boolean value of whether the target function is
+    docstring of interactive shell string (e.g., `>>> def sample():`).
+
+    Parameters
+    ----------
+    func_start_index : int
+        The index of the string at the start of the function.
+    py_module_str : str
+        String of target module.
+
+    Returns
+    -------
+    result_bool : bool
+        If the target function is a interactive shell docstring string,
+        True will be set.
+    """
+    pre_str = py_module_str[func_start_index - 20:func_start_index]
+    pre_str = pre_str.split('\n')[-1]
+    is_in = '>>> ' in pre_str
+    if is_in:
+        return True
+    is_in = '... ' in pre_str
+    if is_in:
+        return True
+    return False
 
 
 def _set_docstring_indent_number_to_one(docstring, indent_num):
@@ -1270,7 +1312,6 @@ def _get_func_start_line_index(line_splitted_list, func_name):
         The start line index of the target function. If target
         function name not found, -1 will be set.
     """
-    # i = 3, len = 4
     search_str = 'def %s' % func_name
     for i, line_str in enumerate(line_splitted_list):
         is_in = search_str in line_str

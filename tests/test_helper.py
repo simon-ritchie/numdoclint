@@ -31,6 +31,14 @@ def sample_func
 (
     price, name
 ):
+    '''
+    Sample function.
+
+    Examples
+    --------
+    >>> def sample_func_4():
+    ...     pass
+    '''
     pass
 
 
@@ -1579,3 +1587,33 @@ def test__is_additional_info_str():
 
     result_bool = helper._is_additional_info_str(target_str='price')
     assert not result_bool
+
+
+def test_is_interactive_shell_example_line():
+    py_module_str = '''
+    def sample_func_1():
+        """
+        Sample function.
+
+        Examples
+        --------
+        >>> def sample_func_2():
+        ...     pass
+        >>> sample_value = 100
+        ... def sample_func_3():
+        ...     pass
+        """
+        pass
+    '''
+
+    result_bool = helper.is_interactive_shell_example_line(
+        func_start_index=5, py_module_str=py_module_str)
+    assert not result_bool
+
+    result_bool = helper.is_interactive_shell_example_line(
+        func_start_index=110, py_module_str=py_module_str)
+
+    result_bool = helper.is_interactive_shell_example_line(
+        func_start_index=195, py_module_str=py_module_str)
+    assert result_bool
+
