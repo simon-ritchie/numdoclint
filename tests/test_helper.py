@@ -1384,6 +1384,10 @@ def test_args_or_kwargs_str_in_param_name():
         param_arg_name='**kwargs')
     assert result_bool
 
+    result_bool = helper.args_or_kwargs_str_in_param_name(
+        param_arg_name='**kwargs, a')
+    assert result_bool
+
 
 def test__append_param_info_to_list():
     param_info_list = helper._append_param_info_to_list(

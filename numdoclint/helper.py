@@ -3,11 +3,16 @@
 
 import re
 
+ARGS_OR_KWARGS_NAME_LIST = [
+    '*args',
+    '**kwds',
+    '**kwargs',
+]
+
 ARG_NAME_LIST_TO_IGNORE = [
     'self',
     'cls',
-    '*args',
-    '**kwargs',
+    *ARGS_OR_KWARGS_NAME_LIST,
 ]
 
 ADDITIONAL_INFO_SUFFIX_LIST = [
@@ -1189,9 +1194,11 @@ def args_or_kwargs_str_in_param_name(param_arg_name):
         If included, True will be set.
     """
 
-    is_in = '*args' in param_arg_name or '**kwargs' in param_arg_name
-    if is_in:
-        return True
+    param_arg_name = param_arg_name.strip()
+    for args_or_kwargs_str in ARGS_OR_KWARGS_NAME_LIST:
+        is_in = args_or_kwargs_str in param_arg_name
+        if is_in:
+            return True
     return False
 
 
