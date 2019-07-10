@@ -4,3 +4,6 @@
 /.ipynb_checkpoints/tmp-checkpoint.ipynb
 /tmp.ipynb
 /.coverage
+/build/*
+/dist/*
+/numdoclint.egg-info/*

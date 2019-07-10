@@ -55,3 +55,33 @@ Command to run the flake8:
 ```
 $ flake8 ./
 ```
+
+# PyPI
+
+The following library are used for PyPI uploading.
+
+- twine==1.13.0
+
+Build command:
+
+```
+$ python build.py
+```
+
+Upload to TestPyPI:
+
+```
+$ twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+```
+
+Install from TestPyPI:
+
+```
+$ pip install --index-url https://testpypi.python.org/simple/ numdoclint
+```
+
+Upload to PyPI:
+
+```
+$ twine upload dist/*
+```
