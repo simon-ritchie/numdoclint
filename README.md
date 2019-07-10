@@ -13,6 +13,7 @@ Numdoc Lint provides features such as NumPy style docstring checking.
 The following library modules are used for testing and lint.
 
 - pytest==4.3.1
+- pytest-cov==2.7.1
 - voluptuous==0.11.5
 - flake8==3.7.8
 - autoflake==1.3
@@ -28,7 +29,7 @@ $ python ./run_all_tests_and_lint.py
 Command to run the entire test:
 
 ```
-$ pytest -s -vv
+$ pytest --cov=numdoclint tests/
 ```
 
 Command to run the autoflake:
