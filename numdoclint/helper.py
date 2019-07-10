@@ -2,6 +2,7 @@
 """
 
 import re
+from io import open
 
 ARGS_OR_KWARGS_NAME_LIST = [
     '*args',
@@ -12,8 +13,8 @@ ARGS_OR_KWARGS_NAME_LIST = [
 ARG_NAME_LIST_TO_IGNORE = [
     'self',
     'cls',
-    *ARGS_OR_KWARGS_NAME_LIST,
 ]
+ARG_NAME_LIST_TO_IGNORE.extend(ARGS_OR_KWARGS_NAME_LIST)
 
 ADDITIONAL_INFO_SUFFIX_LIST = [
     '.. versionadded',

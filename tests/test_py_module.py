@@ -2,9 +2,10 @@ import os
 import shutil
 
 import pytest
-from voluptuous import Schema
+import six
+from voluptuous import Any, Schema
 
-from numdoclint import check_py_module
+from numdoclint import py_module
 from numdoclint.helper import (DOC_PARAM_INFO_KEY_ARG_NAME,
                                DOC_PARAM_INFO_KEY_DEFAULT_VAL,
                                DOC_PARAM_INFO_KEY_DESCRIPTION,
@@ -35,26 +36,26 @@ def teardown():
 
 
 def test__check_module_exists():
-    check_py_module._check_module_exists(
-        py_module_path='./tests/test_check_py_module.py')
-    with pytest.raises(FileNotFoundError):
-        check_py_module._check_module_exists(
+    py_module._check_module_exists(
+        py_module_path='./tests/test_py_module.py')
+    with pytest.raises(IOError):
+        py_module._check_module_exists(
             py_module_path='test_not_exists_file.py')
 
 
 def test__make_info_dict():
-    info_dict = check_py_module._make_info_dict(
+    info_dict = py_module._make_info_dict(
         module_path='sample/path/to/module.py',
         func_name='sample_func',
         info_id=3,
         info='Sample information.')
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH:
+            py_module.INFO_KEY_MODULE_PATH:
             'sample/path/to/module.py',
-            check_py_module.INFO_KEY_FUNC_NAME: 'sample_func',
-            check_py_module.INFO_KEY_INFO_ID: 3,
-            check_py_module.INFO_KEY_INFO: 'Sample information.',
+            py_module.INFO_KEY_FUNC_NAME: 'sample_func',
+            py_module.INFO_KEY_INFO_ID: 3,
+            py_module.INFO_KEY_INFO: 'Sample information.',
         },
         required=True)
     schema(info_dict)
@@ -75,7 +76,7 @@ def test__check_lacked_param():
         DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
         DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample price.',
     }]
-    info_list = check_py_module._check_lacked_param(
+    info_list = py_module._check_lacked_param(
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list,
@@ -84,26 +85,26 @@ def test__check_lacked_param():
     assert len(info_list) == 2
     schema_1 = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_ARGUMENT,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_ARGUMENT,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         }, required=True)
     schema_1(info_list[0])
     schema_2 = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema_2(info_list[1])
 
     arg_name_list = ['name']
-    info_list = check_py_module._check_lacked_param(
+    info_list = py_module._check_lacked_param(
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list,
@@ -127,7 +128,7 @@ def test__check_lacked_param():
         DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
         DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample keyword arguments.',
     }]
-    info_list = check_py_module._check_lacked_param(
+    info_list = py_module._check_lacked_param(
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list,
@@ -150,18 +151,18 @@ def test__check_lacked_docstring_param_type():
         DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
         DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample name.',
     }]
-    info_list = check_py_module._check_lacked_docstring_param_type(
+    info_list = py_module._check_lacked_docstring_param_type(
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=param_info_list)
     assert len(info_list) == 1
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema(info_list[0])
@@ -177,7 +178,7 @@ def test__check_lacked_docstring_param_type():
         DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
         DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample arguments',
     }]
-    param_info_list = check_py_module._check_lacked_docstring_param_type(
+    param_info_list = py_module._check_lacked_docstring_param_type(
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=param_info_list)
@@ -199,14 +200,14 @@ def test__check_docstring_param_order():
         DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample name.',
     }]
 
-    info_list = check_py_module._check_docstring_param_order(
+    info_list = py_module._check_docstring_param_order(
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list[:1],
         param_info_list=param_info_list)
     assert info_list == []
 
-    info_list = check_py_module._check_docstring_param_order(
+    info_list = py_module._check_docstring_param_order(
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list,
@@ -214,7 +215,7 @@ def test__check_docstring_param_order():
     assert info_list == []
 
     arg_name_list = list(reversed(arg_name_list))
-    info_list = check_py_module._check_docstring_param_order(
+    info_list = py_module._check_docstring_param_order(
         module_path=expected_module_path,
         func_name=expected_func_name,
         arg_name_list=arg_name_list,
@@ -222,11 +223,11 @@ def test__check_docstring_param_order():
     assert len(info_list) == 1
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema(info_list[0])
@@ -243,13 +244,13 @@ def test__check_func_description():
     price : int
         Sample price.
     """
-    info_list = check_py_module._check_func_description(
+    info_list = py_module._check_func_description(
         module_path=expected_module_path,
         func_name='test_func',
         docstring=docstring)
     assert info_list == []
 
-    info_list = check_py_module._check_func_description(
+    info_list = py_module._check_func_description(
         module_path=expected_module_path,
         func_name=expected_func_name,
         docstring=docstring)
@@ -261,18 +262,18 @@ def test__check_func_description():
     price : int
         Sample price.
     """
-    info_list = check_py_module._check_func_description(
+    info_list = py_module._check_func_description(
         module_path=expected_module_path,
         func_name=expected_func_name,
         docstring=docstring)
     assert len(info_list) == 1
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema(info_list[0])
@@ -308,7 +309,7 @@ def test__check_lacked_default_value():
         'location_id': '',
         'tax': '5',
     }
-    info_list = check_py_module._check_lacked_default_value(
+    info_list = py_module._check_lacked_default_value(
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=param_info_list,
@@ -317,26 +318,26 @@ def test__check_lacked_default_value():
     assert len(info_list) == 2
     schema_1 = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema_1(info_list[0])
     schema_2 = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema_2(info_list[1])
 
-    info_list = check_py_module._check_lacked_default_value(
+    info_list = py_module._check_lacked_default_value(
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=param_info_list,
@@ -348,7 +349,7 @@ def test__check_lacked_default_value():
 def test__check_lacked_return():
     expected_module_path = 'sample/module/path.py'
     expected_func_name = 'sample_func'
-    info_list = check_py_module._check_lacked_return(
+    info_list = py_module._check_lacked_return(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=[],
@@ -364,14 +365,14 @@ def test__check_lacked_return():
         DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
         DOC_RETURN_INFO_KEY_DESCRIPTION: 'Sample name.',
     }]
-    info_list = check_py_module._check_lacked_return(
+    info_list = py_module._check_lacked_return(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=return_val_info_list,
         return_val_exists_in_func=True)
     assert info_list == []
 
-    info_list = check_py_module._check_lacked_return(
+    info_list = py_module._check_lacked_return(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=[],
@@ -379,16 +380,16 @@ def test__check_lacked_return():
     assert len(info_list) == 1
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema(info_list[0])
 
-    info_list = check_py_module._check_lacked_return(
+    info_list = py_module._check_lacked_return(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=return_val_info_list,
@@ -396,11 +397,11 @@ def test__check_lacked_return():
     assert len(info_list) == 1
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_RETURN_VAL,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_RETURN_VAL,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema(info_list[0])
@@ -410,7 +411,7 @@ def test__check_lacked_return_docstring_type():
     expected_module_path = 'sample/module/path.py'
     expected_func_name = 'sample_func'
 
-    info_list = check_py_module._check_lacked_return_docstring_type(
+    info_list = py_module._check_lacked_return_docstring_type(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=[])
@@ -429,31 +430,31 @@ def test__check_lacked_return_docstring_type():
         DOC_RETURN_INFO_KEY_TYPE_NAME: 'int',
         DOC_RETURN_INFO_KEY_DESCRIPTION: 'Sample location id.',
     }]
-    info_list = check_py_module._check_lacked_return_docstring_type(
+    info_list = py_module._check_lacked_return_docstring_type(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=return_val_info_list)
     assert len(info_list) == 2
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     for info_dict in info_list:
         schema(info_dict)
-    assert 'price' in info_list[0][check_py_module.INFO_KEY_INFO]
-    assert 'name' in info_list[1][check_py_module.INFO_KEY_INFO]
+    assert 'price' in info_list[0][py_module.INFO_KEY_INFO]
+    assert 'name' in info_list[1][py_module.INFO_KEY_INFO]
 
 
 def test__check_lacked_docstring_param_description():
     expected_module_path = 'sample/module/path.py'
     expected_func_name = 'sample_func'
 
-    info_list = check_py_module._check_lacked_docstring_param_description(
+    info_list = py_module._check_lacked_docstring_param_description(
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=[])
@@ -475,31 +476,31 @@ def test__check_lacked_docstring_param_description():
         DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
         DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample location id.',
     }]
-    info_list = check_py_module._check_lacked_docstring_param_description(
+    info_list = py_module._check_lacked_docstring_param_description(
         module_path=expected_module_path,
         func_name=expected_func_name,
         param_info_list=param_info_list)
     assert len(info_list) == 2
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     for info_dict in info_list:
         schema(info_dict)
-    assert 'price' in info_list[0][check_py_module.INFO_KEY_INFO]
-    assert 'name' in info_list[1][check_py_module.INFO_KEY_INFO]
+    assert 'price' in info_list[0][py_module.INFO_KEY_INFO]
+    assert 'name' in info_list[1][py_module.INFO_KEY_INFO]
 
 
 def test__check_lacked_return_docstring_description():
     expected_module_path = 'sample/module/path.py'
     expected_func_name = 'sample_func'
 
-    info_list = check_py_module._check_lacked_return_docstring_description(
+    info_list = py_module._check_lacked_return_docstring_description(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=[])
@@ -518,24 +519,24 @@ def test__check_lacked_return_docstring_description():
         DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
         DOC_RETURN_INFO_KEY_DESCRIPTION: 'Sample location id.',
     }]
-    info_list = check_py_module._check_lacked_return_docstring_description(
+    info_list = py_module._check_lacked_return_docstring_description(
         module_path=expected_module_path,
         func_name=expected_func_name,
         return_val_info_list=return_val_info_list)
     assert len(info_list) == 2
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
-            check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID:
-            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: expected_module_path,
+            py_module.INFO_KEY_FUNC_NAME: expected_func_name,
+            py_module.INFO_KEY_INFO_ID:
+            py_module.INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     schema(info_list[0])
     schema(info_list[1])
-    assert 'price' in info_list[0][check_py_module.INFO_KEY_INFO]
-    assert 'name' in info_list[1][check_py_module.INFO_KEY_INFO]
+    assert 'price' in info_list[0][py_module.INFO_KEY_INFO]
+    assert 'name' in info_list[1][py_module.INFO_KEY_INFO]
 
 
 def _check_info_list_schema(info_list):
@@ -554,10 +555,10 @@ def _check_info_list_schema(info_list):
     """
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: str,
-            check_py_module.INFO_KEY_FUNC_NAME: str,
-            check_py_module.INFO_KEY_INFO_ID: int,
-            check_py_module.INFO_KEY_INFO: str,
+            py_module.INFO_KEY_MODULE_PATH: Any(*six.string_types),
+            py_module.INFO_KEY_FUNC_NAME: Any(*six.string_types),
+            py_module.INFO_KEY_INFO_ID: int,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
     for info_dict in info_list:
@@ -580,7 +581,7 @@ def _check_info_id_is_in_list(expected_info_id, info_list):
     AssertionError
         If the target id is not included in the list.
     """
-    id_list = [info_dict[check_py_module.INFO_KEY_INFO_ID]
+    id_list = [info_dict[py_module.INFO_KEY_INFO_ID]
                for info_dict in info_list]
     is_in = expected_info_id in id_list
     assert is_in
@@ -791,7 +792,7 @@ def sample_func_15(price):
             Return value after function execution.
         """
         enable_def_or_opt_check = enable_default_or_optional_doc_check
-        info_list = check_py_module._get_single_func_info_list(
+        info_list = py_module._get_single_func_info_list(
             module_path=TMP_TEST_MODULE_PATH,
             module_str=module_str,
             func_name=func_name,
@@ -805,44 +806,44 @@ def sample_func_15(price):
     info_list = _exec_target_func(func_name='sample_func_1')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
+        expected_info_id=py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_2')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_ARGUMENT,
+        expected_info_id=py_module.INFO_ID_LACKED_ARGUMENT,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_3')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
+        expected_info_id=py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_4')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
+        expected_info_id=py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_5')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.
+        expected_info_id=py_module.
         INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_6')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
+        expected_info_id=py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_7')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
+        expected_info_id=py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
         info_list=info_list)
 
     info_list = _exec_target_func(
@@ -853,31 +854,31 @@ def sample_func_15(price):
     info_list = _exec_target_func(func_name='sample_func_8')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
+        expected_info_id=py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_9')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_RETURN_VAL,
+        expected_info_id=py_module.INFO_ID_LACKED_RETURN_VAL,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_10')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+        expected_info_id=py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_11')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
+        expected_info_id=py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_12')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.
+        expected_info_id=py_module.
         INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
         info_list=info_list)
 
@@ -903,7 +904,7 @@ location_id = 10
 """
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -917,12 +918,12 @@ def sample_func_1(price):
 '''
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH)
     assert len(info_list) > 0
     _check_info_list_schema(info_list=info_list)
 
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         ignore_func_name_suffix_list=['sample_'],
         enable_default_or_optional_doc_check=True)
@@ -956,7 +957,7 @@ def sample_func_1(price=100: int, name='apple': str) -> int:
     '''
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -975,11 +976,11 @@ def sample_func(price=100):
     '''
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=False)
     assert info_list == []
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=True)
     assert info_list != []
@@ -991,12 +992,12 @@ def sample_func(price):
     """
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender'])
     assert len(info_list) == 0
-    info_list = check_py_module.check_python_module(
+    info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=[])
@@ -1059,18 +1060,18 @@ y = 200
     with open(module_path_3, 'w') as f:
         f.write(module_str_3)
 
-    info_list = check_py_module.check_python_module_recursively(
+    info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
         enable_default_or_optional_doc_check=True)
     _check_info_list_schema(info_list=info_list)
     module_path_list = [
-        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        info_dict[py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
     assert TMP_TEST_MODULE_PATH in module_path_list
     assert module_path_2 in module_path_list
     assert module_path_3 not in module_path_list
 
-    info_list = check_py_module.check_python_module_recursively(
+    info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
         ignore_func_name_suffix_list=['sample_'],
         enable_default_or_optional_doc_check=True)
@@ -1091,12 +1092,12 @@ def sample_func_3(price=100):
     module_path_4 = os.path.join(child_dir_path, 'test_module_4.py')
     with open(module_path_4, 'w') as f:
         f.write(module_str_4)
-    info_list = check_py_module.check_python_module_recursively(
+    info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
         ignore_func_name_suffix_list=['sample_'],
         enable_default_or_optional_doc_check=False)
     module_path_list = [
-        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        info_dict[py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
     assert module_path_4 not in module_path_list
 
@@ -1108,44 +1109,44 @@ def sample_func_4(price):
     module_path_5 = os.path.join(child_dir_path, 'test_module_5.py')
     with open(module_path_5, 'w') as f:
         f.write(module_str_5)
-    info_list = check_py_module.check_python_module_recursively(
+    info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR, skip_decorator_name_list=['Appender'])
     module_path_list = [
-        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        info_dict[py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
     assert module_path_5 not in module_path_list
-    info_list = check_py_module.check_python_module_recursively(
+    info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR, skip_decorator_name_list=[])
     module_path_list = [
-        info_dict[check_py_module.INFO_KEY_MODULE_PATH]
+        info_dict[py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
     assert module_path_5 in module_path_list
 
 
 def test__print_info_list():
     info_list = [{
-        check_py_module.INFO_KEY_MODULE_PATH: 'sample/module/path_1.py',
-        check_py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
-        check_py_module.INFO_KEY_INFO_ID: 1,
-        check_py_module.INFO_KEY_INFO: 'Sample information 1.',
+        py_module.INFO_KEY_MODULE_PATH: 'sample/module/path_1.py',
+        py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
+        py_module.INFO_KEY_INFO_ID: 1,
+        py_module.INFO_KEY_INFO: 'Sample information 1.',
     }, {
-        check_py_module.INFO_KEY_MODULE_PATH: 'sample/module/path_2.py',
-        check_py_module.INFO_KEY_FUNC_NAME: 'sample_func_2',
-        check_py_module.INFO_KEY_INFO_ID: 2,
-        check_py_module.INFO_KEY_INFO: 'Sample information 2.',
+        py_module.INFO_KEY_MODULE_PATH: 'sample/module/path_2.py',
+        py_module.INFO_KEY_FUNC_NAME: 'sample_func_2',
+        py_module.INFO_KEY_INFO_ID: 2,
+        py_module.INFO_KEY_INFO: 'Sample information 2.',
     }]
-    printed_str = check_py_module._print_info_list(
+    printed_str = py_module._print_info_list(
         info_list=info_list,
         verbose=0)
     assert printed_str == ''
 
-    printed_str = check_py_module._print_info_list(
+    printed_str = py_module._print_info_list(
         info_list=info_list, verbose=1)
     assert printed_str != ''
     for info_dict in info_list:
-        module_path = info_dict[check_py_module.INFO_KEY_MODULE_PATH]
-        func_name = info_dict[check_py_module.INFO_KEY_FUNC_NAME]
-        info = info_dict[check_py_module.INFO_KEY_INFO]
+        module_path = info_dict[py_module.INFO_KEY_MODULE_PATH]
+        func_name = info_dict[py_module.INFO_KEY_FUNC_NAME]
+        info = info_dict[py_module.INFO_KEY_INFO]
         assert module_path in printed_str
         assert func_name in printed_str
         assert info in printed_str
@@ -1153,17 +1154,17 @@ def test__print_info_list():
 
 def test__is_func_name_to_ignore():
     ignore_func_name_suffix_list = ['test_', 'sample_']
-    result_bool = check_py_module._is_func_name_to_ignore(
+    result_bool = py_module._is_func_name_to_ignore(
         func_name='test_get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert result_bool
 
-    result_bool = check_py_module._is_func_name_to_ignore(
+    result_bool = py_module._is_func_name_to_ignore(
         func_name='sample_get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert result_bool
 
-    result_bool = check_py_module._is_func_name_to_ignore(
+    result_bool = py_module._is_func_name_to_ignore(
         func_name='get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert not result_bool

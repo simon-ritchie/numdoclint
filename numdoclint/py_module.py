@@ -1,6 +1,8 @@
 """A module that checks docstrings in Python files.
 """
 
+from __future__ import print_function
+
 import os
 
 from numdoclint import helper
@@ -954,11 +956,11 @@ def _check_module_exists(py_module_path):
 
     Raises
     ------
-    FileNotFoundError
+    IOError
         If the target module can not be found.
     """
     if os.path.exists(py_module_path):
         return
     err_msg = 'The target module could not be found.'
     err_msg += '\npy_module_path: %s' % py_module_path
-    raise FileNotFoundError(err_msg)
+    raise IOError(err_msg)

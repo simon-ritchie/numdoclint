@@ -1,4 +1,5 @@
 import pytest
+import six
 from voluptuous import Schema
 
 from numdoclint import helper
@@ -6,7 +7,7 @@ from numdoclint import helper
 
 def test_read_file_str():
     file_str = helper.read_file_str('./tests/test_helper.py')
-    assert isinstance(file_str, str)
+    assert isinstance(file_str, six.string_types)
     assert file_str != ''
     assert 'def' in file_str
 

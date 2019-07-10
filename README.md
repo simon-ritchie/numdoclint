@@ -38,6 +38,17 @@ For more details, please see [A Guide to NumPy/SciPy Documentation](https://docs
 - Check arguments order.
 - Check return value and docstring `Returns` section mismatching.
 
+# Dependencies
+
+## Python version
+
+- Python 3.6 or later (tested on Python 3.6).
+- Python 2.7 (tested on Python 2.7.16).
+
+## Libraries
+
+- six -> For the sake of both Python2.7.x and Python 3.x compatibility.
+
 # Installing
 
 ```

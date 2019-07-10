@@ -10,7 +10,7 @@ long_description = \
 
 setup(
     name='numdoclint',
-    version='0.0.2',
+    version='0.0.3',
     url='https://github.com/simon-ritchie/numdoclint',
     author='simon-ritchie',
     author_email='',
@@ -19,11 +19,12 @@ setup(
     description=description,
     long_description=long_description,
     packages=find_packages(),
-    install_requires=[],
+    install_requires=['six'],
     include_package_data=True,
     license='MIT',
     classifiers=[
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2.7',
         'License :: OSI Approved :: MIT License',
     ],
 ),
