@@ -4,6 +4,8 @@
 import logging
 import os
 
+import numdoclint
+
 log_format = '-----------------------------------------\n'\
              '%(levelname)s : %(asctime)s : %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_format)
@@ -26,6 +28,12 @@ def main():
 
     logging.info('[Lint] flake8 started.')
     os.system('flake8 ./')
+
+    logging.info('[Lint] numdoclint started.')
+    numdoclint.check_python_module_recursively(
+        dir_path='./',
+        enable_default_or_optional_doc_check=True,
+        ignore_func_name_suffix_list=['test_', 'sample_', '__init__'])
 
     logging.info('[Testing] pytest started.')
     os.system('pytest --cov=numdoclint tests/')
