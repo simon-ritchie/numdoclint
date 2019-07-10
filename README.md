@@ -2,6 +2,34 @@
 
 Numdoc Lint provides features such as NumPy style docstring checking in Python code.
 
+# What is NumPy-style docstring?
+
+Descriptions of Python functions, modules, or classes written in the following format.
+
+```py
+def sample_func(sample_arg_1, sample_arg_2=100, sample_arg_3='Apple'):
+    """
+    Sample function description.
+
+    Parameters
+    ----------
+    sample_arg_1 : int
+        First sample argument description.
+    sample_arg_2 : int, default 100
+        Second sample argument description.
+    sample_arg_3 : str, default 'Apple'
+        Third sample argument description.
+
+    Returns
+    ----------
+    sample_return_value : int
+        Sample return value.
+    """
+    return 100
+```
+
+For more details, please see [A Guide to NumPy/SciPy Documentation](https://docs.scipy.org/doc/numpy/docs/howto_document.html).
+
 # Main features
 
 - Check lacked docstring description.
