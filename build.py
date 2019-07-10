@@ -13,4 +13,5 @@ if __name__ == '__main__':
     if os.path.exists('./numdoclint.egg-info'):
         shutil.rmtree('./numdoclint.egg-info', ignore_errors=True)
 
+    os.system('python setup.py sdist')
     os.system('python setup.py bdist_wheel')
