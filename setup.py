@@ -1,5 +1,4 @@
-import os
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 description = 'Numdoc Lint provides features such as '\
               'NumPy style docstring code checking.'
