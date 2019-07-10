@@ -1,15 +1,17 @@
-import shutil
 import os
+import shutil
 
 import pytest
 from voluptuous import Schema
 
 from numdoclint import check_py_module
-from numdoclint.helper import (
-    DOC_PARAM_INFO_KEY_ARG_NAME, DOC_PARAM_INFO_KEY_TYPE_NAME,
-    DOC_PARAM_INFO_KEY_DEFAULT_VAL, DOC_PARAM_INFO_KEY_DESCRIPTION,
-    DOC_RETURN_INFO_KEY_NAME, DOC_RETURN_INFO_KEY_TYPE_NAME,
-    DOC_RETURN_INFO_KEY_DESCRIPTION)
+from numdoclint.helper import (DOC_PARAM_INFO_KEY_ARG_NAME,
+                               DOC_PARAM_INFO_KEY_DEFAULT_VAL,
+                               DOC_PARAM_INFO_KEY_DESCRIPTION,
+                               DOC_PARAM_INFO_KEY_TYPE_NAME,
+                               DOC_RETURN_INFO_KEY_DESCRIPTION,
+                               DOC_RETURN_INFO_KEY_NAME,
+                               DOC_RETURN_INFO_KEY_TYPE_NAME)
 
 TMP_TEST_MODULE_DIR = './tests/tmp/'
 TMP_TEST_MODULE_PATH = os.path.join(
@@ -48,8 +50,8 @@ def test__make_info_dict():
         info='Sample information.')
     schema = Schema(
         schema={
-            check_py_module.INFO_KEY_MODULE_PATH: \
-                'sample/path/to/module.py',
+            check_py_module.INFO_KEY_MODULE_PATH:
+            'sample/path/to/module.py',
             check_py_module.INFO_KEY_FUNC_NAME: 'sample_func',
             check_py_module.INFO_KEY_INFO_ID: 3,
             check_py_module.INFO_KEY_INFO: 'Sample information.',
@@ -84,8 +86,8 @@ def test__check_lacked_param():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_ARGUMENT,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_ARGUMENT,
             check_py_module.INFO_KEY_INFO: str,
         }, required=True)
     schema_1(info_list[0])
@@ -93,8 +95,8 @@ def test__check_lacked_param():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -157,8 +159,8 @@ def test__check_lacked_docstring_param_type():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -222,8 +224,8 @@ def test__check_docstring_param_order():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -268,8 +270,8 @@ def test__check_func_description():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -317,8 +319,8 @@ def test__check_lacked_default_value():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -327,8 +329,8 @@ def test__check_lacked_default_value():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_ARG_DEFAULT_VALUE,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -379,8 +381,8 @@ def test__check_lacked_return():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -396,8 +398,8 @@ def test__check_lacked_return():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_RETURN_VAL,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_RETURN_VAL,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -436,8 +438,8 @@ def test__check_lacked_return_docstring_type():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -482,8 +484,8 @@ def test__check_lacked_docstring_param_description():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -525,8 +527,8 @@ def test__check_lacked_return_docstring_description():
         schema={
             check_py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             check_py_module.INFO_KEY_FUNC_NAME: expected_func_name,
-            check_py_module.INFO_KEY_INFO_ID: \
-                check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
+            check_py_module.INFO_KEY_INFO_ID:
+            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
             check_py_module.INFO_KEY_INFO: str,
         },
         required=True)
@@ -788,12 +790,12 @@ def sample_func_15(price):
         info_list : list of dicts
             Return value after function execution.
         """
+        enable_def_or_opt_check = enable_default_or_optional_doc_check
         info_list = check_py_module._get_single_func_info_list(
             module_path=TMP_TEST_MODULE_PATH,
             module_str=module_str,
             func_name=func_name,
-            enable_default_or_optional_doc_check=\
-                enable_default_or_optional_doc_check,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list)
         return info_list
 
@@ -827,8 +829,8 @@ def sample_func_15(price):
     info_list = _exec_target_func(func_name='sample_func_5')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.\
-            INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
+        expected_info_id=check_py_module.
+        INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_6')
@@ -869,15 +871,14 @@ def sample_func_15(price):
     info_list = _exec_target_func(func_name='sample_func_11')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=\
-            check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
+        expected_info_id=check_py_module.INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_12')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
-        expected_info_id=check_py_module.\
-            INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
+        expected_info_id=check_py_module.
+        INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
         info_list=info_list)
 
     info_list = _exec_target_func(func_name='sample_func_13')
@@ -1067,7 +1068,7 @@ y = 200
         for info_dict in info_list]
     assert TMP_TEST_MODULE_PATH in module_path_list
     assert module_path_2 in module_path_list
-    assert not module_path_3 in module_path_list
+    assert module_path_3 not in module_path_list
 
     info_list = check_py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
@@ -1097,7 +1098,7 @@ def sample_func_3(price=100):
     module_path_list = [
         info_dict[check_py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
-    assert not module_path_4 in module_path_list
+    assert module_path_4 not in module_path_list
 
     module_str_5 = '''
 @Appender
@@ -1112,7 +1113,7 @@ def sample_func_4(price):
     module_path_list = [
         info_dict[check_py_module.INFO_KEY_MODULE_PATH]
         for info_dict in info_list]
-    assert not module_path_5 in module_path_list
+    assert module_path_5 not in module_path_list
     info_list = check_py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR, skip_decorator_name_list=[])
     module_path_list = [

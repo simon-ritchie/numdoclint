@@ -1,5 +1,5 @@
 import pytest
-from voluptuous import Schema, All, Any
+from voluptuous import Schema
 
 from numdoclint import helper
 
@@ -599,8 +599,8 @@ def test_get_docstring_param_info_list():
             helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'location_id',
             helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int or None',
             helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
-            helper.DOC_PARAM_INFO_KEY_DESCRIPTION: \
-                '        Sample id.\n        Sample id.',
+            helper.DOC_PARAM_INFO_KEY_DESCRIPTION:
+            '        Sample id.\n        Sample id.',
         },
         required=True)
     schema_2(param_info_list[1])
@@ -623,8 +623,8 @@ def test_get_docstring_param_info_list():
                 helper.DOC_PARAM_INFO_KEY_ARG_NAME: expected_arg_name,
                 helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
                 helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
-                helper.DOC_PARAM_INFO_KEY_DESCRIPTION: \
-                    '        Sample two argument.',
+                helper.DOC_PARAM_INFO_KEY_DESCRIPTION:
+                '        Sample two argument.',
             }, required=True)
         schema(param_info_list[i])
 
@@ -997,8 +997,8 @@ def test_get_docstring_return_val_info_list():
         schema={
             helper.DOC_RETURN_INFO_KEY_NAME: 'location_id',
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME: 'int or None',
-            helper.DOC_RETURN_INFO_KEY_DESCRIPTION: \
-                '        Sample location id.',
+            helper.DOC_RETURN_INFO_KEY_DESCRIPTION:
+            '        Sample location id.',
         }, required=True)
     schema_2(return_val_info_list[1])
 
@@ -1431,13 +1431,13 @@ def test__append_param_info_to_list():
     expected_arg_name_list = ['one', 'two']
     for i, expected_arg_name in enumerate(expected_arg_name_list):
         schema = Schema(
-        schema={
-            helper.DOC_PARAM_INFO_KEY_ARG_NAME: expected_arg_name,
-            helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
-            helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
-            helper.DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample arguments.'
-        },
-        required=True)
+            schema={
+                helper.DOC_PARAM_INFO_KEY_ARG_NAME: expected_arg_name,
+                helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
+                helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL: '',
+                helper.DOC_PARAM_INFO_KEY_DESCRIPTION: 'Sample arguments.'
+            },
+            required=True)
         schema(param_info_list[i])
 
 
@@ -1622,4 +1622,3 @@ def test_is_interactive_shell_example_line():
     result_bool = helper.is_interactive_shell_example_line(
         func_start_index=195, py_module_str=py_module_str)
     assert result_bool
-

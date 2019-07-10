@@ -289,7 +289,7 @@ def get_func_overall_docstring(
             continue
         line_indent_num = get_line_indent_num(line_str=line_str)
         if (line_indent_num < indent_num and line_str != ''
-                and line_str.strip() !='):'):
+                and line_str.strip() != '):'):
             break
         func_str += '\n%s' % line_str
 
@@ -1178,10 +1178,10 @@ def _remove_docstring_from_func_str(func_str, module_str, func_name):
         single_quote_idx_3_exists = "'''" in line_splitted_list[3]
         pop_index_list = []
         if ((double_quote_idx_1_exists and double_quote_idx_2_exists)
-                or single_quote_idx_1_exists and single_quote_idx_2_exists):
+                or (single_quote_idx_1_exists and single_quote_idx_2_exists)):
             pop_index_list = [2, 1]
         if ((double_quote_idx_1_exists and double_quote_idx_3_exists)
-                or single_quote_idx_1_exists and single_quote_idx_3_exists):
+                or (single_quote_idx_1_exists and single_quote_idx_3_exists)):
             pop_index_list = [3, 2, 1]
         for pop_index in pop_index_list:
             line_splitted_list.pop(pop_index)

@@ -65,6 +65,7 @@ def check_python_module(
     if not func_name_list:
         return []
     info_list = []
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
     for func_name in func_name_list:
         is_func_name_to_ignore = _is_func_name_to_ignore(
             func_name=func_name,
@@ -75,8 +76,7 @@ def check_python_module(
             module_path=py_module_path,
             module_str=module_str,
             func_name=func_name,
-            enable_default_or_optional_doc_check=\
-                enable_default_or_optional_doc_check,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list,
         )
         info_list.extend(single_func_info_list)
@@ -123,11 +123,11 @@ def check_python_module_recursively(
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
         ignore_func_name_suffix_list=ignore_func_name_suffix_list,
-        enable_default_or_optional_doc_check=\
-            enable_default_or_optional_doc_check,
+        enable_default_or_optional_doc_check=enable_def_or_opt_check,
         skip_decorator_name_list=skip_decorator_name_list)
     return info_list
 
@@ -233,6 +233,7 @@ def _check_python_module_recursively(
     file_or_folder_name_list = os.listdir(dir_path)
     if not file_or_folder_name_list:
         return info_list
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
     for file_or_folder_name in file_or_folder_name_list:
         path = os.path.join(dir_path, file_or_folder_name)
         path = path.replace('\\', '/')
@@ -240,8 +241,7 @@ def _check_python_module_recursively(
             info_list = _check_python_module_recursively(
                 dir_path=path, info_list=info_list, verbose=verbose,
                 ignore_func_name_suffix_list=ignore_func_name_suffix_list,
-                enable_default_or_optional_doc_check=\
-                    enable_default_or_optional_doc_check,
+                enable_default_or_optional_doc_check=enable_def_or_opt_check,
                 skip_decorator_name_list=skip_decorator_name_list)
             continue
         if not path.endswith('.py'):
@@ -249,8 +249,7 @@ def _check_python_module_recursively(
         unit_info_list = check_python_module(
             py_module_path=path, verbose=verbose,
             ignore_func_name_suffix_list=ignore_func_name_suffix_list,
-            enable_default_or_optional_doc_check=\
-                enable_default_or_optional_doc_check,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list)
         info_list.extend(unit_info_list)
     return info_list
@@ -531,7 +530,7 @@ def _check_lacked_return_docstring_type(
         if type_name != '':
             continue
         info = 'Missing docstring type information, or maybe missing '\
-        'return value name (colon not exists).'
+            'return value name (colon not exists).'
         info += '\nReturn value name: %s' % return_value_name
         info_dict = _make_info_dict(
             module_path=module_path,
@@ -654,7 +653,9 @@ def _check_lacked_default_value(
         if param_info_default_val == '':
             if default_val_info_dict[param_info_arg_name] == '':
                 continue
-            info = 'While there is no description of default value in docstring, there is a default value on the argument side.'
+            info = 'While there is no description of default value'\
+                   ' in docstring, there is a default value on the'\
+                   ' argument side.'
             info += '\nArgument name: %s' % param_info_arg_name
             info += '\nArgument default value: %s' \
                 % default_val_info_dict[param_info_arg_name]
@@ -668,7 +669,8 @@ def _check_lacked_default_value(
 
         if default_val_info_dict[param_info_arg_name] != '':
             continue
-        info = 'The default value described in docstring does not exist in the actual argument.'
+        info = 'The default value described in docstring does not '\
+               'exist in the actual argument.'
         info += '\nArgment name: %s' % param_info_arg_name
         info += '\nDocstring default value: %s' % param_info_default_val
         info_dict = _make_info_dict(
@@ -757,7 +759,7 @@ def _check_docstring_param_order(
         return []
     param_info_arg_name_list = [
         param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
-            for param_info_dict in param_info_list]
+        for param_info_dict in param_info_list]
     info_list = []
     for i, arg_name in enumerate(arg_name_list):
         param_info_arg_name = param_info_arg_name_list[i]
@@ -893,7 +895,8 @@ def _check_lacked_param(
         is_in = arg_name in param_info_arg_name_list
         if is_in:
             continue
-        info = 'There is an argument whose explanation does not exist in docstring.'
+        info = 'There is an argument whose explanation '\
+               'does not exist in docstring.'
         info += '\nTarget argument name: %s' % arg_name
         info_dict = _make_info_dict(
             module_path=module_path,
