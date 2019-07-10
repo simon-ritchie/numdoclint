@@ -526,6 +526,12 @@ def test__get_docstring_default_value():
     default_val = helper._get_docstring_default_value(var_doc=var_doc)
     assert default_val == 'None'
 
+    var_doc = """    price : int (default 0), optional
+        Sample price.
+    """
+    default_val = helper._get_docstring_default_value(var_doc=var_doc)
+    assert default_val == '0'
+
 
 def test__get_docstring_var_description():
     var_doc = """    price : int

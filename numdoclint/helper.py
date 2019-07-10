@@ -578,11 +578,12 @@ def _get_docstring_default_value(var_doc):
         Description of the defautl value.
     """
     default_val = var_doc.split('\n')[0]
-    is_in = ', default' in default_val
+    is_in = ', default ' in default_val or '(default ' in default_val
     if not is_in:
         return ''
     default_val = default_val.split('default')[1]
     default_val = default_val.split(',')[0]
+    default_val = default_val.replace(')', '')
     default_val = default_val.strip()
     return default_val
 
