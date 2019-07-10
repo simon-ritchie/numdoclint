@@ -36,7 +36,7 @@ def read_file_str(file_path):
     file_str : str
         The target string read.
     """
-    with open(file_path, 'r') as f:
+    with open(file_path, mode='r', encoding='utf-8') as f:
         file_str = f.read()
     return file_str
 
@@ -277,19 +277,31 @@ def get_func_overall_docstring(
         func_name=func_name)
     start_idx = match.start()
     func_str = py_module_str[start_idx:]
+    func_str = func_str.replace('\\\n', '')
     line_splitted_list = func_str.split('\n')
     indent_num = get_func_indent_num(
         py_module_str=py_module_str,
         func_name=func_name,
     )
     func_str = ''
+    is_docstring_line = False
     for index, line_str in enumerate(line_splitted_list):
+        is_docstring_last_line = False
         if index == 0:
             func_str += line_str
             continue
+        if (('"""' in line_str or "'''" in line_str)
+                and (not is_docstring_line)):
+            is_docstring_line = True
+        elif (('"""' in line_str or "'''" in line_str)
+                and (is_docstring_line)):
+            is_docstring_line = False
+            is_docstring_last_line = True
         line_indent_num = get_line_indent_num(line_str=line_str)
         if (line_indent_num < indent_num and line_str != ''
-                and line_str.strip() != '):'):
+                and line_str.strip() != '):'
+                and not is_docstring_line
+                and not is_docstring_last_line):
             break
         func_str += '\n%s' % line_str
 

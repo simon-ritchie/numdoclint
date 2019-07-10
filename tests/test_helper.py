@@ -272,6 +272,13 @@ class SampleClass1:
             Sample name.
         """
         pass
+
+
+def sample_func_10(price):
+    """Sample function.
+
+Sample docstring."""
+    pass
     '''
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
@@ -363,6 +370,13 @@ class SampleClass1:
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample')
     expected_docstring = """    Sample docstring (foward match)."""
+    assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str, func_name='sample_func_10')
+    expected_docstring = """    Sample function.
+
+Sample docstring."""
     assert docstring == expected_docstring
 
 
