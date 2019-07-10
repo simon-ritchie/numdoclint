@@ -19,6 +19,12 @@ The following library modules are used for testing and lint.
 - autopep8==1.4.4
 - isort==4.3.16
 
+Command to run overall tests and lint:
+
+```
+$ python ./run_all_tests_and_lint.py
+```
+
 Command to run the entire test:
 
 ```
