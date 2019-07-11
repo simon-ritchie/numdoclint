@@ -7,3 +7,4 @@
 /build/*
 /dist/*
 /numdoclint.egg-info/*
+/sample.py

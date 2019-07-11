@@ -181,6 +181,86 @@ Argument default value: "dict"
 
 Currently not implemented yet ([#2](https://github.com/simon-ritchie/numdoclint/issues/2)).
 
+# Lint condition examples
+
+## Lacked argument
+
+If the actual argument does not exist, while docstring parameter exists.
+
+`sample.py`:
+
+```py
+# sample.py
+
+def sample_func(price):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    lacked_arg : str
+        Sample string.
+    """
+    pass
+```
+
+```
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
+
+./sample.py::sample_func
+An argument exists in docstring does not exists in the actual argument.
+Lacked argument name: lacked_arg
+```
+
+## Lacked docstring parameter description
+
+```py
+# sample.py
+
+def sample_func(price, lacked_arg):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    pass
+```
+
+```
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
+
+./sample.py::sample_func
+There is an argument whose explanation does not exist in docstring.
+Target argument name: lacked_arg
+```
+
+## Lacked docstring parameter type information
+
+```py
+# sample.py
+
+def sample_func(price):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price
+        Sample price (type not specified).
+    """
+    pass
+```
+
+
+
+
 # Testing and Lint
 
 The following library modules are used for testing and lint.
