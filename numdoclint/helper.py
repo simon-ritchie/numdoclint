@@ -641,6 +641,7 @@ def _get_docstring_var_name(var_doc):
         Argument or return value name.
     """
     var_name = var_doc.split(':')[0]
+    var_name = var_name.split('\n')[0]
     var_name = var_name.strip()
     return var_name
 

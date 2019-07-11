@@ -513,6 +513,12 @@ def test__get_docstring_var_name():
     var_name = helper._get_docstring_var_name(var_doc=var_doc)
     assert var_name == 'price'
 
+    var_doc = """    price
+        Sample price.
+    """
+    var_name = helper._get_docstring_var_name(var_doc=var_doc)
+    assert var_name == 'price'
+
 
 def test__get_docstring_type_name():
     var_doc = """    price : int or None, default None, optional
