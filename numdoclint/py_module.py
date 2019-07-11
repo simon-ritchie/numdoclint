@@ -10,6 +10,7 @@ from numdoclint import helper
 
 def check_python_module(
         py_module_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender']):
     """
@@ -25,6 +26,9 @@ def check_python_module(
         - 1 -> Output the check result.
     ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int, default []
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
@@ -80,6 +84,7 @@ def check_python_module(
             func_name=func_name,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list,
+            ignore_info_id_list=ignore_info_id_list,
         )
         info_list.extend(single_func_info_list)
     _print_info_list(info_list=info_list, verbose=verbose)
@@ -279,7 +284,8 @@ INFO_KEY_INFO = 'info'
 def _get_single_func_info_list(
         module_path, module_str, func_name,
         enable_default_or_optional_doc_check,
-        skip_decorator_name_list):
+        skip_decorator_name_list,
+        ignore_info_id_list):
     """
     Get a list that stores the check result information for
     one function.
@@ -298,6 +304,9 @@ def _get_single_func_info_list(
     skip_decorator_name_list : list
         If a decorator name in this list is set to function, that
         function will not be checked.
+    ignore_info_id_list : list of int
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
 
     Returns
     -------
@@ -384,7 +393,44 @@ def _get_single_func_info_list(
         return_val_info_list=return_val_info_list)
     info_list.extend(unit_info_list)
 
+    info_list = _remove_info_to_ignore_by_id(
+        info_list=info_list,
+        ignore_info_id_list=ignore_info_id_list)
+
     return info_list
+
+
+def _remove_info_to_ignore_by_id(info_list, ignore_info_id_list):
+    """
+    Remove information from list if specified to ignore.
+
+    Parameters
+    ----------
+    info_list : list of dicts
+        A list of check results. The following keys are set
+        in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    ignore_info_id_list : list of int
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
+
+    Returns
+    ----------
+    after_info_list : list of dicts
+        A list after removed information to ignore.
+    """
+    if not info_list:
+        return info_list
+    after_info_list = []
+    for info_dict in info_list:
+        is_in = info_dict[INFO_KEY_INFO_ID] in ignore_info_id_list
+        if is_in:
+            continue
+        after_info_list.append(info_dict)
+    return after_info_list
 
 
 def _check_lacked_return_docstring_description(

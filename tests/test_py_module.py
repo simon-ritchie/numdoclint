@@ -797,7 +797,8 @@ def sample_func_15(price):
             module_str=module_str,
             func_name=func_name,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
-            skip_decorator_name_list=skip_decorator_name_list)
+            skip_decorator_name_list=skip_decorator_name_list,
+            ignore_info_id_list=[])
         return info_list
 
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
@@ -1168,3 +1169,29 @@ def test__is_func_name_to_ignore():
         func_name='get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert not result_bool
+
+
+def test__remove_info_to_ignore_by_id():
+    info_list = py_module._remove_info_to_ignore_by_id(
+        info_list=[],
+        ignore_info_id_list=[])
+    assert info_list == []
+
+    info_list = [{
+        py_module.INFO_KEY_MODULE_PATH: 'sample/path_1.py',
+        py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
+        py_module.INFO_KEY_INFO_ID: py_module.INFO_ID_DIFFERENT_PARAM_ORDER,
+        py_module.INFO_KEY_INFO: 'Sample information 1.',
+    }, {
+        py_module.INFO_KEY_MODULE_PATH: 'sample/path_2.py',
+        py_module.INFO_KEY_FUNC_NAME: 'sample_func_2',
+        py_module.INFO_KEY_INFO_ID: py_module.INFO_ID_LACKED_ARGUMENT,
+        py_module.INFO_KEY_INFO: 'Sample information 2.',
+    }]
+    info_list = py_module._remove_info_to_ignore_by_id(
+        info_list=info_list,
+        ignore_info_id_list=[py_module.INFO_ID_DIFFERENT_PARAM_ORDER])
+    assert len(info_list) == 1
+    assert (
+        info_list[0][py_module.INFO_KEY_INFO_ID]
+        == py_module.INFO_ID_LACKED_ARGUMENT)
