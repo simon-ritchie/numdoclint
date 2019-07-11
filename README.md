@@ -140,7 +140,7 @@ If you want to skip functions with a specific suffix, set suffix names to the `s
 ```py
 >>> lint_info_list = numdoclint.check_python_module(
 ...     py_module_path='../pandas/pandas/core/arrays/array_.py',
-...     skip_decorator_name_list=['test_', '_main', '__init__'])
+...     ignore_func_name_suffix_list=['test_', '_main', '__init__'])
 ```
 
 ### Parameters default check
@@ -458,7 +458,7 @@ Argment name: price
 Docstring default value: 100
 ```
 
-## Lacked docstring return value description
+## Lacked docstring of return value
 
 ```py
 # sample.py
@@ -477,6 +477,57 @@ def sample_func():
 
 ./sample.py::sample_func
 While the return value exists in the function, the return value document does not exist in docstring.
+```
+
+## Lacked docstring return value description
+
+```py
+# sample.py
+
+def sample_func():
+    """
+    Sample function.
+
+    Returns
+    -------
+    price : int
+    """
+    return 100
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
+
+./sample.py::sample_func
+Docstring description of return value is missing.
+Return value name: price
+Return value type: int
+```
+
+## Lacked return value, while `Returns` docstring section exists
+
+```py
+# sample.py
+
+def sample_func():
+    """
+    Sample function.
+
+    Returns
+    -------
+    price : int
+        Sample price
+    """
+    pass
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+>>>     py_module_path='./sample.py')
+
+./sample.py::sample_func
+While the return value document exists in docstring, the return value does not exist in the function.
 ```
 
 # Testing and Lint
