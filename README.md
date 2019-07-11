@@ -183,11 +183,30 @@ Currently not implemented yet ([#2](https://github.com/simon-ritchie/numdoclint/
 
 # Lint condition examples
 
+## Lacked docstring function description
+
+```py
+# sample.py
+
+def sample_func(price):
+    """
+    Parameters
+    ----------
+    name : str
+        Sample name.
+    """
+    pass
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
+
+./sample.py::sample_func
+The function description is not set to docstring.
+```
+
 ## Lacked argument
-
-If the actual argument does not exist, while docstring parameter exists.
-
-`sample.py`:
 
 ```py
 # sample.py
@@ -206,7 +225,7 @@ def sample_func(price):
     pass
 ```
 
-```
+```py
 >>> lint_info_list = numdoclint.check_python_module(
 ...     py_module_path='./sample.py')
 
@@ -232,7 +251,7 @@ def sample_func(price, lacked_arg):
     pass
 ```
 
-```
+```py
 >>> lint_info_list = numdoclint.check_python_module(
 ...     py_module_path='./sample.py')
 
@@ -258,8 +277,207 @@ def sample_func(price):
     pass
 ```
 
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
 
+./sample.py::sample_func
+Missing docstring argument type information.
+Target argument: price
+```
 
+## Lacked docstring parameter description
+
+```py
+# sample.py
+
+def sample_func(price, name):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+    name : str
+    """
+    pass
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
+
+./sample.py::sample_func
+Missing docstring argument information.
+Argument name: price
+
+./sample.py::sample_func
+Missing docstring argument information.
+Argument name: name
+```
+
+## Argument and docstring parameter order mismatching
+
+```py
+# sample.py
+
+def sample_func(price, name):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    name : str
+        Sample name.
+    price : int
+        Sample price.
+    """
+    pass
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py')
+
+./sample.py::sample_func
+The order of the argument and docstring is different.
+Order of arguments: ['price', 'name']
+Order of docstring parameters: ['name', 'price']
+```
+
+## Lacked docstring default value description
+
+Note: Only enabled when `enable_default_or_optional_doc_check=True` argument specified.
+
+```py
+# sample.py
+
+def sample_func(price=100):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    pass
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py',
+...     enable_default_or_optional_doc_check=True)
+
+./sample.py::sample_func
+While there is no description of default value in docstring, there is a default value on the argument side.
+Argument name: price
+Argument default value: 100
+```
+
+Good patterns:
+
+1. `, default xxx` specified (mainly used in Pandas):
+
+```py
+# sample.py
+
+def sample_func(price=100):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int, default 100
+        Sample price.
+    """
+    pass
+```
+
+2. `, default is xxx` specified (mainly used in NumPy):
+
+```py
+# sample.py
+
+def sample_func(price=100):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int, default is 100
+        Sample price.
+    """
+    pass
+```
+
+3. `(default 100)` specified (mainly used in Pands):
+
+```py
+# sample.py
+
+def sample_func(price=100):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int (default 100)
+        Sample price.
+    """
+    pass
+```
+
+## Lacked argument default value, while docstring default value exists.
+
+Note: Only enabled when `enable_default_or_optional_doc_check=True` argument specified.
+
+```py
+# sample.py
+
+def sample_func(price):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int, default 100
+        Sample price.
+    """
+    pass
+```
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py',
+...     enable_default_or_optional_doc_check=True)
+
+./sample.py::sample_func
+The default value described in docstring does not exist in the actual argument.
+Argment name: price
+Docstring default value: 100
+```
+
+## Lacked docstring return value description
+
+```py
+# sample.py
+
+def sample_func():
+    """
+    Sample function.
+    """
+    return 100
+```
+
+```
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py',
+...     enable_default_or_optional_doc_check=True)
+
+./sample.py::sample_func
+While the return value exists in the function, the return value document does not exist in docstring.
+```
 
 # Testing and Lint
 
