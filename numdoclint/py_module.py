@@ -30,7 +30,7 @@ def check_python_module(
         List of IDs to ignore lint checking. A constant with a
         suffix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
-        If True specified, the `defalt` and `optional` string
+        If True specified, the `default` and `optional` string
         in docstring will be checked.
         i.e., if there is an argument containing a default value,
         docstring's argument needs to describe default or optional.
@@ -57,7 +57,7 @@ def check_python_module(
 
     Raises
     ------
-    FileNotFoundError
+    IOError
         If the target module can not be found.
 
     Notes
