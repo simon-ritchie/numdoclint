@@ -143,6 +143,58 @@ If you want to skip functions with a specific suffix, set suffix names to the `s
 ...     ignore_func_name_suffix_list=['test_', '_main', '__init__'])
 ```
 
+### Ignore specified IDs check
+
+You can specify IDs to `ignore_info_id_list` argument to ignore.
+The ID corresponds to the return value's `info_id`.
+
+```py
+# sample.py
+
+def sample_func():
+    """
+    Sample function.
+
+    Returns
+    -------
+    price : int
+        Sample price
+    """
+    pass
+```
+
+```py
+>>> import numdoclint
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py',
+...     verbose=0)
+>>> lint_info_list
+[{'module_path': './sample.py',
+  'func_name': 'sample_func',
+  'info_id': 12,
+  'info': 'While the return value document exists in docstring, the return value does not exist in the function.'}]
+
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py',
+...     ignore_info_id_list=[12],
+...     verbose=0)
+>>> lint_info_list
+[]
+```
+
+Or you can also specify ID's constant to argument.
+
+```py
+>>> lint_info_list = numdoclint.check_python_module(
+...     py_module_path='./sample.py',
+...     ignore_info_id_list=[
+...         numdoclint.INFO_ID_LACKED_RETURN_VAL,
+...     ],
+...     verbose=0)
+>>> lint_info_list
+[]
+```
+
 ### Parameters default check
 
 By default, the following docstring `Parameters` default specification will not be checked.

@@ -93,6 +93,7 @@ def check_python_module(
 
 def check_python_module_recursively(
         dir_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender']):
     """
@@ -108,6 +109,9 @@ def check_python_module_recursively(
         - 1 -> Output the check result.
     ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int, default []
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
@@ -134,6 +138,7 @@ def check_python_module_recursively(
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
         ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=enable_def_or_opt_check,
         skip_decorator_name_list=skip_decorator_name_list)
     return info_list
@@ -203,6 +208,7 @@ def _print_info_list(info_list, verbose):
 def _check_python_module_recursively(
         dir_path, info_list, verbose=1,
         ignore_func_name_suffix_list=['test_'],
+        ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender']):
     """
@@ -220,6 +226,9 @@ def _check_python_module_recursively(
         - 1 -> Output the check result.
     ignore_func_name_suffix_list : list of str, default ['test_']
         A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int, default []
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
@@ -248,6 +257,7 @@ def _check_python_module_recursively(
             info_list = _check_python_module_recursively(
                 dir_path=path, info_list=info_list, verbose=verbose,
                 ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                ignore_info_id_list=ignore_info_id_list,
                 enable_default_or_optional_doc_check=enable_def_or_opt_check,
                 skip_decorator_name_list=skip_decorator_name_list)
             continue
@@ -256,6 +266,7 @@ def _check_python_module_recursively(
         unit_info_list = check_python_module(
             py_module_path=path, verbose=verbose,
             ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list)
         info_list.extend(unit_info_list)

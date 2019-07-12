@@ -771,7 +771,8 @@ def sample_func_15(price):
 
     def _exec_target_func(
             func_name, enable_default_or_optional_doc_check=True,
-            skip_decorator_name_list=['Appender']):
+            skip_decorator_name_list=['Appender'],
+            ignore_info_id_list=[]):
         """
         Execute the function to be tested and get the return value.
 
@@ -785,6 +786,9 @@ def sample_func_15(price):
         skip_decorator_name_list : list of str, default ['Appender']
             If a decorator name in this list is set to function,
             that function will not be checked.
+        ignore_info_id_list : list of int, default []
+            List of IDs to ignore lint checking. A constant with a
+            suffix of `INFO_ID_` can be specified.
 
         Returns
         -------
@@ -798,7 +802,7 @@ def sample_func_15(price):
             func_name=func_name,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list,
-            ignore_info_id_list=[])
+            ignore_info_id_list=ignore_info_id_list)
         return info_list
 
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
@@ -809,6 +813,11 @@ def sample_func_15(price):
     _check_info_id_is_in_list(
         expected_info_id=py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
         info_list=info_list)
+
+    info_list = _exec_target_func(
+        func_name='sample_func_1',
+        ignore_info_id_list=[py_module.INFO_ID_LACKED_FUNC_DESCRIPTION])
+    assert info_list == []
 
     info_list = _exec_target_func(func_name='sample_func_2')
     _check_info_list_schema(info_list=info_list)
@@ -923,6 +932,14 @@ def sample_func_1(price):
         py_module_path=TMP_TEST_MODULE_PATH)
     assert len(info_list) > 0
     _check_info_list_schema(info_list=info_list)
+
+    info_list = py_module.check_python_module(
+        py_module_path=TMP_TEST_MODULE_PATH,
+        ignore_info_id_list=[
+            py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
+            py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+        ])
+    assert info_list == []
 
     info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
@@ -1071,6 +1088,14 @@ y = 200
     assert TMP_TEST_MODULE_PATH in module_path_list
     assert module_path_2 in module_path_list
     assert module_path_3 not in module_path_list
+
+    info_list = py_module.check_python_module_recursively(
+        dir_path=TMP_TEST_MODULE_DIR,
+        ignore_info_id_list=[
+            py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
+            py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+        ])
+    assert info_list == []
 
     info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
