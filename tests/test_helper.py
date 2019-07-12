@@ -698,7 +698,7 @@ def test__get_args_str():
         print(300)
 
 
-    def sample_func_4(price=100: int, location_id=200: int) -> str:
+    def sample_func_4(price: int=100, location_id: int=200) -> str:
         print(400)
 
 
@@ -733,7 +733,7 @@ def test__get_args_str():
 
     args_str = helper._get_args_str(
         py_module_str=py_module_str, func_name='sample_func_4')
-    assert args_str == 'price=100: int, location_id=200: int'
+    assert args_str == 'price: int=100, location_id: int=200'
 
     args_str = helper._get_args_str(
         py_module_str=py_module_str, func_name='sample_func_5')
@@ -759,7 +759,7 @@ def test_get_arg_default_val_info_dict():
 
 
     def sample_func_3(
-            price: int, location_id=100: int) -> str:
+            price: int, location_id: int=100) -> str:
         print(300)
     """
     default_val_info_dict = helper.get_arg_default_val_info_dict(
@@ -1643,3 +1643,17 @@ def test_is_interactive_shell_example_line():
     result_bool = helper.is_interactive_shell_example_line(
         func_start_index=195, py_module_str=py_module_str)
     assert result_bool
+
+
+def test__remove_type_str_from_arg_str():
+    after_arg_str = helper._remove_type_str_from_arg_str(
+        arg_str='price')
+    assert after_arg_str == 'price'
+
+    after_arg_str = helper._remove_type_str_from_arg_str(
+        arg_str='price: int')
+    assert after_arg_str == 'price'
+
+    after_arg_str = helper._remove_type_str_from_arg_str(
+        arg_str=' price: int=100 ')
+    assert after_arg_str == 'price=100'

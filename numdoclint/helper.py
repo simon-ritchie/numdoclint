@@ -793,7 +793,7 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
     default_val_info_dict = {}
     for arg_str in splitted_arg_list:
         arg_str = arg_str.replace(' ', '')
-        arg_str = arg_str.split(':')[0]
+        arg_str = _remove_type_str_from_arg_str(arg_str=arg_str)
         default_val_exists = '=' in arg_str
         if not default_val_exists:
             default_val_info_dict[arg_str] = ''
@@ -803,6 +803,31 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
         default_val = name_and_default_val_list[1]
         default_val_info_dict[arg_name] = default_val
     return default_val_info_dict
+
+
+def _remove_type_str_from_arg_str(arg_str):
+    """
+    Remove the string of type information from the argument string.
+
+    Parameters
+    ----------
+    arg_str : str
+        The target argument string.
+
+    Returns
+    -------
+    after_arg_str : str
+        String after type information has been removed.
+    """
+    is_in = ':' in arg_str
+    if not is_in:
+        return arg_str
+    after_arg_str = arg_str.split(':')[0]
+    is_in = '=' in arg_str
+    if is_in:
+        after_arg_str += '=%s' % arg_str.split('=')[1]
+    after_arg_str = after_arg_str.strip()
+    return after_arg_str
 
 
 DOC_RETURN_INFO_KEY_NAME = 'name'

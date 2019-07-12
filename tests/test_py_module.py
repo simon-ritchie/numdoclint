@@ -726,7 +726,7 @@ def sample_func_12():
     return 100
 
 
-def sample_func_13(price: int, name='apple': str) -> int:
+def sample_func_13(price: int, name: str='apple') -> int:
     """
     Sample function.
 
@@ -948,7 +948,7 @@ def sample_func_1(price):
     assert not info_list
 
     module_str = '''
-def sample_func_1(price=100: int, name='apple': str) -> int:
+def sample_func_1(price: int=100, name: str='apple') -> int:
     """
     Sample func.
 
