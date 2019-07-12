@@ -2,7 +2,6 @@ import inspect
 
 import numdoclint
 from numdoclint import py_module
-import pytest
 
 
 def test_interface():
