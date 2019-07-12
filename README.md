@@ -463,7 +463,7 @@ def sample_func(price=100):
     pass
 ```
 
-3. `(default 100)` specified (mainly used in Pands):
+3. `(default 100)` specified (rarely used in Pands):
 
 ```py
 # sample.py
