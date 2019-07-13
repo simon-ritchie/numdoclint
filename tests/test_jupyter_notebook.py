@@ -55,3 +55,11 @@ def test__check_notebook_extension():
             notebook_path='sample/path.py')
     jupyter_notebook._check_notebook_extension(
         notebook_path='sample/path.ipynb')
+
+
+def test__read_notebook_data_dict():
+    notebook_data_dict = jupyter_notebook._read_notebook_data_dict(
+        notebook_path='./tests/jupyter/test_jupyter_notebook_py3.ipynb')
+    assert isinstance(notebook_data_dict, dict)
+    has_key = 'cells' in notebook_data_dict
+    assert has_key

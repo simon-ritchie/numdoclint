@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 import os
+import json
 
 from numdoclint import helper
 from numdoclint import py_module
@@ -55,7 +56,29 @@ def check_jupyter_notebook(
     """
     _check_notebook_exists(notebook_path=notebook_path)
     _check_notebook_extension(notebook_path=notebook_path)
+    notebook_data_dict = _read_notebook_data_dict(
+        notebook_path=notebook_path)
     pass
+
+
+def _read_notebook_data_dict(notebook_path):
+    """
+    Read a dictionary of notebook data.
+
+    Parameters
+    ----------
+    notebook_path : str
+        Path of target notebook.
+
+    Returns
+    -------
+    notebook_data_dict : dict
+        A dictionary of notebook data.
+    """
+    with open(notebook_path, 'r') as f:
+        notebook_data_str = f.read()
+    notebook_data_dict = json.loads(notebook_data_str)
+    return notebook_data_dict
 
 
 def _check_notebook_extension(notebook_path):
