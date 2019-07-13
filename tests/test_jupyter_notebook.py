@@ -249,3 +249,39 @@ def sample_func(price=100):
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list
+
+
+def test__print_info_list():
+    printed_str = jupyter_notebook._print_info_list(
+        info_list=[], verbose=jupyter_notebook.VERBOSE_ENABLED)
+    assert printed_str == ''
+
+    info_list = [{
+        jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: 'sample/path.ipynb',
+        jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: 5,
+        jupyter_notebook.INFO_KEY_FUNC_NAME: 'sample_func_1',
+        jupyter_notebook.INFO_KEY_INFO_ID: 3,
+        jupyter_notebook.INFO_KEY_INFO: 'Sample infomation 1.',
+    }, {
+        jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: 'sample/path.ipynb',
+        jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: 6,
+        jupyter_notebook.INFO_KEY_FUNC_NAME: 'sample_func_2',
+        jupyter_notebook.INFO_KEY_INFO_ID: 5,
+        jupyter_notebook.INFO_KEY_INFO: 'Sample infomation 2.',
+    }]
+
+    printed_str = jupyter_notebook._print_info_list(
+        info_list=info_list,
+        verbose=jupyter_notebook.VERBOSE_DISABLED)
+    assert printed_str == ''
+
+    printed_str = jupyter_notebook._print_info_list(
+        info_list=info_list,
+        verbose=jupyter_notebook.VERBOSE_ENABLED)
+    assert 'sample/path.ipynb' in printed_str
+    assert 'sample_func_1' in printed_str
+    assert '5' in printed_str
+    assert 'Sample infomation 1.' in printed_str
+    assert '6' in printed_str
+    assert 'sample_func_2' in printed_str
+    assert 'Sample infomation 2.' in printed_str

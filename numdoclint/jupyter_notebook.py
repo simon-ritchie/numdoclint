@@ -14,6 +14,9 @@ INFO_KEY_FUNC_NAME = py_module.INFO_KEY_FUNC_NAME
 INFO_KEY_INFO_ID = py_module.INFO_KEY_INFO_ID
 INFO_KEY_INFO = py_module.INFO_KEY_INFO
 
+VERBOSE_ENABLED = py_module.VERBOSE_ENABLED
+VERBOSE_DISABLED = py_module.VERBOSE_DISABLED
+
 
 def check_jupyter_notebook(
         notebook_path, verbose=1, ignore_func_name_suffix_list=['test_'],
@@ -79,6 +82,49 @@ def check_jupyter_notebook(
             ignore_func_name_suffix_list=ignore_func_name_suffix_list,
             ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check)
+        info_list.extend(info_list_unit)
+    _print_info_list(info_list=info_list, verbose=verbose)
+    pass
+
+
+def _print_info_list(info_list, verbose):
+    """
+    Print check result.
+
+    Parameters
+    ----------
+    info_list : list of dicts
+        A list containing information on check results.
+        The following values are necessary in the dictionary key:
+        - notebook_path : str
+        - code_cell_index : int
+        - func_name : str
+        - info_id : int
+        - info : str
+    verbose : int
+        Log settings of stdout.
+
+    Returns
+    -------
+    printed_str : str
+        Printed string.
+    """
+    if not info_list:
+        return ''
+    if verbose != VERBOSE_ENABLED:
+        return ''
+    printed_str = ''
+    for info_dict in info_list:
+        if printed_str != '':
+            printed_str += '\n\n'
+        printed_str += '{notebook_path}::code cell index:{code_cell_index}'\
+                      '::{func_name}\n{info}'.format(
+                          notebook_path=info_dict['notebook_path'],
+                          code_cell_index=info_dict['code_cell_index'],
+                          func_name=info_dict['func_name'],
+                          info=info_dict['info'])
+    print(printed_str)
+    return printed_str
 
 
 def _check_unit_code_cell_str(

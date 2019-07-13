@@ -7,6 +7,9 @@ import os
 
 from numdoclint import helper
 
+VERBOSE_DISABLED = 0
+VERBOSE_ENABLED = 1
+
 
 def check_python_module(
         py_module_path, verbose=1, ignore_func_name_suffix_list=['test_'],
@@ -174,15 +177,13 @@ def _print_info_list(info_list, verbose):
     ----------
     info_list : list of dicts
         A list containing information on check results.
-        The following values are set in the dictionary key:
+        The following values are necessary in the dictionary key:
         - module_path : str -> Path of target module.
         - func_name : str -> Target function name.
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     verbose : int
-        Log settings of stdout. Specify one of the following numbers:
-        - 0 -> Do not output log.
-        - 1 -> Output the check result.
+        Log settings of stdout.
 
     Returns
     -------
@@ -191,7 +192,7 @@ def _print_info_list(info_list, verbose):
     """
     if not info_list:
         return ''
-    if verbose != 1:
+    if verbose != VERBOSE_ENABLED:
         return ''
     printed_str = ''
     for info_dict in info_list:
