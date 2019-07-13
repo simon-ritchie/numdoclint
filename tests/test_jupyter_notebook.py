@@ -63,3 +63,39 @@ def test__read_notebook_data_dict():
     assert isinstance(notebook_data_dict, dict)
     has_key = 'cells' in notebook_data_dict
     assert has_key
+
+
+def test__get_code_cell_str_list():
+    code_str_list = jupyter_notebook._get_code_cell_str_list(
+        notebook_data_dict={})
+    assert code_str_list == []
+
+    notebook_data_dict = {
+        'cells': [{
+            'cell_type': 'code',
+            'source': [
+                'import pandas as pd\n',
+                'import numpy as np',
+            ],
+        }, {
+            'cell_type': 'markdown',
+            'source': [
+                '# Markdown cell\n',
+                '\n',
+                'Contents of this cell should be ignored.\n',
+            ],
+        }, {
+            'cell_type': 'code',
+            'source': [
+                'def sample_func():\n',
+                '    pass',
+            ],
+        }]
+    }
+    code_str_list = jupyter_notebook._get_code_cell_str_list(
+        notebook_data_dict=notebook_data_dict)
+    assert len(code_str_list) == 2
+    expected_code_str = 'import pandas as pd\nimport numpy as np'
+    assert code_str_list[0] == expected_code_str
+    expected_code_str = 'def sample_func():\n    pass'
+    assert code_str_list[1] == expected_code_str

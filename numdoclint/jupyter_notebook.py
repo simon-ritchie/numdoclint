@@ -58,7 +58,38 @@ def check_jupyter_notebook(
     _check_notebook_extension(notebook_path=notebook_path)
     notebook_data_dict = _read_notebook_data_dict(
         notebook_path=notebook_path)
+    code_cell_str_list = _get_code_cell_str_list(
+        notebook_data_dict=notebook_data_dict)
     pass
+
+
+def _get_code_cell_str_list(notebook_data_dict):
+    """
+    Get a list of code cell strings.
+
+    Parameters
+    ----------
+    notebook_data_dict : dict
+        A dictionary of notebook data.
+
+    Returns
+    -------
+    code_str_list : list of str
+        A list of code cell strings.
+    """
+    code_str_list = []
+    has_key = 'cells' in notebook_data_dict
+    if not has_key:
+        return []
+    cells_list = notebook_data_dict['cells']
+    for cell_dict in cells_list:
+        cell_type = cell_dict['cell_type']
+        if cell_type != 'code':
+            continue
+        source_list = cell_dict['source']
+        source = ''.join(source_list)
+        code_str_list.append(source)
+    return code_str_list
 
 
 def _read_notebook_data_dict(notebook_path):
