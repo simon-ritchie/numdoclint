@@ -47,3 +47,11 @@ def test__check_notebook_exists():
     jupyter_notebook._check_notebook_exists(
         notebook_path=TMP_TEST_NOTEBOOK_PATH_1)
     _delete_test_notebook()
+
+
+def test__check_notebook_extension():
+    with pytest.raises(IOError):
+        jupyter_notebook._check_notebook_extension(
+            notebook_path='sample/path.py')
+    jupyter_notebook._check_notebook_extension(
+        notebook_path='sample/path.ipynb')

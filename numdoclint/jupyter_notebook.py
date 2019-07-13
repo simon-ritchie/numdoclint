@@ -54,7 +54,30 @@ def check_jupyter_notebook(
         - If the target notebook extension is not `ipynb`.
     """
     _check_notebook_exists(notebook_path=notebook_path)
+    _check_notebook_extension(notebook_path=notebook_path)
     pass
+
+
+def _check_notebook_extension(notebook_path):
+    """
+    Check the path extension of the notebook.
+
+    Parameters
+    ----------
+    notebook_path : str
+        Path of target notebook.
+
+    Raises
+    ------
+    IOError
+        If the extension is invalid.
+    """
+    extension_str = notebook_path.split('.')[-1]
+    if extension_str.endswith('ipynb'):
+        return
+    err_msg = 'The extension is invalid. Please Specify a path of '\
+              '`.ipynb` extension.'
+    raise IOError(err_msg)
 
 
 def _check_notebook_exists(notebook_path):
