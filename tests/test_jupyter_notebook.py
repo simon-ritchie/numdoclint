@@ -285,3 +285,7 @@ def test__print_info_list():
     assert '6' in printed_str
     assert 'sample_func_2' in printed_str
     assert 'Sample infomation 2.' in printed_str
+
+
+def test_check_jupyter_notebook():
+    pass

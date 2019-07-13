@@ -84,7 +84,7 @@ def check_jupyter_notebook(
             enable_default_or_optional_doc_check=enable_def_or_opt_check)
         info_list.extend(info_list_unit)
     _print_info_list(info_list=info_list, verbose=verbose)
-    pass
+    return info_list
 
 
 def _print_info_list(info_list, verbose):
