@@ -43,9 +43,10 @@ def check_jupyter_notebook(
         A list containing information on check results.
         The following values are set in the dictionary key:
         - notebook_path : str -> Path of target Jupyter notebook.
-        - cell_index : int -> Notebook cell index number
-            (start with zero).
+        - code_cell_index : int -> Notebook code cell index number
+            (start with zero). Not include markdown cells.
         - func_name : str -> Target function name.
+        - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
 
     Raises
@@ -60,7 +61,115 @@ def check_jupyter_notebook(
         notebook_path=notebook_path)
     code_cell_str_list = _get_code_cell_str_list(
         notebook_data_dict=notebook_data_dict)
+    if not code_cell_str_list:
+        return []
+    info_list = []
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    for i, code_cell_str in enumerate(code_cell_str_list):
+        info_list_unit = _check_unit_code_cell_str(
+            notebook_path=notebook_path,
+            code_cell_idx=i,
+            code_cell_str=code_cell_str,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_info_id_list=ignore_info_id_list,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check)
+
+
+def _check_unit_code_cell_str(
+        notebook_path, code_cell_idx, code_cell_str,
+        ignore_func_name_suffix_list, ignore_info_id_list,
+        enable_default_or_optional_doc_check):
+    """
+    Check the single code cell.
+
+    Parameters
+    ----------
+    notebook_path : str
+        Path of target Jupyter notebook.
+    code_cell_idx : int
+        Index of target code cell.
+    code_cell_str : str
+        Code string of target cell.
+    ignore_func_name_suffix_list : list of str
+        A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
+    enable_default_or_optional_doc_check : bool
+        If True specified, the `default` and `optional` string
+        in docstring will be checked.
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing information on check results.
+        The following values are set in the dictionary key:
+        - notebook_path : str -> Path of target Jupyter notebook.
+        - code_cell_index : int -> Notebook code cell index number
+            (start with zero). Not include markdown cells.
+        - func_name : str -> Target function name.
+        - info : str -> Information of check result.
+    """
+    func_name_list = helper.get_func_name_list(
+        py_module_str=code_cell_str)
+    if not func_name_list:
+        return []
+    info_list = []
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    for func_name in func_name_list:
+        is_func_name_to_ignore = py_module.is_func_name_to_ignore(
+            func_name=func_name,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+        if is_func_name_to_ignore:
+            continue
+        single_func_info_list = py_module.get_single_func_info_list(
+            module_path=notebook_path,
+            module_str=code_cell_str,
+            func_name=func_name,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check,
+            skip_decorator_name_list=[],
+            ignore_info_id_list=ignore_info_id_list)
+        info_list.extend(single_func_info_list)
+    info_list = _rename_dict_key(info_list=info_list)
     pass
+
+
+INFO_KEY_NOTEBOOK_PATH = 'notebook_path'
+INFO_KEY_CODE_CELL_INDEX = 'code_cell_index'
+INFO_KEY_FUNC_NAME = py_module.INFO_KEY_FUNC_NAME
+INFO_KEY_INFO_ID = py_module.INFO_KEY_INFO_ID
+INFO_KEY_INFO = py_module.INFO_KEY_INFO
+
+
+def _rename_dict_key(info_list):
+    """
+    Rename dictionary key names in the list.
+
+    Parameters
+    ----------
+    info_list : list of dict
+        A list of check results. The following keys are necessary
+        in the dictionary:
+        - module_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing the renamed dictionary.
+        The following keys will be set.
+        - notebook_path : str
+        - func_name : str
+        - info_id : int
+        - info : str
+    """
+    for info_dict in info_list:
+        path_str = info_dict[py_module.INFO_KEY_MODULE_PATH]
+        info_dict[INFO_KEY_NOTEBOOK_PATH] = path_str
+        del info_dict[py_module.INFO_KEY_MODULE_PATH]
+    return info_list
 
 
 def _get_code_cell_str_list(notebook_data_dict):

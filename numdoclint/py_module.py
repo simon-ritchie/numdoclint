@@ -73,12 +73,12 @@ def check_python_module(
     info_list = []
     enable_def_or_opt_check = enable_default_or_optional_doc_check
     for func_name in func_name_list:
-        is_func_name_to_ignore = _is_func_name_to_ignore(
+        is_func_name_to_ignore_ = is_func_name_to_ignore(
             func_name=func_name,
             ignore_func_name_suffix_list=ignore_func_name_suffix_list)
-        if is_func_name_to_ignore:
+        if is_func_name_to_ignore_:
             continue
-        single_func_info_list = _get_single_func_info_list(
+        single_func_info_list = get_single_func_info_list(
             module_path=py_module_path,
             module_str=module_str,
             func_name=func_name,
@@ -144,7 +144,7 @@ def check_python_module_recursively(
     return info_list
 
 
-def _is_func_name_to_ignore(func_name, ignore_func_name_suffix_list):
+def is_func_name_to_ignore(func_name, ignore_func_name_suffix_list):
     """
     Get boolean value of function name which should be ignored.
 
@@ -292,7 +292,7 @@ INFO_KEY_INFO_ID = 'info_id'
 INFO_KEY_INFO = 'info'
 
 
-def _get_single_func_info_list(
+def get_single_func_info_list(
         module_path, module_str, func_name,
         enable_default_or_optional_doc_check,
         skip_decorator_name_list,

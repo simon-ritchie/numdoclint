@@ -6,6 +6,7 @@ import six
 from voluptuous import Any, Schema
 
 from numdoclint import jupyter_notebook
+from numdoclint import py_module
 
 TMP_TEST_MODULE_DIR = './tests/tmp/'
 TMP_TEST_NOTEBOOK_PATH_1 = os.path.join(TMP_TEST_MODULE_DIR, 'tmp_1.ipynb')
@@ -99,3 +100,32 @@ def test__get_code_cell_str_list():
     assert code_str_list[0] == expected_code_str
     expected_code_str = 'def sample_func():\n    pass'
     assert code_str_list[1] == expected_code_str
+
+
+def test__rename_dict_key():
+    info_list = [{
+        py_module.INFO_KEY_MODULE_PATH: 'sample/path.ipynb',
+        py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
+        py_module.INFO_KEY_INFO_ID: 1,
+        py_module.INFO_KEY_INFO: 'Sample information 1.',
+    }, {
+        py_module.INFO_KEY_MODULE_PATH: 'sample/path.ipynb',
+        py_module.INFO_KEY_FUNC_NAME: 'sample_func_2',
+        py_module.INFO_KEY_INFO_ID: 2,
+        py_module.INFO_KEY_INFO: 'Sample information 2.',
+    }]
+    info_list = jupyter_notebook._rename_dict_key(
+        info_list=info_list)
+    assert len(info_list) == 2
+    schema = Schema(
+        schema={
+            jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: 'sample/path.ipynb',
+            jupyter_notebook.INFO_KEY_FUNC_NAME: Any(
+                'sample_func_1', 'sample_func_2'),
+            jupyter_notebook.INFO_KEY_INFO_ID: Any(1, 2),
+            jupyter_notebook.INFO_KEY_INFO: Any(
+                'Sample information 1.', 'Sample information 2.'),
+        },
+        required=True)
+    for info_dict in info_list:
+        schema(info_dict)

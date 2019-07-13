@@ -587,7 +587,7 @@ def _check_info_id_is_in_list(expected_info_id, info_list):
     assert is_in
 
 
-def test__get_single_func_info_list():
+def test_get_single_func_info_list():
 
     module_str = '''
 import os
@@ -796,7 +796,7 @@ def sample_func_15(price):
             Return value after function execution.
         """
         enable_def_or_opt_check = enable_default_or_optional_doc_check
-        info_list = py_module._get_single_func_info_list(
+        info_list = py_module.get_single_func_info_list(
             module_path=TMP_TEST_MODULE_PATH,
             module_str=module_str,
             func_name=func_name,
@@ -1178,19 +1178,19 @@ def test__print_info_list():
         assert info in printed_str
 
 
-def test__is_func_name_to_ignore():
+def test_is_func_name_to_ignore():
     ignore_func_name_suffix_list = ['test_', 'sample_']
-    result_bool = py_module._is_func_name_to_ignore(
+    result_bool = py_module.is_func_name_to_ignore(
         func_name='test_get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert result_bool
 
-    result_bool = py_module._is_func_name_to_ignore(
+    result_bool = py_module.is_func_name_to_ignore(
         func_name='sample_get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert result_bool
 
-    result_bool = py_module._is_func_name_to_ignore(
+    result_bool = py_module.is_func_name_to_ignore(
         func_name='get_name',
         ignore_func_name_suffix_list=ignore_func_name_suffix_list)
     assert not result_bool
