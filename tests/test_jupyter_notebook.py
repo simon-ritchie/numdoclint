@@ -12,6 +12,8 @@ TMP_TEST_MODULE_DIR = './tests/tmp/'
 TMP_TEST_NOTEBOOK_PATH_1 = os.path.join(TMP_TEST_MODULE_DIR, 'tmp_1.ipynb')
 TMP_TEST_NOTEBOOK_PATH_2 = os.path.join(TMP_TEST_MODULE_DIR, 'tmp_2.ipynb')
 
+STR_SCHEMA = Any(*six.string_types)
+
 
 def setup():
     """Function to be executed at the start of the test.
@@ -144,3 +146,106 @@ def test__add_code_cell_index():
         required=True)
     for info_dict in info_list:
         schema(info_dict)
+
+
+def test__check_unit_code_cell_str():
+    expected_notebook_path = 'sample/path.ipynb'
+    expected_code_cell_idx = 5
+    code_cell_str = """
+import pandas as pd
+import numpy as np
+    """
+    info_list = jupyter_notebook._check_unit_code_cell_str(
+        notebook_path=expected_notebook_path,
+        code_cell_idx=expected_code_cell_idx,
+        code_cell_str=code_cell_str,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False)
+    assert info_list == []
+
+    schema = Schema(
+        schema={
+            jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: STR_SCHEMA,
+            jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
+            jupyter_notebook.INFO_KEY_FUNC_NAME: STR_SCHEMA,
+            jupyter_notebook.INFO_KEY_INFO_ID: int,
+            jupyter_notebook.INFO_KEY_INFO: STR_SCHEMA,
+        },
+        required=True)
+
+    code_cell_str = '''
+import pandas as pd
+
+
+def sample_func(price):
+    return 100
+    '''
+    info_list = jupyter_notebook._check_unit_code_cell_str(
+        notebook_path=expected_notebook_path,
+        code_cell_idx=expected_code_cell_idx,
+        code_cell_str=code_cell_str,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False)
+    assert info_list
+    for info_dict in info_list:
+        schema(info_dict)
+        notebook_path = info_dict[jupyter_notebook.INFO_KEY_NOTEBOOK_PATH]
+        assert notebook_path == expected_notebook_path
+        code_cell_idx = info_dict[jupyter_notebook.INFO_KEY_CODE_CELL_INDEX]
+        assert code_cell_idx == expected_code_cell_idx
+
+    info_list = jupyter_notebook._check_unit_code_cell_str(
+        notebook_path=expected_notebook_path,
+        code_cell_idx=expected_code_cell_idx,
+        code_cell_str=code_cell_str,
+        ignore_func_name_suffix_list=['sample_'],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False)
+    assert info_list == []
+
+    info_list = jupyter_notebook._check_unit_code_cell_str(
+        notebook_path=expected_notebook_path,
+        code_cell_idx=expected_code_cell_idx,
+        code_cell_str=code_cell_str,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[
+            py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
+            py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
+            py_module.INFO_ID_LACKED_DOCSTRING_RETURN,
+        ],
+        enable_default_or_optional_doc_check=False)
+    assert info_list == []
+
+    code_cell_str = '''
+import pandas as pd
+
+
+def sample_func(price=100):
+    """
+    Sample function.
+
+    Parameters
+    ----------
+    price : int
+        Sample price.
+    """
+    pass
+    '''
+    info_list = jupyter_notebook._check_unit_code_cell_str(
+        notebook_path=expected_notebook_path,
+        code_cell_idx=expected_code_cell_idx,
+        code_cell_str=code_cell_str,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False)
+    assert info_list == []
+    info_list = jupyter_notebook._check_unit_code_cell_str(
+        notebook_path=expected_notebook_path,
+        code_cell_idx=expected_code_cell_idx,
+        code_cell_str=code_cell_str,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list

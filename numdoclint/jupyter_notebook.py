@@ -114,6 +114,7 @@ def _check_unit_code_cell_str(
         - code_cell_index : int -> Notebook code cell index number
             (start with zero). Not include markdown cells.
         - func_name : str -> Target function name.
+        - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
     func_name_list = helper.get_func_name_list(
@@ -139,7 +140,7 @@ def _check_unit_code_cell_str(
     info_list = _rename_dict_key(info_list=info_list)
     info_list = _add_code_cell_index(
         info_list=info_list, code_cell_idx=code_cell_idx)
-    pass
+    return info_list
 
 
 def _add_code_cell_index(info_list, code_cell_idx):
