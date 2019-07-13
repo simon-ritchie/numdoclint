@@ -129,3 +129,18 @@ def test__rename_dict_key():
         required=True)
     for info_dict in info_list:
         schema(info_dict)
+
+
+def test__add_code_cell_index():
+    info_list = [{}, {}]
+    info_list = jupyter_notebook._add_code_cell_index(
+        info_list=info_list,
+        code_cell_idx=5)
+    assert len(info_list) == 2
+    schema = Schema(
+        schema={
+            jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: 5,
+        },
+        required=True)
+    for info_dict in info_list:
+        schema(info_dict)

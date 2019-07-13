@@ -8,6 +8,12 @@ import json
 from numdoclint import helper
 from numdoclint import py_module
 
+INFO_KEY_NOTEBOOK_PATH = 'notebook_path'
+INFO_KEY_CODE_CELL_INDEX = 'code_cell_index'
+INFO_KEY_FUNC_NAME = py_module.INFO_KEY_FUNC_NAME
+INFO_KEY_INFO_ID = py_module.INFO_KEY_INFO_ID
+INFO_KEY_INFO = py_module.INFO_KEY_INFO
+
 
 def check_jupyter_notebook(
         notebook_path, verbose=1, ignore_func_name_suffix_list=['test_'],
@@ -131,14 +137,32 @@ def _check_unit_code_cell_str(
             ignore_info_id_list=ignore_info_id_list)
         info_list.extend(single_func_info_list)
     info_list = _rename_dict_key(info_list=info_list)
+    info_list = _add_code_cell_index(
+        info_list=info_list, code_cell_idx=code_cell_idx)
     pass
 
 
-INFO_KEY_NOTEBOOK_PATH = 'notebook_path'
-INFO_KEY_CODE_CELL_INDEX = 'code_cell_index'
-INFO_KEY_FUNC_NAME = py_module.INFO_KEY_FUNC_NAME
-INFO_KEY_INFO_ID = py_module.INFO_KEY_INFO_ID
-INFO_KEY_INFO = py_module.INFO_KEY_INFO
+def _add_code_cell_index(info_list, code_cell_idx):
+    """
+    Add cell index value to the dictionaries in the list.
+
+    Parameters
+    ----------
+    info_list : list of dicts
+        A list containing information on check results.
+    code_cell_idx : int
+        A code cell index to be set.
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing a dictionary with the following
+        added key.
+        - code_cell_index : int
+    """
+    for info_dict in info_list:
+        info_dict[INFO_KEY_CODE_CELL_INDEX] = code_cell_idx
+    return info_list
 
 
 def _rename_dict_key(info_list):
