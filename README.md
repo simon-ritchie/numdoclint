@@ -37,6 +37,7 @@ For more details, please see [A Guide to NumPy/SciPy Documentation](https://docs
     - Also will be checked argument default value and docstring optionally.
 - Check arguments order.
 - Check return value and docstring `Returns` section mismatching.
+- Check Jupyter notebook's docstring also.
 
 # Dependencies
 
@@ -228,6 +229,22 @@ Argument name: orient
 Argument default value: "dict"
 ...
 ```
+
+### Check Jupyter notebook
+
+By using the `check_jupyter_notebook` and `check_jupyter_notebook_recursively` interface, you can check Jupyter notebooks as well as Python modules.
+
+```py
+check_result_list = numdoclint.check_jupyter_notebook(
+    notebook_path='./sample_notebook.ipynb')
+```
+
+```py
+check_result_list = numdoclint.check_jupyter_notebook_recursively(
+    dir_path='./sample_dir/')
+```
+
+`ignore_func_name_suffix_list`, `ignore_info_id_list`, and `enable_default_or_optional_doc_check` arguments described above are also available.
 
 ## Command line interface
 
