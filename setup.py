@@ -10,7 +10,7 @@ long_description = \
 
 setup(
     name='numdoclint',
-    version='0.0.8',
+    version='0.0.9',
     url='https://github.com/simon-ritchie/numdoclint',
     author='simon-ritchie',
     author_email='',
