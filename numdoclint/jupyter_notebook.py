@@ -87,6 +87,112 @@ def check_jupyter_notebook(
     return info_list
 
 
+def check_jupyter_notebook_recursively(
+        dir_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False):
+    """
+    Check docstring of Jupyter notebook recursively.
+
+    Parameters
+    ----------
+    dir_path : str
+        Target directory path.
+    verbose : int, default 1
+        Log settings of stdout. Specify one of the following numbers:
+        - 0 -> Do not output log.
+        - 1 -> Output the check result.
+    ignore_func_name_suffix_list : list of str, default ['test_']
+        A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int, default []
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
+    enable_default_or_optional_doc_check : bool, default False
+        If True specified, the `default` and `optional` string
+        in docstring will be checked.
+        i.e., if there is an argument containing a default value,
+        docstring's argument needs to describe default or optional.
+        e.g., `price : int, default is 100`, `price : int, default 100`,
+        `price : int, optional`.
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing information on check results.
+        The following values are set in the dictionary key:
+        - notebook_path : str -> Path of target Jupyter notebook.
+        - code_cell_index : int -> Notebook code cell index number
+            (start with zero). Not include markdown cells.
+        - func_name : str -> Target function name.
+        - info_id : int -> Identification number of which information.
+        - info : str -> Information of check result.
+    """
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    info_list = _check_jupyter_notebook_recursively(
+        dir_path=dir_path,
+        info_list=[],
+        verbose=verbose,
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        ignore_info_id_list=ignore_info_id_list,
+        enable_default_or_optional_doc_check=enable_def_or_opt_check)
+    return info_list
+
+
+def _check_jupyter_notebook_recursively(
+        dir_path, info_list, verbose,
+        ignore_func_name_suffix_list, ignore_info_id_list,
+        enable_default_or_optional_doc_check):
+    """
+    Check docstring of Jupyter notebook recursively.
+
+    Parameters
+    ----------
+    dir_path : str
+        Target directory path.
+    verbose : int
+        Log settings of stdout. Specify one of the following numbers:
+        - 0 -> Do not output log.
+        - 1 -> Output the check result.
+    ignore_func_name_suffix_list : list of str
+        A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int
+        List of IDs to ignore lint checking. A constant with a
+        suffix of `INFO_ID_` can be specified.
+    enable_default_or_optional_doc_check : bool
+        If True specified, the `default` and `optional` string
+        in docstring will be checked.
+        i.e., if there is an argument containing a default value,
+        docstring's argument needs to describe default or optional.
+        e.g., `price : int, default is 100`, `price : int, default 100`,
+        `price : int, optional`.
+    """
+    file_or_folder_name_list = os.listdir(dir_path)
+    if not file_or_folder_name_list:
+        return info_list
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    for file_or_folder_name in file_or_folder_name_list:
+        path = os.path.join(dir_path, file_or_folder_name)
+        path = path.replace('\\', '/')
+        if os.path.isdir(path):
+            info_list = _check_jupyter_notebook_recursively(
+                dir_path=path,
+                info_list=info_list,
+                verbose=verbose,
+                ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                ignore_info_id_list=ignore_info_id_list,
+                enable_default_or_optional_doc_check=enable_def_or_opt_check)
+            continue
+        if not path.endswith('.ipynb'):
+            continue
+        unit_info_list = check_jupyter_notebook(
+            notebook_path=path,
+            verbose=verbose,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_info_id_list=ignore_info_id_list)
+        info_list.extend(unit_info_list)
+    return info_list
+
+
 def _print_info_list(info_list, verbose):
     """
     Print check result.

@@ -287,6 +287,16 @@ def test__print_info_list():
     assert 'Sample infomation 2.' in printed_str
 
 
+schema = Schema(
+    schema={
+        jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: STR_SCHEMA,
+        jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
+        jupyter_notebook.INFO_KEY_FUNC_NAME: STR_SCHEMA,
+        jupyter_notebook.INFO_KEY_INFO_ID: int,
+        jupyter_notebook.INFO_KEY_INFO: STR_SCHEMA,
+    }, required=True)
+
+
 def test_check_jupyter_notebook():
     notebook_path = './tests/jupyter/test_jupyter_notebook_py3.ipynb'
     info_list = jupyter_notebook.check_jupyter_notebook(
@@ -295,14 +305,6 @@ def test_check_jupyter_notebook():
         ignore_func_name_suffix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
-    schema = Schema(
-        schema={
-            jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: STR_SCHEMA,
-            jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
-            jupyter_notebook.INFO_KEY_FUNC_NAME: STR_SCHEMA,
-            jupyter_notebook.INFO_KEY_INFO_ID: int,
-            jupyter_notebook.INFO_KEY_INFO: STR_SCHEMA,
-        }, required=True)
     assert info_list
     for info_dict in info_list:
         schema(info_dict)
@@ -332,8 +334,53 @@ def test_check_jupyter_notebook():
     notebook_path = './tests/jupyter/test_blank_notebook.ipynb'
     info_list = jupyter_notebook.check_jupyter_notebook(
         notebook_path=notebook_path,
-        verbose=0,
+        verbose=jupyter_notebook.VERBOSE_DISABLED,
         ignore_func_name_suffix_list=[],
         ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list == []
+
+
+def test_check_jupyter_notebook_recursively():
+    info_list = jupyter_notebook.check_jupyter_notebook_recursively(
+        dir_path='./numdoclint/',
+        verbose=jupyter_notebook.VERBOSE_DISABLED,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list == []
+
+    info_list = jupyter_notebook.check_jupyter_notebook_recursively(
+        dir_path='./tests/',
+        verbose=jupyter_notebook.VERBOSE_DISABLED,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list
+    for info_dict in info_list:
+        schema(info_dict)
+    notebook_path_list = [
+        info_dict[jupyter_notebook.INFO_KEY_NOTEBOOK_PATH]
+        for info_dict in info_list]
+    unique_path_list = list(set(notebook_path_list))
+    assert len(unique_path_list) > 1
+
+    ignore_info_id_list = [
+        info_dict[jupyter_notebook.INFO_KEY_INFO_ID]
+        for info_dict in info_list]
+
+    info_list = jupyter_notebook.check_jupyter_notebook_recursively(
+        dir_path='./tests/',
+        verbose=jupyter_notebook.VERBOSE_DISABLED,
+        ignore_func_name_suffix_list=['test_'],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list == []
+
+    info_list = jupyter_notebook.check_jupyter_notebook_recursively(
+        dir_path='./tests/',
+        verbose=jupyter_notebook.VERBOSE_DISABLED,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=True)
     assert info_list == []
