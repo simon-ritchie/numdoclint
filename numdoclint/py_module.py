@@ -197,8 +197,8 @@ def _print_info_list(info_list, verbose):
     printed_str = ''
     for info_dict in info_list:
         if printed_str != '':
-            printed_str += '\n\n'
-        printed_str += '{module_path}::{func_name}\n{info}'.format(
+            printed_str += '\n'
+        printed_str += '{module_path}::{func_name}\n{info}\n'.format(
             module_path=info_dict[INFO_KEY_MODULE_PATH],
             func_name=info_dict[INFO_KEY_FUNC_NAME],
             info=info_dict[INFO_KEY_INFO])

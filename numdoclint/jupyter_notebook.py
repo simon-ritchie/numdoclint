@@ -64,6 +64,9 @@ def check_jupyter_notebook(
         - If the target notebook can not be found.
         - If the target notebook extension is not `ipynb`.
     """
+    is_checkpoint_in = '.ipynb_checkpoints' in notebook_path
+    if is_checkpoint_in:
+        return []
     _check_notebook_exists(notebook_path=notebook_path)
     _check_notebook_extension(notebook_path=notebook_path)
     notebook_data_dict = _read_notebook_data_dict(
@@ -222,9 +225,9 @@ def _print_info_list(info_list, verbose):
     printed_str = ''
     for info_dict in info_list:
         if printed_str != '':
-            printed_str += '\n\n'
+            printed_str += '\n'
         printed_str += '{notebook_path}::code cell index:{code_cell_index}'\
-                      '::{func_name}\n{info}'.format(
+                      '::{func_name}\n{info}\n'.format(
                           notebook_path=info_dict['notebook_path'],
                           code_cell_index=info_dict['code_cell_index'],
                           func_name=info_dict['func_name'],
