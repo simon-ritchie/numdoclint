@@ -2,11 +2,11 @@
 """
 
 from __future__ import print_function
-import os
-import json
 
-from numdoclint import helper
-from numdoclint import py_module
+import json
+import os
+
+from numdoclint import helper, py_module
 
 INFO_KEY_NOTEBOOK_PATH = 'notebook_path'
 INFO_KEY_CODE_CELL_INDEX = 'code_cell_index'
@@ -152,6 +152,8 @@ def _check_jupyter_notebook_recursively(
     ----------
     dir_path : str
         Target directory path.
+    info_list : list of dicts
+        A list containing information on check results.
     verbose : int
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
@@ -168,6 +170,11 @@ def _check_jupyter_notebook_recursively(
         docstring's argument needs to describe default or optional.
         e.g., `price : int, default is 100`, `price : int, default 100`,
         `price : int, optional`.
+
+    Returns
+    -------
+    info_list : list of dicts
+        A list containing information on check results.
     """
     file_or_folder_name_list = os.listdir(dir_path)
     if not file_or_folder_name_list:
@@ -227,11 +234,11 @@ def _print_info_list(info_list, verbose):
         if printed_str != '':
             printed_str += '\n'
         printed_str += '{notebook_path}::code cell index:{code_cell_index}'\
-                      '::{func_name}\n{info}\n'.format(
-                          notebook_path=info_dict['notebook_path'],
-                          code_cell_index=info_dict['code_cell_index'],
-                          func_name=info_dict['func_name'],
-                          info=info_dict['info'])
+            '::{func_name}\n{info}\n'.format(
+                notebook_path=info_dict['notebook_path'],
+                code_cell_index=info_dict['code_cell_index'],
+                func_name=info_dict['func_name'],
+                info=info_dict['info'])
     print(printed_str)
     return printed_str
 

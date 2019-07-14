@@ -1,5 +1,7 @@
 # flake8: noqa
 
+from numdoclint.jupyter_notebook import (check_jupyter_notebook,
+                                         check_jupyter_notebook_recursively)
 from numdoclint.py_module import (INFO_ID_DIFFERENT_PARAM_ORDER,
                                   INFO_ID_LACKED_ARG_DEFAULT_VALUE,
                                   INFO_ID_LACKED_ARGUMENT,
@@ -14,5 +16,3 @@ from numdoclint.py_module import (INFO_ID_DIFFERENT_PARAM_ORDER,
                                   INFO_ID_LACKED_RETURN_VAL,
                                   check_python_module,
                                   check_python_module_recursively)
-from numdoclint.jupyter_notebook import (check_jupyter_notebook,
-                                         check_jupyter_notebook_recursively)
