@@ -164,7 +164,7 @@ def _check_unit_code_cell_str(
         - info : str -> Information of check result.
     """
     func_name_list = helper.get_func_name_list(
-        py_module_str=code_cell_str)
+        code_str=code_cell_str)
     if not func_name_list:
         return []
     info_list = []
@@ -176,8 +176,8 @@ def _check_unit_code_cell_str(
         if is_func_name_to_ignore:
             continue
         single_func_info_list = py_module.get_single_func_info_list(
-            module_path=notebook_path,
-            module_str=code_cell_str,
+            path=notebook_path,
+            code_str=code_cell_str,
             func_name=func_name,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=[],

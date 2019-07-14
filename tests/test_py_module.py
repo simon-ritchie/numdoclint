@@ -797,8 +797,8 @@ def sample_func_15(price):
         """
         enable_def_or_opt_check = enable_default_or_optional_doc_check
         info_list = py_module.get_single_func_info_list(
-            module_path=TMP_TEST_MODULE_PATH,
-            module_str=module_str,
+            path=TMP_TEST_MODULE_PATH,
+            code_str=module_str,
             func_name=func_name,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list,

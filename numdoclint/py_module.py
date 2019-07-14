@@ -70,7 +70,7 @@ def check_python_module(
     """
     _check_module_exists(py_module_path=py_module_path)
     module_str = helper.read_file_str(file_path=py_module_path)
-    func_name_list = helper.get_func_name_list(py_module_str=module_str)
+    func_name_list = helper.get_func_name_list(code_str=module_str)
     if not func_name_list:
         return []
     info_list = []
@@ -82,8 +82,8 @@ def check_python_module(
         if is_func_name_to_ignore_:
             continue
         single_func_info_list = get_single_func_info_list(
-            module_path=py_module_path,
-            module_str=module_str,
+            path=py_module_path,
+            code_str=module_str,
             func_name=func_name,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list,
@@ -294,7 +294,7 @@ INFO_KEY_INFO = 'info'
 
 
 def get_single_func_info_list(
-        module_path, module_str, func_name,
+        path, code_str, func_name,
         enable_default_or_optional_doc_check,
         skip_decorator_name_list,
         ignore_info_id_list):
@@ -304,10 +304,10 @@ def get_single_func_info_list(
 
     Parameters
     ----------
-    module_path : str
-        Path of target module.
-    module_str : str
-        String of target Python module.
+    path : str
+        Path of target module file.
+    code_str : str
+        String of target Python code.
     func_name : str
         Target function name.
     enable_default_or_optional_doc_check : bool
@@ -332,11 +332,11 @@ def get_single_func_info_list(
     """
     info_list = []
     docstring = helper.get_func_overall_docstring(
-        py_module_str=module_str, func_name=func_name)
+        py_module_str=code_str, func_name=func_name)
     arg_name_list = helper.get_arg_name_list(
-        py_module_str=module_str, func_name=func_name)
+        py_module_str=code_str, func_name=func_name)
     default_val_info_dict = helper.get_arg_default_val_info_dict(
-        py_module_str=module_str, func_name=func_name)
+        py_module_str=code_str, func_name=func_name)
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
     optional_arg_name_list = helper.get_optional_arg_name_list(
@@ -344,11 +344,11 @@ def get_single_func_info_list(
     return_val_info_list = helper.get_docstring_return_val_info_list(
         docstring=docstring)
     return_val_exists_in_func = helper.return_val_exists_in_func(
-        module_str=module_str, func_name=func_name)
+        module_str=code_str, func_name=func_name)
     kwargs_exists = helper.kwargs_exists(
-        py_module_str=module_str, func_name=func_name)
+        py_module_str=code_str, func_name=func_name)
     decorator_names = helper.get_decorator_names(
-        py_module_str=module_str, func_name=func_name)
+        py_module_str=code_str, func_name=func_name)
     joined_decorator_names = ' '.join(decorator_names)
     for skip_decorator_name in skip_decorator_name_list:
         is_in = skip_decorator_name in joined_decorator_names
@@ -356,52 +356,52 @@ def get_single_func_info_list(
             return []
 
     unit_info_list = _check_func_description(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         docstring=docstring)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_param(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         arg_name_list=arg_name_list, param_info_list=param_info_list,
         kwargs_exists=kwargs_exists)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_docstring_param_type(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         param_info_list=param_info_list)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_docstring_param_description(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         param_info_list=param_info_list)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_docstring_param_order(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         arg_name_list=arg_name_list, param_info_list=param_info_list)
     info_list.extend(unit_info_list)
 
     if enable_default_or_optional_doc_check:
         unit_info_list = _check_lacked_default_value(
-            module_path=module_path, func_name=func_name,
+            module_path=path, func_name=func_name,
             param_info_list=param_info_list,
             default_val_info_dict=default_val_info_dict,
             optional_arg_name_list=optional_arg_name_list)
         info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_return(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         return_val_info_list=return_val_info_list,
         return_val_exists_in_func=return_val_exists_in_func)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_return_docstring_type(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         return_val_info_list=return_val_info_list)
     info_list.extend(unit_info_list)
 
     unit_info_list = _check_lacked_return_docstring_description(
-        module_path=module_path, func_name=func_name,
+        module_path=path, func_name=func_name,
         return_val_info_list=return_val_info_list)
     info_list.extend(unit_info_list)
 

@@ -42,24 +42,24 @@ def read_file_str(file_path):
     return file_str
 
 
-def get_func_name_list(py_module_str):
+def get_func_name_list(code_str):
     """
     Get a list of function names in the Python module.
 
     Parameters
     ----------
-    py_module_str : str
-        String of target Python module.
+    code_str : str
+        String of target Python code.
 
     Returns
     -------
     func_name_list : list of str
         List containing function names.
     """
-    py_module_str = py_module_str.replace('\n', '')
+    code_str = code_str.replace('\n', '')
     search_pattern = r'def .*?\(.*?\)'
     searched_result_list = re.findall(
-        pattern=search_pattern, string=py_module_str)
+        pattern=search_pattern, string=code_str)
     func_name_list = []
     for searched_result_str in searched_result_list:
         func_name = searched_result_str.replace('def ', '')
@@ -72,21 +72,21 @@ def get_func_name_list(py_module_str):
         if not_func_str:
             continue
         match = _get_func_match(
-            py_module_str=py_module_str, func_name=func_name)
+            py_module_str=code_str, func_name=func_name)
         if match is None:
             continue
         func_name_list.append(func_name)
     return func_name_list
 
 
-def _get_args_str(py_module_str, func_name):
+def _get_args_str(code_str, func_name):
     """
     Get the string of the arguments.
 
     Parameters
     ----------
-    py_module_str : str
-        String of target Python module.
+    code_str : str
+        String of target Python code.
     func_name : str
         Target function name.
 
@@ -97,9 +97,9 @@ def _get_args_str(py_module_str, func_name):
     """
     search_pattern = 'def %s' % func_name
     search_pattern = search_pattern + r'.*?\(.*?\)'
-    py_module_str = re.sub(pattern=r'\n', repl='', string=py_module_str)
+    code_str = re.sub(pattern=r'\n', repl='', string=code_str)
     searched_result_list = re.findall(
-        pattern=search_pattern, string=py_module_str)
+        pattern=search_pattern, string=code_str)
     searched_result_str = ''
     for searched_str_unit in searched_result_list:
         searched_func_name = searched_str_unit.split('(')[0]
@@ -142,7 +142,7 @@ def get_arg_name_list(
         List of argument names of target function.
     """
     args_str = _get_args_str(
-        py_module_str=py_module_str, func_name=func_name)
+        code_str=py_module_str, func_name=func_name)
     splitted_arg_name_list = args_str.split(',')
     arg_name_list = []
     for arg_name in splitted_arg_name_list:
@@ -786,7 +786,7 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
     as a string.
     """
     args_str = _get_args_str(
-        py_module_str=py_module_str, func_name=func_name)
+        code_str=py_module_str, func_name=func_name)
     if args_str == '':
         return {}
     splitted_arg_list = args_str.split(',')

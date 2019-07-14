@@ -13,7 +13,7 @@ def test_read_file_str():
 
 
 def test_get_func_name_list():
-    py_module_str = """
+    code_str = """
 def sample_func_1():
     pass
 
@@ -46,7 +46,7 @@ def sample_func
 sample_str = r'def .*?\\(.*?\\)'
     """
     func_name_list = helper.get_func_name_list(
-        py_module_str=py_module_str)
+        code_str=code_str)
     assert len(func_name_list) == 4
     assert 'sample_func_1' in func_name_list
     assert 'sample_func_2' in func_name_list
@@ -685,7 +685,7 @@ def test_get_func_description_from_docstring():
 
 
 def test__get_args_str():
-    py_module_str = """
+    code_str = """
     def sample_func_1():
         print(100)
 
@@ -720,31 +720,31 @@ def test__get_args_str():
         pass
     """
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func_1')
+        code_str=code_str, func_name='sample_func_1')
     assert args_str == ''
 
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func_2')
+        code_str=code_str, func_name='sample_func_2')
     assert args_str == 'price, location_id'
 
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func_3')
+        code_str=code_str, func_name='sample_func_3')
     assert args_str == 'price, location_id=200'
 
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func_4')
+        code_str=code_str, func_name='sample_func_4')
     assert args_str == 'price: int=100, location_id: int=200'
 
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func_5')
+        code_str=code_str, func_name='sample_func_5')
     assert args_str == 'price, location_id, season'
 
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func_6')
+        code_str=code_str, func_name='sample_func_6')
     assert args_str == 'prince = 100, location_id = 200'
 
     args_str = helper._get_args_str(
-        py_module_str=py_module_str, func_name='sample_func')
+        code_str=code_str, func_name='sample_func')
     assert args_str == 'price, name'
 
 
