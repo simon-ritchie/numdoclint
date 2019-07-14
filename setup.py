@@ -10,7 +10,7 @@ long_description = \
 
 setup(
     name='numdoclint',
-    version='0.0.9',
+    version='0.0.10',
     url='https://github.com/simon-ritchie/numdoclint',
     author='simon-ritchie',
     author_email='',
@@ -28,4 +28,9 @@ setup(
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
     ],
-),
+    entry_points={
+        'console_scripts': [
+            'numdoclint = numdoclint.cli:main',
+        ],
+    },
+)
