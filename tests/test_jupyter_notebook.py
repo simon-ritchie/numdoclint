@@ -288,4 +288,52 @@ def test__print_info_list():
 
 
 def test_check_jupyter_notebook():
-    pass
+    notebook_path = './tests/jupyter/test_jupyter_notebook_py3.ipynb'
+    info_list = jupyter_notebook.check_jupyter_notebook(
+        notebook_path=notebook_path,
+        verbose=0,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    schema = Schema(
+        schema={
+            jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: STR_SCHEMA,
+            jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
+            jupyter_notebook.INFO_KEY_FUNC_NAME: STR_SCHEMA,
+            jupyter_notebook.INFO_KEY_INFO_ID: int,
+            jupyter_notebook.INFO_KEY_INFO: STR_SCHEMA,
+        }, required=True)
+    assert info_list
+    for info_dict in info_list:
+        schema(info_dict)
+    assert len(info_list) >= 10
+
+    ignore_info_id_list = [
+        info_dict[jupyter_notebook.INFO_KEY_INFO_ID]
+        for info_dict in info_list]
+
+    info_list = jupyter_notebook.check_jupyter_notebook(
+        notebook_path=notebook_path,
+        verbose=0,
+        ignore_func_name_suffix_list=['test_'],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list == []
+
+    info_list = jupyter_notebook.check_jupyter_notebook(
+        notebook_path=notebook_path,
+        verbose=0,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=ignore_info_id_list,
+        enable_default_or_optional_doc_check=True)
+    info_list
+    assert info_list == []
+
+    notebook_path = './tests/jupyter/test_blank_notebook.ipynb'
+    info_list = jupyter_notebook.check_jupyter_notebook(
+        notebook_path=notebook_path,
+        verbose=0,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True)
+    assert info_list == []
