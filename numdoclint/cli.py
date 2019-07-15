@@ -1,9 +1,11 @@
 """Module for command line interface.
 """
 
+import os
 import argparse
 
 import numdoclint
+from numdoclint import py_module
 
 
 def _get_list_of_str_from_csv(csv):
@@ -23,6 +25,47 @@ def _get_list_of_str_from_csv(csv):
     if csv == '':
         return []
     return csv.split(',')
+
+
+def _validate_args(path, ignore_info_id_list, check_recursively):
+    """
+    Check whether the specified argument is valid or not.
+
+    Parameters
+    ----------
+    path : str
+        Specified path argument.
+    ignore_info_id_list : list of int
+        List of specified information IDs to ignore.
+    check_recursively : bool
+        A boolean value of whether to check recursively.
+
+    Raises
+    ------
+    Exception
+        - If the path argument is None.
+        - If specified invalid information id.
+        - If specified `-r` and a path is not directory.
+    """
+    if path is None:
+        err_msg = 'A path is not specified in the argument.'\
+                  'Please set the `-p` or `--path` argument.'
+        raise Exception(err_msg)
+    info_id_list = py_module.get_info_id_list()
+    for ignore_info_id in ignore_info_id_list:
+        is_in = ignore_info_id in info_id_list
+        if is_in:
+            continue
+        err_msg = 'Invalid information id is specified to '\
+            '`-i` or `--ignore_info_id_list` argument : %s' \
+            % ignore_info_id
+        raise Exception(err_msg)
+    if check_recursively:
+        if not os.path.isdir(path):
+            err_msg = 'If the `-r` or `--check_recursively`'\
+                ' argument is specified, the path argument'\
+                ' must specify a directory.'
+            raise Exception(err_msg)
 
 
 def _get_list_of_int_from_csv(csv):
@@ -96,6 +139,7 @@ def main():
              'necessary for docstring-related decorators.')
 
     args = parser.parse_args()
+    print('type:', type(args))
     print('path:', args.path)
     print('is_jupyter:', args.is_jupyter)
     print('ignore_func_name_suffix_list:', args.ignore_func_name_suffix_list)
@@ -104,3 +148,8 @@ def main():
         'enable_default_or_optional_doc_check:',
         args.enable_default_or_optional_doc_check)
     print('skip_decorator_name_list:', args.skip_decorator_name_list)
+
+    _validate_args(
+        path=args.path,
+        ignore_info_id_list=args.ignore_info_id_list,
+        check_recursively=args.check_recursively)
