@@ -26,10 +26,23 @@ def _get_list_of_str_from_csv(csv):
 
 
 def _get_list_of_int_from_csv(csv):
+    """
+    Get a list of integer from one line CSV.
+
+    Parameters
+    ----------
+    csv : str
+        One line CSV string.
+
+    Returns
+    -------
+    result_list : list of str
+        List of splitted integer.
+    """
     if csv == '':
         return []
     ignore_info_id_list = csv.split(',')
-    for i, info_id in ignore_info_id_list:
+    for i, info_id in enumerate(ignore_info_id_list):
         ignore_info_id_list[i] = int(info_id)
     return ignore_info_id_list
 
