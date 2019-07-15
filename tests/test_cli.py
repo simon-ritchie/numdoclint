@@ -407,7 +407,7 @@ def sample_func_1(price):
         skip_decorator_name_list = []
 
     args = Args()
-    info_list = cli.main(args=args)
+    info_list = cli.main(args=args, return_list=True)
     assert info_list
     schema = Schema(
         schema={

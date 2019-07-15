@@ -248,7 +248,59 @@ check_result_list = numdoclint.check_jupyter_notebook_recursively(
 
 ## Command line interface
 
-Currently not implemented yet ([#2](https://github.com/simon-ritchie/numdoclint/issues/2)).
+You can run the check as well with the following command:
+
+```
+$ numdoclint -p ./sample/path.py
+```
+
+The following arguments are provided. Only `--path` argument is required, other arguments are optional.
+
+```
+  -h, --help            show this help message and exit
+  -p PATH, --path PATH  Python module file path, Jupyter notebook path, or
+                        directory path.
+  -r, --check_recursively
+                        If specified, check files recursively.In that case,
+                        you need to specify the directory in the path
+                        argument.
+  -j, --is_jupyter      If specified, check target will become Jupyter
+                        notebook. If not, Python module will be checked.
+  -f IGNORE_FUNC_NAME_SUFFIX_LIST, --ignore_func_name_suffix_list IGNORE_FUNC_NAME_SUFFIX_LIST
+                        A suffix list of function name conditions to ignore.
+                        e.g., test_,sample_ Comma separated string is
+                        acceptable.
+  -i IGNORE_INFO_ID_LIST, --ignore_info_id_list IGNORE_INFO_ID_LIST
+                        List of IDs to ignore lint checking. e.g, 1,2,3 Comma
+                        separated integer is acceptable.
+  -o, --enable_default_or_optional_doc_check
+                        If specified, the `default` and `optional` stringin
+                        docstring will be checked.
+  -d SKIP_DECORATOR_NAME_LIST, --skip_decorator_name_list SKIP_DECORATOR_NAME_LIST
+                        If a decorator name in this list is set to function,
+                        that function will not be checked. Specify if
+                        necessary for docstring-related decorators. Note: only
+                        available when check Python module, not supported
+                        Jupyter notebook.
+```
+
+### Example of checking Python module recursively:
+
+```
+$ numdoclint -p ./sample/dir/ -r
+```
+
+### Example of checking Jupyter notebook:
+
+```
+$ numdoclint -j -p ./sample/path.ipynb
+```
+
+### Example of checking Jupyter notebook recursively:
+
+```
+$ numdoclint -j -r -p ./sample/dir/
+```
 
 # Lint condition examples
 
