@@ -5,8 +5,7 @@ import pytest
 import six
 from voluptuous import Any, Schema
 
-from numdoclint import cli
-from numdoclint import py_module, jupyter_notebook
+from numdoclint import cli, jupyter_notebook, py_module
 
 TMP_TEST_MODULE_DIR = 'tests/tmp_test/'
 TMP_TEST_MODULE_PATH_1 = os.path.join(

@@ -1,8 +1,8 @@
 """Module for command line interface.
 """
 
-import os
 import argparse
+import os
 
 import numdoclint
 from numdoclint import py_module
