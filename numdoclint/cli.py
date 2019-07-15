@@ -48,7 +48,7 @@ def _validate_args(path, ignore_info_id_list, check_recursively):
         - If specified `-r` and a path is not directory.
     """
     if path is None:
-        err_msg = 'A path is not specified in the argument.'\
+        err_msg = 'A path is not specified in the argument. '\
                   'Please set the `-p` or `--path` argument.'
         raise Exception(err_msg)
     info_id_list = py_module.get_info_id_list()
@@ -90,8 +90,84 @@ def _get_list_of_int_from_csv(csv):
     return ignore_info_id_list
 
 
+def _exec_numdoclist(
+        path,
+        check_recursively,
+        is_jupyter,
+        ignore_func_name_suffix_list,
+        ignore_info_id_list,
+        enable_default_or_optional_doc_check,
+        skip_decorator_name_list):
+    """
+    Execute Numdoc Lint function.
+
+    Parameters
+    ----------
+    path : str
+        Python module file path, Jupyter notebook path, or
+        directory path.
+    check_recursively : bool
+        If True, check files recursively.
+    is_jupyter : bool
+        If True, check target will become Jupyter notebook.
+        If not, Python module will be checked.
+    ignore_func_name_suffix_list : list of str
+        A suffix list of function name conditions to ignore.
+    ignore_info_id_list : list of int
+        List of IDs to ignore lint checking.
+    enable_default_or_optional_doc_check : bool
+        If True, the `default` and `optional` string in
+        docstring will be checked.
+    skip_decorator_name_list : list of str
+        If a decorator name in this list is set to function,
+        that function will not bo checked.
+
+    Returns
+    -------
+    info_list : list of dicts
+        List of check results.
+    """
+    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    if not is_jupyter:
+        if not check_recursively:
+            info_list = numdoclint.check_python_module(
+                py_module_path=path,
+                ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                ignore_info_id_list=ignore_info_id_list,
+                enable_default_or_optional_doc_check=enable_def_or_opt_check,
+                skip_decorator_name_list=skip_decorator_name_list)
+            return info_list
+        info_list = numdoclint.check_python_module_recursively(
+            dir_path=path,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_info_id_list=ignore_info_id_list,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check,
+            skip_decorator_name_list=skip_decorator_name_list)
+        return info_list
+
+    if not check_recursively:
+        info_list = numdoclint.check_jupyter_notebook(
+            notebook_path=path,
+            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_info_id_list=ignore_info_id_list,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check)
+        return info_list
+    info_list = numdoclint.check_jupyter_notebook_recursively(
+        dir_path=path,
+        ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        ignore_info_id_list=ignore_info_id_list,
+        enable_default_or_optional_doc_check=enable_def_or_opt_check)
+    return info_list
+
+
 def main():
-    """The function of command line entry point.
+    """
+    The function of command line entry point.
+
+    Returns
+    -------
+    info_list : list of dicts
+        List of check results.
     """
     description = 'NumPy style docstring checking in Python code.'
     parser = argparse.ArgumentParser(description=description)
@@ -109,7 +185,7 @@ def main():
     parser.add_argument(
         '-j', '--is_jupyter',
         action='store_true',
-        help='If specified, check target will become jupyter notebook. '
+        help='If specified, check target will become Jupyter notebook. '
              'If not, Python module will be checked.')
     parser.add_argument(
         '-f', '--ignore_func_name_suffix_list',
@@ -139,17 +215,20 @@ def main():
              'necessary for docstring-related decorators.')
 
     args = parser.parse_args()
-    print('type:', type(args))
-    print('path:', args.path)
-    print('is_jupyter:', args.is_jupyter)
-    print('ignore_func_name_suffix_list:', args.ignore_func_name_suffix_list)
-    print('ignore_info_id_list:', args.ignore_info_id_list)
-    print(
-        'enable_default_or_optional_doc_check:',
-        args.enable_default_or_optional_doc_check)
-    print('skip_decorator_name_list:', args.skip_decorator_name_list)
 
     _validate_args(
         path=args.path,
         ignore_info_id_list=args.ignore_info_id_list,
         check_recursively=args.check_recursively)
+
+    enable_def_or_opt_check = args.enable_default_or_optional_doc_check
+    info_list = _exec_numdoclist(
+        path=args.path,
+        check_recursively=args.check_recursively,
+        is_jupyter=args.is_jupyter,
+        ignore_func_name_suffix_list=args.ignore_func_name_suffix_list,
+        ignore_info_id_list=args.ignore_info_id_list,
+        enable_default_or_optional_doc_check=enable_def_or_opt_check,
+        skip_decorator_name_list=args.skip_decorator_name_list,
+    )
+    return info_list
