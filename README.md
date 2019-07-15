@@ -268,10 +268,10 @@ The following arguments are provided. Only `--path` argument is required, other 
                         notebook. If not, Python module will be checked.
   -f IGNORE_FUNC_NAME_SUFFIX_LIST, --ignore_func_name_suffix_list IGNORE_FUNC_NAME_SUFFIX_LIST
                         A suffix list of function name conditions to ignore.
-                        e.g., test_,sample_ Comma separated string is
+                        e.g., test_,sample_. Comma separated string is
                         acceptable.
   -i IGNORE_INFO_ID_LIST, --ignore_info_id_list IGNORE_INFO_ID_LIST
-                        List of IDs to ignore lint checking. e.g, 1,2,3 Comma
+                        List of IDs to ignore lint checking. e.g, 1,2,3. Comma
                         separated integer is acceptable.
   -o, --enable_default_or_optional_doc_check
                         If specified, the `default` and `optional` stringin

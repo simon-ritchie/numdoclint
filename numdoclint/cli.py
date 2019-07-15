@@ -188,7 +188,7 @@ def main(args=None, return_list=False):
     parser.add_argument(
         '-r', '--check_recursively',
         action='store_true',
-        help='If specified, check files recursively.'
+        help='If specified, check files recursively. '
              'In that case, you need to specify the directory '
              'in the path argument.')
     parser.add_argument(
@@ -201,19 +201,19 @@ def main(args=None, return_list=False):
         type=_get_list_of_str_from_csv,
         default='',
         help='A suffix list of function name conditions to ignore.'
-             '\ne.g., test_,sample_'
+             '\ne.g., test_,sample_.'
              '\nComma separated string is acceptable.')
     parser.add_argument(
         '-i', '--ignore_info_id_list',
         type=_get_list_of_int_from_csv,
         default='',
         help='List of IDs to ignore lint checking.'
-             '\ne.g, 1,2,3'
+             '\ne.g, 1,2,3.'
              '\nComma separated integer is acceptable.')
     parser.add_argument(
         '-o', '--enable_default_or_optional_doc_check',
         action='store_true',
-        help='If specified, the `default` and `optional` string'
+        help='If specified, the `default` and `optional` string '
              'in docstring will be checked.')
     parser.add_argument(
         '-d', '--skip_decorator_name_list',
