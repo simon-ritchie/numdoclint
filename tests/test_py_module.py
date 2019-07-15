@@ -1220,3 +1220,12 @@ def test__remove_info_to_ignore_by_id():
     assert (
         info_list[0][py_module.INFO_KEY_INFO_ID]
         == py_module.INFO_ID_LACKED_ARGUMENT)
+
+
+def test_get_info_id_list():
+    info_id_list = py_module.get_info_id_list()
+    assert info_id_list
+    for info_id in info_id_list:
+        assert isinstance(info_id, int)
+    assert len(info_id_list) == len(list(set(info_id_list)))
+    assert py_module.INFO_ID_LACKED_ARGUMENT in info_id_list

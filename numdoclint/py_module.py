@@ -4,6 +4,8 @@
 from __future__ import print_function
 
 import os
+import inspect
+import sys
 
 from numdoclint import helper
 
@@ -291,6 +293,27 @@ INFO_KEY_MODULE_PATH = 'module_path'
 INFO_KEY_FUNC_NAME = 'func_name'
 INFO_KEY_INFO_ID = 'info_id'
 INFO_KEY_INFO = 'info'
+
+
+def get_info_id_list():
+    """
+    Get a list of information IDs.
+
+    Returns
+    -------
+    info_id_list : list of int
+        A list of information IDs.
+    """
+    this_module = sys.modules[__name__]
+    members = inspect.getmembers(this_module)
+    info_id_list = []
+    for name, obj in members:
+        if not name.startswith('INFO_ID_'):
+            continue
+        if not isinstance(obj, int):
+            continue
+        info_id_list.append(obj)
+    return info_id_list
 
 
 def get_single_func_info_list(
