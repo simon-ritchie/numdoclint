@@ -90,7 +90,7 @@ def _get_list_of_int_from_csv(csv):
     return ignore_info_id_list
 
 
-def _exec_numdoclist(
+def _exec_numdoclint(
         path,
         check_recursively,
         is_jupyter,
@@ -212,7 +212,9 @@ def main():
         default='',
         help='If a decorator name in this list is set to function, '
              'that function will not be checked. Specify if '
-             'necessary for docstring-related decorators.')
+             'necessary for docstring-related decorators. '
+             'Note: only available when check Python module, '
+             'not supported Jupyter notebook.')
 
     args = parser.parse_args()
 
@@ -222,7 +224,7 @@ def main():
         check_recursively=args.check_recursively)
 
     enable_def_or_opt_check = args.enable_default_or_optional_doc_check
-    info_list = _exec_numdoclist(
+    info_list = _exec_numdoclint(
         path=args.path,
         check_recursively=args.check_recursively,
         is_jupyter=args.is_jupyter,

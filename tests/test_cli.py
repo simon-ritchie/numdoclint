@@ -6,7 +6,7 @@ import six
 from voluptuous import Any, Schema
 
 from numdoclint import cli
-from numdoclint import py_module
+from numdoclint import py_module, jupyter_notebook
 
 TMP_TEST_MODULE_DIR = 'tests/tmp_test/'
 TMP_TEST_MODULE_PATH_1 = os.path.join(
@@ -47,6 +47,51 @@ def test__get_list_of_int_from_csv():
     assert result_list == [1, 2, 3]
 
 
+def _assert_default_value_check_info_id_is_in(info_list):
+    """
+    Check that the check result of the default value
+    is included in the list.
+
+    Parameters
+    ----------
+    info_list : list of dict
+        List of check results.
+
+    Raises
+    ------
+    AssertionError
+        If not included in the list.
+    """
+    default_val_info_exists = False
+    for info_dict in info_list:
+        if (info_dict[py_module.INFO_KEY_INFO_ID]
+                == py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE):
+            default_val_info_exists = True
+            break
+    assert default_val_info_exists
+
+
+def _assert_default_value_check_info_id_is_not_in(info_list):
+    """
+    Check that the check result of the default value is not
+    included in the list.
+
+    Parameters
+    ----------
+    info_list : list of dicts
+        List of check results.
+
+    Raises
+    ------
+    AssertionError
+        If included in the list.
+    """
+    info_id_list = [
+        info_dict[py_module.INFO_KEY_INFO_ID] for info_dict in info_list]
+    for info_id in info_id_list:
+        assert info_id != py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE
+
+
 def test__validate_args():
     with pytest.raises(Exception):
         cli._validate_args(
@@ -69,7 +114,7 @@ def test__validate_args():
         check_recursively=False)
 
 
-def test__exec_numdoclist():
+def test__exec_numdoclint():
     module_str_1 = """
 def sample_func_1(price):
     pass
@@ -92,7 +137,7 @@ def sample_func_2(price=100):
     with open(TMP_TEST_MODULE_PATH_2, 'w') as f:
         f.write(module_str_2)
 
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_1,
         check_recursively=False,
         is_jupyter=False,
@@ -112,7 +157,7 @@ def sample_func_2(price=100):
         schema(info_dict)
     info_id_list = [
         info_dict[py_module.INFO_KEY_INFO_ID] for info_dict in info_list]
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_1,
         check_recursively=False,
         is_jupyter=False,
@@ -121,7 +166,7 @@ def sample_func_2(price=100):
         enable_default_or_optional_doc_check=True,
         skip_decorator_name_list=[])
     assert info_list == []
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_1,
         check_recursively=False,
         is_jupyter=False,
@@ -130,7 +175,7 @@ def sample_func_2(price=100):
         enable_default_or_optional_doc_check=True,
         skip_decorator_name_list=[])
     assert info_list == []
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_2,
         check_recursively=False,
         is_jupyter=False,
@@ -139,7 +184,7 @@ def sample_func_2(price=100):
         enable_default_or_optional_doc_check=True,
         skip_decorator_name_list=[])
     assert info_list
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_2,
         check_recursively=False,
         is_jupyter=False,
@@ -148,7 +193,7 @@ def sample_func_2(price=100):
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=[])
     assert info_list == []
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_2,
         check_recursively=False,
         is_jupyter=False,
@@ -166,7 +211,7 @@ def sample_func_2(price=100):
             py_module.INFO_KEY_INFO: Any(*six.string_types),
         },
         required=True)
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_DIR,
         check_recursively=True,
         is_jupyter=False,
@@ -192,7 +237,7 @@ def sample_func_2(price=100):
     assert module_path_2_exists
     info_id_list = [
         info_dict[py_module.INFO_KEY_INFO_ID] for info_dict in info_list]
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_DIR,
         check_recursively=True,
         is_jupyter=False,
@@ -201,7 +246,7 @@ def sample_func_2(price=100):
         enable_default_or_optional_doc_check=True,
         skip_decorator_name_list=[])
     assert info_list == []
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_DIR,
         check_recursively=True,
         is_jupyter=False,
@@ -211,7 +256,7 @@ def sample_func_2(price=100):
         skip_decorator_name_list=[])
     assert info_list == []
 
-    info_list = cli._exec_numdoclist(
+    info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_DIR,
         check_recursively=True,
         is_jupyter=False,
@@ -221,5 +266,124 @@ def sample_func_2(price=100):
         skip_decorator_name_list=[])
     info_id_list = [
         info_dict[py_module.INFO_KEY_INFO_ID] for info_dict in info_list]
-    for info_id in info_id_list:
-        assert info_id != py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE
+    _assert_default_value_check_info_id_is_not_in(info_list=info_list)
+    schema = Schema(
+        schema={
+            jupyter_notebook.INFO_KEY_NOTEBOOK_PATH:
+            './tests/jupyter/test_jupyter_notebook_py3.ipynb',
+            jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
+            jupyter_notebook.INFO_KEY_FUNC_NAME: Any(*six.string_types),
+            jupyter_notebook.INFO_KEY_INFO_ID: int,
+            jupyter_notebook.INFO_KEY_INFO: Any(*six.string_types),
+        },
+        required=True)
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/test_jupyter_notebook_py3.ipynb',
+        check_recursively=False,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    assert info_list
+    for info_dict in info_list:
+        schema(info_dict)
+    info_id_list = [
+        info_dict[jupyter_notebook.INFO_KEY_INFO_ID]
+        for info_dict in info_list]
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/test_jupyter_notebook_py3.ipynb',
+        check_recursively=False,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=['sample_', 'test_'],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    assert info_list == []
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/test_jupyter_notebook_py3.ipynb',
+        check_recursively=False,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=info_id_list,
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    assert info_list == []
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/test_jupyter_notebook_py3.ipynb',
+        check_recursively=False,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    _assert_default_value_check_info_id_is_in(info_list=info_list)
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/test_jupyter_notebook_py3.ipynb',
+        check_recursively=False,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=[])
+    for info_dict in info_list:
+        assert (
+            info_dict[jupyter_notebook.INFO_KEY_INFO_ID]
+            != py_module.INFO_ID_LACKED_DOC_DEFAULT_VALUE)
+
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/',
+        check_recursively=True,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    schema = Schema(
+        schema={
+            jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: Any(*six.string_types),
+            jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
+            jupyter_notebook.INFO_KEY_FUNC_NAME: Any(*six.string_types),
+            jupyter_notebook.INFO_KEY_INFO_ID: int,
+            jupyter_notebook.INFO_KEY_INFO: Any(*six.string_types),
+        },
+        required=True)
+    assert info_list
+    for info_dict in info_list:
+        schema(info_dict)
+    unique_notebook_path_list = [
+        info_dict[jupyter_notebook.INFO_KEY_NOTEBOOK_PATH]
+        for info_dict in info_list]
+    unique_notebook_path_list = list(set(unique_notebook_path_list))
+    assert len(unique_notebook_path_list) > 1
+    _assert_default_value_check_info_id_is_in(info_list=info_list)
+    info_id_list = [
+        info_dict[jupyter_notebook.INFO_KEY_INFO_ID]
+        for info_dict in info_list]
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/',
+        check_recursively=True,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=['test_', 'sample_'],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    assert info_list == []
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/',
+        check_recursively=True,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=info_id_list,
+        enable_default_or_optional_doc_check=True,
+        skip_decorator_name_list=[])
+    assert info_list == []
+    info_list = cli._exec_numdoclint(
+        path='./tests/jupyter/',
+        check_recursively=True,
+        is_jupyter=True,
+        ignore_func_name_suffix_list=[],
+        ignore_info_id_list=[],
+        enable_default_or_optional_doc_check=False,
+        skip_decorator_name_list=[])
+    _assert_default_value_check_info_id_is_not_in(info_list=info_list)

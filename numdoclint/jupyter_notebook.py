@@ -198,7 +198,8 @@ def _check_jupyter_notebook_recursively(
             notebook_path=path,
             verbose=verbose,
             ignore_func_name_suffix_list=ignore_func_name_suffix_list,
-            ignore_info_id_list=ignore_info_id_list)
+            ignore_info_id_list=ignore_info_id_list,
+            enable_default_or_optional_doc_check=enable_def_or_opt_check)
         info_list.extend(unit_info_list)
     return info_list
 
