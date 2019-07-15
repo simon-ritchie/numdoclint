@@ -387,3 +387,36 @@ def sample_func_2(price=100):
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=[])
     _assert_default_value_check_info_id_is_not_in(info_list=info_list)
+
+
+def test_main():
+    module_str_1 = """
+def sample_func_1(price):
+    pass
+    """
+    with open(TMP_TEST_MODULE_PATH_1, 'w') as f:
+        f.write(module_str_1)
+
+    class Args:
+
+        path = TMP_TEST_MODULE_PATH_1
+        check_recursively = False
+        is_jupyter = False
+        ignore_func_name_suffix_list = []
+        ignore_info_id_list = []
+        enable_default_or_optional_doc_check = True
+        skip_decorator_name_list = []
+
+    args = Args()
+    info_list = cli.main(args=args)
+    assert info_list
+    schema = Schema(
+        schema={
+            py_module.INFO_KEY_MODULE_PATH: TMP_TEST_MODULE_PATH_1,
+            py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
+            py_module.INFO_KEY_INFO_ID: int,
+            py_module.INFO_KEY_INFO: Any(*six.string_types),
+        },
+        required=True)
+    for info_dict in info_list:
+        schema(info_dict)

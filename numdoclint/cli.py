@@ -160,9 +160,15 @@ def _exec_numdoclint(
     return info_list
 
 
-def main():
+def main(args=None):
     """
     The function of command line entry point.
+
+    Parameters
+    ----------
+    args : argparse.Namespace or None, default None
+        Object that stores data of argument. Specify `None`
+        when not testing.
 
     Returns
     -------
@@ -216,7 +222,8 @@ def main():
              'Note: only available when check Python module, '
              'not supported Jupyter notebook.')
 
-    args = parser.parse_args()
+    if args is None:
+        args = parser.parse_args()
 
     _validate_args(
         path=args.path,
