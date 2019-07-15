@@ -1,5 +1,7 @@
 from setuptools import find_packages, setup
 
+from numdoclint import __version__ as version
+
 description = 'Numdoc Lint provides features such as '\
               'NumPy style docstring code checking.'
 
@@ -10,7 +12,7 @@ long_description = \
 
 setup(
     name='numdoclint',
-    version='0.0.10',
+    version=version,
     url='https://github.com/simon-ritchie/numdoclint',
     author='simon-ritchie',
     author_email='',

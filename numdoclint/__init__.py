@@ -16,3 +16,5 @@ from numdoclint.py_module import (INFO_ID_DIFFERENT_PARAM_ORDER,
                                   INFO_ID_LACKED_RETURN_VAL,
                                   check_python_module,
                                   check_python_module_recursively)
+
+__version__ = '0.0.10'
