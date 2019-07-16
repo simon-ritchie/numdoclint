@@ -1169,6 +1169,13 @@ def return_val_exists_in_func(module_str, func_name):
         func_str=func_str, module_str=module_str, func_name=func_name)
     if func_str == '':
         return False
+    func_indent_num = get_func_indent_num(
+        py_module_str=module_str,
+        func_name=func_name)
+    func_str = _remove_nested_func_str(
+        func_str=func_str, func_indent_num=func_indent_num)
+    if func_str == '':
+        return False
     line_splitted_list = func_str.split('\n')
     for line_str in line_splitted_list:
         return_statement_exists = 'return' in line_str
@@ -1181,6 +1188,79 @@ def return_val_exists_in_func(module_str, func_name):
             continue
         return True
     return False
+
+
+def _add_line_str(target_str, line_str):
+    """
+    Add target line string for string concatenation.
+
+    Parameters
+    ----------
+    target_str : str
+        The string to be concatenated.
+    line_str : str
+        String of target line.
+
+    Returns
+    -------
+    target_str : str
+        Concatenated string.
+    """
+
+    if target_str != '':
+        target_str += '\n'
+    target_str += line_str
+    return target_str
+
+
+def _remove_nested_func_str(func_str, func_indent_num):
+    """
+    Remove the string of nested function part.
+
+    Parameters
+    ----------
+    func_str : str
+        Target function string.
+    func_indent_num : int
+        Indent number of the target function (starting from 1).
+
+    Returns
+    -------
+    removed_func_str : str
+        The string after removed nested function part.
+    """
+
+    removed_func_str = ''
+    line_splitted_list = func_str.split('\n')
+    is_initial_function_appeared = False
+    is_nested_func_line = False
+    for line_str in line_splitted_list:
+        is_func_statement_in = 'def ' in line_str
+        if not is_nested_func_line:
+            if not is_func_statement_in or not is_initial_function_appeared:
+                removed_func_str = _add_line_str(
+                    target_str=removed_func_str, line_str=line_str)
+        if not is_initial_function_appeared and is_func_statement_in:
+            is_initial_function_appeared = True
+            continue
+        if not is_initial_function_appeared:
+            continue
+        line_indent_num = get_line_indent_num(line_str=line_str)
+        if is_nested_func_line:
+            if line_str.strip() == '' or '):' in line_str:
+                continue
+            if (line_indent_num <= func_indent_num
+                    and not is_func_statement_in):
+                is_nested_func_line = False
+                removed_func_str = _add_line_str(
+                    target_str=removed_func_str, line_str=line_str)
+                continue
+        if is_func_statement_in and not is_nested_func_line:
+            if line_indent_num < func_indent_num:
+                continue
+            is_nested_func_line = True
+            continue
+    return removed_func_str
 
 
 def _remove_docstring_from_func_str(func_str, module_str, func_name):

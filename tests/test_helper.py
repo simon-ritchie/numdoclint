@@ -1182,6 +1182,14 @@ class SampleClass:
         Sample function that return sample func.
         """
         pass
+
+
+def sample_func_7():
+
+    def sample_func_8():
+        return 100
+
+    pass
     '''
     result_bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_1')
@@ -1205,6 +1213,10 @@ class SampleClass:
 
     result_bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_6')
+    assert not result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_7')
     assert not result_bool
 
 
@@ -1657,3 +1669,56 @@ def test__remove_type_str_from_arg_str():
     after_arg_str = helper._remove_type_str_from_arg_str(
         arg_str=' price: int=100 ')
     assert after_arg_str == 'price=100'
+
+
+def test__remove_nested_func_str():
+    func_str = """
+def sample_func_1():
+
+    def sample_func_2():
+        print(100)
+
+        def sample_func_3():
+            return 300
+
+        return 200
+
+    def sample_func_4(
+        price=200
+    ):
+        return price
+
+    print(200)
+    """
+    removed_func_str = helper._remove_nested_func_str(
+        func_str=func_str, func_indent_num=1)
+    expected_removed_func_str = """def sample_func_1():
+
+    print(200)
+    """
+    assert removed_func_str == expected_removed_func_str
+
+    func_str = """
+    def sample_func_2():
+        print(100)
+
+        def sample_func_3():
+            return 300
+
+        return 200
+    """
+    removed_func_str = helper._remove_nested_func_str(
+        func_str=func_str, func_indent_num=2)
+    expected_removed_func_str = """    def sample_func_2():
+        print(100)
+
+        return 200
+    """
+    assert removed_func_str == expected_removed_func_str
+
+
+def test__add_line_str():
+    target_str = helper._add_line_str(target_str='', line_str='abc')
+    assert target_str == 'abc'
+    target_str = helper._add_line_str(target_str='abc', line_str='def')
+    assert target_str == 'abc\ndef'
