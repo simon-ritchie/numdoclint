@@ -788,7 +788,7 @@ def sample_func_15(price):
             that function will not be checked.
         ignore_info_id_list : list of int, default []
             List of IDs to ignore lint checking. A constant with a
-            suffix of `INFO_ID_` can be specified.
+            prefix of `INFO_ID_` can be specified.
 
         Returns
         -------
@@ -943,7 +943,7 @@ def sample_func_1(price):
 
     info_list = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
-        ignore_func_name_suffix_list=['sample_'],
+        ignore_func_name_prefix_list=['sample_'],
         enable_default_or_optional_doc_check=True)
     assert not info_list
 
@@ -1099,7 +1099,7 @@ y = 200
 
     info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
-        ignore_func_name_suffix_list=['sample_'],
+        ignore_func_name_prefix_list=['sample_'],
         enable_default_or_optional_doc_check=True)
     assert not info_list
 
@@ -1120,7 +1120,7 @@ def sample_func_3(price=100):
         f.write(module_str_4)
     info_list = py_module.check_python_module_recursively(
         dir_path=TMP_TEST_MODULE_DIR,
-        ignore_func_name_suffix_list=['sample_'],
+        ignore_func_name_prefix_list=['sample_'],
         enable_default_or_optional_doc_check=False)
     module_path_list = [
         info_dict[py_module.INFO_KEY_MODULE_PATH]
@@ -1179,20 +1179,20 @@ def test__print_info_list():
 
 
 def test_is_func_name_to_ignore():
-    ignore_func_name_suffix_list = ['test_', 'sample_']
+    ignore_func_name_prefix_list = ['test_', 'sample_']
     result_bool = py_module.is_func_name_to_ignore(
         func_name='test_get_name',
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+        ignore_func_name_prefix_list=ignore_func_name_prefix_list)
     assert result_bool
 
     result_bool = py_module.is_func_name_to_ignore(
         func_name='sample_get_name',
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+        ignore_func_name_prefix_list=ignore_func_name_prefix_list)
     assert result_bool
 
     result_bool = py_module.is_func_name_to_ignore(
         func_name='get_name',
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+        ignore_func_name_prefix_list=ignore_func_name_prefix_list)
     assert not result_bool
 
 

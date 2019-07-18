@@ -158,7 +158,7 @@ import numpy as np
         notebook_path=expected_notebook_path,
         code_cell_idx=expected_code_cell_idx,
         code_cell_str=code_cell_str,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False)
     assert info_list == []
@@ -184,7 +184,7 @@ def sample_func(price):
         notebook_path=expected_notebook_path,
         code_cell_idx=expected_code_cell_idx,
         code_cell_str=code_cell_str,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False)
     assert info_list
@@ -199,7 +199,7 @@ def sample_func(price):
         notebook_path=expected_notebook_path,
         code_cell_idx=expected_code_cell_idx,
         code_cell_str=code_cell_str,
-        ignore_func_name_suffix_list=['sample_'],
+        ignore_func_name_prefix_list=['sample_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False)
     assert info_list == []
@@ -208,7 +208,7 @@ def sample_func(price):
         notebook_path=expected_notebook_path,
         code_cell_idx=expected_code_cell_idx,
         code_cell_str=code_cell_str,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[
             py_module.INFO_ID_LACKED_DOCSTRING_PARAM,
             py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
@@ -236,7 +236,7 @@ def sample_func(price=100):
         notebook_path=expected_notebook_path,
         code_cell_idx=expected_code_cell_idx,
         code_cell_str=code_cell_str,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False)
     assert info_list == []
@@ -244,7 +244,7 @@ def sample_func(price=100):
         notebook_path=expected_notebook_path,
         code_cell_idx=expected_code_cell_idx,
         code_cell_str=code_cell_str,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list
@@ -301,7 +301,7 @@ def test_check_jupyter_notebook():
     info_list = jupyter_notebook.check_jupyter_notebook(
         notebook_path=notebook_path,
         verbose=0,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list
@@ -316,7 +316,7 @@ def test_check_jupyter_notebook():
     info_list = jupyter_notebook.check_jupyter_notebook(
         notebook_path=notebook_path,
         verbose=0,
-        ignore_func_name_suffix_list=['test_'],
+        ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -324,7 +324,7 @@ def test_check_jupyter_notebook():
     info_list = jupyter_notebook.check_jupyter_notebook(
         notebook_path=notebook_path,
         verbose=0,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=True)
     info_list
@@ -334,7 +334,7 @@ def test_check_jupyter_notebook():
     info_list = jupyter_notebook.check_jupyter_notebook(
         notebook_path=notebook_path,
         verbose=jupyter_notebook.VERBOSE_DISABLED,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -344,7 +344,7 @@ def test_check_jupyter_notebook_recursively():
     info_list = jupyter_notebook.check_jupyter_notebook_recursively(
         dir_path='./numdoclint/',
         verbose=jupyter_notebook.VERBOSE_DISABLED,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -352,7 +352,7 @@ def test_check_jupyter_notebook_recursively():
     info_list = jupyter_notebook.check_jupyter_notebook_recursively(
         dir_path='./tests/',
         verbose=jupyter_notebook.VERBOSE_DISABLED,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list
@@ -371,7 +371,7 @@ def test_check_jupyter_notebook_recursively():
     info_list = jupyter_notebook.check_jupyter_notebook_recursively(
         dir_path='./tests/',
         verbose=jupyter_notebook.VERBOSE_DISABLED,
-        ignore_func_name_suffix_list=['test_'],
+        ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -379,7 +379,7 @@ def test_check_jupyter_notebook_recursively():
     info_list = jupyter_notebook.check_jupyter_notebook_recursively(
         dir_path='./tests/',
         verbose=jupyter_notebook.VERBOSE_DISABLED,
-        ignore_func_name_suffix_list=[],
+        ignore_func_name_prefix_list=[],
         ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=True)
     assert info_list == []

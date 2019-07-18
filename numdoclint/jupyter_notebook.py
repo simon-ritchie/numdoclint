@@ -19,7 +19,7 @@ VERBOSE_DISABLED = py_module.VERBOSE_DISABLED
 
 
 def check_jupyter_notebook(
-        notebook_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        notebook_path, verbose=1, ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False):
     """
@@ -33,11 +33,11 @@ def check_jupyter_notebook(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str, default ['test_']
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str, default ['test_']
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int, default []
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `default` and `optional` string
         in docstring will be checked.
@@ -82,7 +82,7 @@ def check_jupyter_notebook(
             notebook_path=notebook_path,
             code_cell_idx=i,
             code_cell_str=code_cell_str,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list,
             ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check)
         info_list.extend(info_list_unit)
@@ -91,7 +91,7 @@ def check_jupyter_notebook(
 
 
 def check_jupyter_notebook_recursively(
-        dir_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        dir_path, verbose=1, ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False):
     """
@@ -105,11 +105,11 @@ def check_jupyter_notebook_recursively(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str, default ['test_']
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str, default ['test_']
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int, default []
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `default` and `optional` string
         in docstring will be checked.
@@ -135,7 +135,7 @@ def check_jupyter_notebook_recursively(
         dir_path=dir_path,
         info_list=[],
         verbose=verbose,
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        ignore_func_name_prefix_list=ignore_func_name_prefix_list,
         ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=enable_def_or_opt_check)
     return info_list
@@ -143,7 +143,7 @@ def check_jupyter_notebook_recursively(
 
 def _check_jupyter_notebook_recursively(
         dir_path, info_list, verbose,
-        ignore_func_name_suffix_list, ignore_info_id_list,
+        ignore_func_name_prefix_list, ignore_info_id_list,
         enable_default_or_optional_doc_check):
     """
     Check docstring of Jupyter notebook recursively.
@@ -158,11 +158,11 @@ def _check_jupyter_notebook_recursively(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool
         If True specified, the `default` and `optional` string
         in docstring will be checked.
@@ -188,7 +188,7 @@ def _check_jupyter_notebook_recursively(
                 dir_path=path,
                 info_list=info_list,
                 verbose=verbose,
-                ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                ignore_func_name_prefix_list=ignore_func_name_prefix_list,
                 ignore_info_id_list=ignore_info_id_list,
                 enable_default_or_optional_doc_check=enable_def_or_opt_check)
             continue
@@ -197,7 +197,7 @@ def _check_jupyter_notebook_recursively(
         unit_info_list = check_jupyter_notebook(
             notebook_path=path,
             verbose=verbose,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list,
             ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check)
         info_list.extend(unit_info_list)
@@ -246,7 +246,7 @@ def _print_info_list(info_list, verbose):
 
 def _check_unit_code_cell_str(
         notebook_path, code_cell_idx, code_cell_str,
-        ignore_func_name_suffix_list, ignore_info_id_list,
+        ignore_func_name_prefix_list, ignore_info_id_list,
         enable_default_or_optional_doc_check):
     """
     Check the single code cell.
@@ -259,11 +259,11 @@ def _check_unit_code_cell_str(
         Index of target code cell.
     code_cell_str : str
         Code string of target cell.
-    ignore_func_name_suffix_list : list of str
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool
         If True specified, the `default` and `optional` string
         in docstring will be checked.
@@ -289,7 +289,7 @@ def _check_unit_code_cell_str(
     for func_name in func_name_list:
         is_func_name_to_ignore = py_module.is_func_name_to_ignore(
             func_name=func_name,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list)
         if is_func_name_to_ignore:
             continue
         single_func_info_list = py_module.get_single_func_info_list(

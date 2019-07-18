@@ -16,7 +16,7 @@ ARG_NAME_LIST_TO_IGNORE = [
 ]
 ARG_NAME_LIST_TO_IGNORE.extend(ARGS_OR_KWARGS_NAME_LIST)
 
-ADDITIONAL_INFO_SUFFIX_LIST = [
+ADDITIONAL_INFO_PREFIX_LIST = [
     '.. versionadded',
     '.. deprecated',
     '.. versionchanged',
@@ -912,8 +912,8 @@ def _is_additional_info_str(target_str):
         will be set.
     """
     target_str = target_str.strip()
-    for additional_info_suffix in ADDITIONAL_INFO_SUFFIX_LIST:
-        if target_str.startswith(additional_info_suffix):
+    for additional_info_prefix in ADDITIONAL_INFO_PREFIX_LIST:
+        if target_str.startswith(additional_info_prefix):
             return True
     return False
 
@@ -1053,11 +1053,11 @@ def _get_return_value_docstring(docstring, drop_additional_info=True):
     docstring = docstring.strip()
 
     if drop_additional_info:
-        for additional_info_suffix in ADDITIONAL_INFO_SUFFIX_LIST:
-            is_in = additional_info_suffix in docstring
+        for additional_info_prefix in ADDITIONAL_INFO_PREFIX_LIST:
+            is_in = additional_info_prefix in docstring
             if not is_in:
                 continue
-            docstring = docstring.split(additional_info_suffix)[0]
+            docstring = docstring.split(additional_info_prefix)[0]
             docstring = docstring.strip()
 
     if not docstring.startswith('    '):

@@ -94,7 +94,7 @@ def _exec_numdoclint(
         path,
         check_recursively,
         is_jupyter,
-        ignore_func_name_suffix_list,
+        ignore_func_name_prefix_list,
         ignore_info_id_list,
         enable_default_or_optional_doc_check,
         skip_decorator_name_list):
@@ -111,8 +111,8 @@ def _exec_numdoclint(
     is_jupyter : bool
         If True, check target will become Jupyter notebook.
         If not, Python module will be checked.
-    ignore_func_name_suffix_list : list of str
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int
         List of IDs to ignore lint checking.
     enable_default_or_optional_doc_check : bool
@@ -132,14 +132,14 @@ def _exec_numdoclint(
         if not check_recursively:
             info_list = numdoclint.check_python_module(
                 py_module_path=path,
-                ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                ignore_func_name_prefix_list=ignore_func_name_prefix_list,
                 ignore_info_id_list=ignore_info_id_list,
                 enable_default_or_optional_doc_check=enable_def_or_opt_check,
                 skip_decorator_name_list=skip_decorator_name_list)
             return info_list
         info_list = numdoclint.check_python_module_recursively(
             dir_path=path,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list,
             ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list)
@@ -148,13 +148,13 @@ def _exec_numdoclint(
     if not check_recursively:
         info_list = numdoclint.check_jupyter_notebook(
             notebook_path=path,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list,
             ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check)
         return info_list
     info_list = numdoclint.check_jupyter_notebook_recursively(
         dir_path=path,
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        ignore_func_name_prefix_list=ignore_func_name_prefix_list,
         ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=enable_def_or_opt_check)
     return info_list
@@ -197,10 +197,10 @@ def main(args=None, return_list=False):
         help='If specified, check target will become Jupyter notebook. '
              'If not, Python module will be checked.')
     parser.add_argument(
-        '-f', '--ignore_func_name_suffix_list',
+        '-f', '--ignore_func_name_prefix_list',
         type=_get_list_of_str_from_csv,
         default='',
-        help='A suffix list of function name conditions to ignore.'
+        help='A prefix list of function name conditions to ignore.'
              '\ne.g., test_,sample_.'
              '\nComma separated string is acceptable.')
     parser.add_argument(
@@ -238,7 +238,7 @@ def main(args=None, return_list=False):
         path=args.path,
         check_recursively=args.check_recursively,
         is_jupyter=args.is_jupyter,
-        ignore_func_name_suffix_list=args.ignore_func_name_suffix_list,
+        ignore_func_name_prefix_list=args.ignore_func_name_prefix_list,
         ignore_info_id_list=args.ignore_info_id_list,
         enable_default_or_optional_doc_check=enable_def_or_opt_check,
         skip_decorator_name_list=args.skip_decorator_name_list,

@@ -14,7 +14,7 @@ VERBOSE_ENABLED = 1
 
 
 def check_python_module(
-        py_module_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        py_module_path, verbose=1, ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender']):
@@ -29,11 +29,11 @@ def check_python_module(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str, default ['test_']
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str, default ['test_']
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int, default []
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `default` and `optional` string
         in docstring will be checked.
@@ -80,7 +80,7 @@ def check_python_module(
     for func_name in func_name_list:
         is_func_name_to_ignore_ = is_func_name_to_ignore(
             func_name=func_name,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list)
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list)
         if is_func_name_to_ignore_:
             continue
         single_func_info_list = get_single_func_info_list(
@@ -97,7 +97,7 @@ def check_python_module(
 
 
 def check_python_module_recursively(
-        dir_path, verbose=1, ignore_func_name_suffix_list=['test_'],
+        dir_path, verbose=1, ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender']):
@@ -112,11 +112,11 @@ def check_python_module_recursively(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str, default ['test_']
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str, default ['test_']
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int, default []
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
@@ -142,14 +142,14 @@ def check_python_module_recursively(
     enable_def_or_opt_check = enable_default_or_optional_doc_check
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
-        ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+        ignore_func_name_prefix_list=ignore_func_name_prefix_list,
         ignore_info_id_list=ignore_info_id_list,
         enable_default_or_optional_doc_check=enable_def_or_opt_check,
         skip_decorator_name_list=skip_decorator_name_list)
     return info_list
 
 
-def is_func_name_to_ignore(func_name, ignore_func_name_suffix_list):
+def is_func_name_to_ignore(func_name, ignore_func_name_prefix_list):
     """
     Get boolean value of function name which should be ignored.
 
@@ -157,16 +157,16 @@ def is_func_name_to_ignore(func_name, ignore_func_name_suffix_list):
     ----------
     func_name : str
         Target function name.
-    ignore_func_name_suffix_list : list of str
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str
+        A prefix list of function name conditions to ignore.
 
     Returns
     -------
     result_bool : bool
         The boolean value of function name which should be ignored.
     """
-    for ignore_func_name_suffix in ignore_func_name_suffix_list:
-        if func_name.startswith(ignore_func_name_suffix):
+    for ignore_func_name_prefix in ignore_func_name_prefix_list:
+        if func_name.startswith(ignore_func_name_prefix):
             return True
     return False
 
@@ -210,7 +210,7 @@ def _print_info_list(info_list, verbose):
 
 def _check_python_module_recursively(
         dir_path, info_list, verbose=1,
-        ignore_func_name_suffix_list=['test_'],
+        ignore_func_name_prefix_list=['test_'],
         ignore_info_id_list=[],
         enable_default_or_optional_doc_check=False,
         skip_decorator_name_list=['Appender']):
@@ -227,11 +227,11 @@ def _check_python_module_recursively(
         Log settings of stdout. Specify one of the following numbers:
         - 0 -> Do not output log.
         - 1 -> Output the check result.
-    ignore_func_name_suffix_list : list of str, default ['test_']
-        A suffix list of function name conditions to ignore.
+    ignore_func_name_prefix_list : list of str, default ['test_']
+        A prefix list of function name conditions to ignore.
     ignore_info_id_list : list of int, default []
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
     enable_default_or_optional_doc_check : bool, default False
         If True specified, the `defalt` and `optional` string
         in docstring will be checked.
@@ -259,7 +259,7 @@ def _check_python_module_recursively(
         if os.path.isdir(path):
             info_list = _check_python_module_recursively(
                 dir_path=path, info_list=info_list, verbose=verbose,
-                ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+                ignore_func_name_prefix_list=ignore_func_name_prefix_list,
                 ignore_info_id_list=ignore_info_id_list,
                 enable_default_or_optional_doc_check=enable_def_or_opt_check,
                 skip_decorator_name_list=skip_decorator_name_list)
@@ -268,7 +268,7 @@ def _check_python_module_recursively(
             continue
         unit_info_list = check_python_module(
             py_module_path=path, verbose=verbose,
-            ignore_func_name_suffix_list=ignore_func_name_suffix_list,
+            ignore_func_name_prefix_list=ignore_func_name_prefix_list,
             ignore_info_id_list=ignore_info_id_list,
             enable_default_or_optional_doc_check=enable_def_or_opt_check,
             skip_decorator_name_list=skip_decorator_name_list)
@@ -341,7 +341,7 @@ def get_single_func_info_list(
         function will not be checked.
     ignore_info_id_list : list of int
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
 
     Returns
     -------
@@ -450,7 +450,7 @@ def _remove_info_to_ignore_by_id(info_list, ignore_info_id_list):
         - info : str
     ignore_info_id_list : list of int
         List of IDs to ignore lint checking. A constant with a
-        suffix of `INFO_ID_` can be specified.
+        prefix of `INFO_ID_` can be specified.
 
     Returns
     ----------

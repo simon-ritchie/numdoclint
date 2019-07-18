@@ -33,7 +33,7 @@ def main():
     numdoclint.check_python_module_recursively(
         dir_path='./',
         enable_default_or_optional_doc_check=True,
-        ignore_func_name_suffix_list=['test_', 'sample_', '__init__'])
+        ignore_func_name_prefix_list=['test_', 'sample_', '__init__'])
 
     logging.info('[Testing] pytest started.')
     os.system('pytest --cov=numdoclint tests/')

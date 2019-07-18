@@ -136,12 +136,12 @@ If you only need lint result list, and not necessary standard output, then set v
 
 ### Ignore specified functions
 
-If you want to skip functions with a specific suffix, set suffix names to the `skip_decorator_name_list` argument (default is `[test_]`).
+If you want to skip functions with a specific prefix, set prefix names to the `skip_decorator_name_list` argument (default is `[test_]`).
 
 ```py
 >>> lint_info_list = numdoclint.check_python_module(
 ...     py_module_path='../pandas/pandas/core/arrays/array_.py',
-...     ignore_func_name_suffix_list=['test_', '_main', '__init__'])
+...     ignore_func_name_prefix_list=['test_', '_main', '__init__'])
 ```
 
 ### Ignore specified IDs check
@@ -244,7 +244,7 @@ check_result_list = numdoclint.check_jupyter_notebook_recursively(
     dir_path='./sample_dir/')
 ```
 
-`ignore_func_name_suffix_list`, `ignore_info_id_list`, and `enable_default_or_optional_doc_check` arguments described above are also available.
+`ignore_func_name_prefix_list`, `ignore_info_id_list`, and `enable_default_or_optional_doc_check` arguments described above are also available.
 
 ## Command line interface
 
@@ -266,8 +266,8 @@ The following arguments are provided. Only `--path` argument is required, other 
                         argument.
   -j, --is_jupyter      If specified, check target will become Jupyter
                         notebook. If not, Python module will be checked.
-  -f IGNORE_FUNC_NAME_SUFFIX_LIST, --ignore_func_name_suffix_list IGNORE_FUNC_NAME_SUFFIX_LIST
-                        A suffix list of function name conditions to ignore.
+  -f IGNORE_FUNC_NAME_PREFIX_LIST, --ignore_func_name_prefix_list IGNORE_FUNC_NAME_PREFIX_LIST
+                        A prefix list of function name conditions to ignore.
                         e.g., test_,sample_. Comma separated string is
                         acceptable.
   -i IGNORE_INFO_ID_LIST, --ignore_info_id_list IGNORE_INFO_ID_LIST
