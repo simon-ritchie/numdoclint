@@ -280,6 +280,13 @@ def sample_func_10(price):
 
 Sample docstring."""
     pass
+
+
+def sample_func_11(price):
+    # type: (int) -> None
+    """
+    Sample function with type annotation comment.
+    """
     '''
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
@@ -379,6 +386,13 @@ Sample docstring."""
 
 Sample docstring."""
     assert docstring == expected_docstring
+
+    docstring = helper.get_func_overall_docstring(
+        py_module_str=py_module_str,
+        func_name='sample_func_11')
+    expected_docstring = \
+        """    Sample function with type annotation comment"""
+    assert docstring, expected_docstring
 
 
 def test__set_docstring_indent_number_to_one():
@@ -1722,3 +1736,13 @@ def test__add_line_str():
     assert target_str == 'abc'
     target_str = helper._add_line_str(target_str='abc', line_str='def')
     assert target_str == 'abc\ndef'
+
+
+def test__type_anotation_comment_exists():
+    result = helper._type_anotation_comment_exists(
+        line_str='def sample_func():')
+    assert not result
+
+    result = helper._type_anotation_comment_exists(
+        line_str='    # type: (int) -> str')
+    assert result

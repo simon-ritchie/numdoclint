@@ -291,6 +291,8 @@ def get_func_overall_docstring(
         if index == 0:
             func_str += line_str
             continue
+        if _type_anotation_comment_exists(line_str=line_str):
+            continue
         if (('"""' in line_str or "'''" in line_str)
                 and (not is_docstring_line)):
             is_docstring_line = True
@@ -338,6 +340,25 @@ def get_func_overall_docstring(
             indent_num=func_indent_num,
         )
     return docstring
+
+
+def _type_anotation_comment_exists(line_str):
+    """
+    Get a boolean value whether type annotation comment exists
+    in line or not.
+
+    Parameters
+    ----------
+    line_str : str
+        The target line string.
+
+    Returns
+    -------
+    result : bool
+        If exists, True will be set.
+    """
+    result = '# type: ' in line_str
+    return result
 
 
 def _get_func_match(py_module_str, func_name):

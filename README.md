@@ -672,7 +672,7 @@ $ python ./run_all_tests_and_lint.py
 Command to run the entire test:
 
 ```
-$ pytest --cov=numdoclint tests/
+$ pytest --cov=numdoclint tests/ -v
 ```
 
 Command to run the autoflake:
