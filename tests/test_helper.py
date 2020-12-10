@@ -82,6 +82,9 @@ class SampleClass:
 
     def sample_func_6(self, cls, price, name, *args, **kwargs):
         pass
+
+def sample_func_7(price: int = 100, name: str = 'apple'):
+    pass
     """
 
     arg_name_list = helper.get_arg_name_list(
@@ -113,6 +116,10 @@ class SampleClass:
         exclude_ignoring_args=False)
     assert arg_name_list == [
         'self', 'cls', 'price', 'name', '*args', '**kwargs']
+
+    arg_name_list = helper.get_arg_name_list(
+        py_module_str=py_module_str, func_name='sample_func_7')
+    assert arg_name_list == ['price', 'name']
 
 
 def test_get_func_indent_num():
@@ -726,11 +733,15 @@ def test__get_args_str():
         print(600)
 
 
-    def sample_func
+    def sample_func_7
     (
         price,
         name
     ):
+        pass
+
+
+    def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
         pass
     """
     args_str = helper._get_args_str(
@@ -758,7 +769,7 @@ def test__get_args_str():
     assert args_str == 'prince = 100, location_id = 200'
 
     args_str = helper._get_args_str(
-        code_str=code_str, func_name='sample_func')
+        code_str=code_str, func_name='sample_func_7')
     assert args_str == 'price, name'
 
 
@@ -774,6 +785,15 @@ def test_get_arg_default_val_info_dict():
 
     def sample_func_3(
             price: int, location_id: int=100) -> str:
+        print(300)
+
+
+    def sample_func_4(
+            price: int = 100, name: str = 'apple') -> str:
+        print(300)
+
+
+    def sample_func_5(name: str = "apple") -> str:
         print(300)
     """
     default_val_info_dict = helper.get_arg_default_val_info_dict(
@@ -794,6 +814,21 @@ def test_get_arg_default_val_info_dict():
     expected_dict = {
         'price': '',
         'location_id': '100',
+    }
+    assert default_val_info_dict == expected_dict
+
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=py_module_str, func_name='sample_func_4')
+    expected_dict = {
+        'price': '100',
+        'name': 'apple',
+    }
+    assert default_val_info_dict == expected_dict
+
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=py_module_str, func_name='sample_func_5')
+    expected_dict = {
+        'name': 'apple',
     }
     assert default_val_info_dict == expected_dict
 
@@ -1682,6 +1717,10 @@ def test__remove_type_str_from_arg_str():
 
     after_arg_str = helper._remove_type_str_from_arg_str(
         arg_str=' price: int=100 ')
+    assert after_arg_str == 'price=100'
+
+    after_arg_str = helper._remove_type_str_from_arg_str(
+        arg_str=' price: int = 100 ')
     assert after_arg_str == 'price=100'
 
 
