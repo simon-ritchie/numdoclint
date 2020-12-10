@@ -43,8 +43,7 @@ For more details, please see [A Guide to NumPy/SciPy Documentation](https://docs
 
 ## Python version
 
-- Python 3.6 or later (tested on Python 3.6).
-- Python 2.7 (tested on Python 2.7.16).
+- Python 3.6 or later.
 
 ## Libraries
 
@@ -657,7 +656,7 @@ The following library modules are used for testing and lint.
 
 - pytest==4.3.1
 - pytest-cov==2.7.1
-- voluptuous==0.11.5
+- voluptuous==0.12.1
 - flake8==3.7.8
 - autoflake==1.3
 - autopep8==1.4.4
