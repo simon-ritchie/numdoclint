@@ -849,13 +849,18 @@ def _remove_type_bracket_block_from_args_str(args_str: str):
         return args_str
     bracket_count: int = 0
     result_str: str = ''
+    is_type_block: bool = False
     for char in args_str:
-        if char == '[':
+        if bracket_count == 0 and char == ':':
+            is_type_block = True
+        if is_type_block and char == '[':
             bracket_count += 1
             continue
-        if char == ']':
+        if is_type_block and char == ']':
             bracket_count -= 1
             continue
+        if bracket_count == 0 and (char == ',' or char == '='):
+            is_type_block = False
         if bracket_count != 0:
             continue
         result_str += char

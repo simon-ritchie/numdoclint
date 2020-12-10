@@ -1809,3 +1809,14 @@ def test__remove_type_bracket_block_from_args_str():
         'dict_val: Optional = None, tuple_val: Optional=None'
     )
     assert result_str == expected_str
+
+    args_str: str = (
+        'list_val_1: List[int],'
+        ' list_val_2: Optional[List[int]] = [100, 200]'
+    )
+    result_str = helper._remove_type_bracket_block_from_args_str(
+        args_str=args_str)
+    expected_str = (
+        'list_val_1: List, list_val_2: Optional = [100, 200]'
+    )
+    assert result_str == expected_str
