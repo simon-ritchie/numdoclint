@@ -795,6 +795,10 @@ def test_get_arg_default_val_info_dict():
 
     def sample_func_5(name: str = "apple") -> str:
         print(300)
+
+
+    def sample_func_6(dict_value: Optional[Dict[str, int]] = None) -> str:
+        print(300)
     """
     default_val_info_dict = helper.get_arg_default_val_info_dict(
         py_module_str=py_module_str, func_name='sample_func_1')
@@ -829,6 +833,13 @@ def test_get_arg_default_val_info_dict():
         py_module_str=py_module_str, func_name='sample_func_5')
     expected_dict = {
         'name': 'apple',
+    }
+    assert default_val_info_dict == expected_dict
+
+    default_val_info_dict = helper.get_arg_default_val_info_dict(
+        py_module_str=py_module_str, func_name='sample_func_6')
+    expected_dict = {
+        'dict_value': 'None',
     }
     assert default_val_info_dict == expected_dict
 
@@ -1785,3 +1796,16 @@ def test__type_anotation_comment_exists():
     result = helper._type_anotation_comment_exists(
         line_str='    # type: (int) -> str')
     assert result
+
+
+def test__remove_type_bracket_block_from_args_str():
+    args_str: str = (
+        'dict_val: Optional[Dict[str, int]] = None,'
+        ' tuple_val: Optional[Tuple[int, str, int]]=None'
+    )
+    result_str = helper._remove_type_bracket_block_from_args_str(
+        args_str=args_str)
+    expected_str = (
+        'dict_val: Optional = None, tuple_val: Optional=None'
+    )
+    assert result_str == expected_str

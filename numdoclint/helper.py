@@ -808,6 +808,7 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
     """
     args_str = _get_args_str(
         code_str=py_module_str, func_name=func_name)
+    args_str = _remove_type_bracket_block_from_args_str(args_str=args_str)
     if args_str == '':
         return {}
     splitted_arg_list = args_str.split(',')
@@ -826,6 +827,39 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
         default_val = name_and_default_val_list[1]
         default_val_info_dict[arg_name] = default_val
     return default_val_info_dict
+
+
+def _remove_type_bracket_block_from_args_str(args_str: str):
+    """
+    Remove type annotation block bracket from arguments string.
+
+    Parameters
+    ----------
+    args_str : str
+        The target arguments string.
+        e.g., 'dict_val: Dict[str, int] == {}'
+
+    Returns
+    -------
+    result_str : str
+        The converted arguments string.
+        e.g., 'dict_val: Dict == {}'
+    """
+    if '[' not in args_str:
+        return args_str
+    bracket_count: int = 0
+    result_str: str = ''
+    for char in args_str:
+        if char == '[':
+            bracket_count += 1
+            continue
+        if char == ']':
+            bracket_count -= 1
+            continue
+        if bracket_count != 0:
+            continue
+        result_str += char
+    return result_str
 
 
 def _remove_type_str_from_arg_str(arg_str):
