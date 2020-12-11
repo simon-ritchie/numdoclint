@@ -3,27 +3,29 @@
 
 import re
 from io import open
+from typing import Dict, List, Optional
 
-ARGS_OR_KWARGS_NAME_LIST = [
+ARGS_OR_KWARGS_NAME_LIST: List[str] = [
     '*args',
     '**kwds',
     '**kwargs',
+    '**options',
 ]
 
-ARG_NAME_LIST_TO_IGNORE = [
+ARG_NAME_LIST_TO_IGNORE: List[str] = [
     'self',
     'cls',
 ]
 ARG_NAME_LIST_TO_IGNORE.extend(ARGS_OR_KWARGS_NAME_LIST)
 
-ADDITIONAL_INFO_PREFIX_LIST = [
+ADDITIONAL_INFO_PREFIX_LIST: List[str]= [
     '.. versionadded',
     '.. deprecated',
     '.. versionchanged',
 ]
 
 
-def read_file_str(file_path):
+def read_file_str(file_path: str) -> str:
     """
     Read the target file string.
 
@@ -38,11 +40,11 @@ def read_file_str(file_path):
         The target string read.
     """
     with open(file_path, mode='r', encoding='utf-8') as f:
-        file_str = f.read()
+        file_str: str = f.read()
     return file_str
 
 
-def get_func_name_list(code_str):
+def get_func_name_list(code_str: str) -> List[str]:
     """
     Get a list of function names in the Python module.
 
@@ -57,21 +59,21 @@ def get_func_name_list(code_str):
         List containing function names.
     """
     code_str = code_str.replace('\n', '')
-    search_pattern = r'def .*?\(.*?\)'
-    searched_result_list = re.findall(
+    search_pattern: str = r'def .*?\(.*?\)'
+    searched_result_list: List[str] = re.findall(
         pattern=search_pattern, string=code_str)
-    func_name_list = []
+    func_name_list: List[str] = []
     for searched_result_str in searched_result_list:
-        func_name = searched_result_str.replace('def ', '')
+        func_name: str = searched_result_str.replace('def ', '')
         func_name = func_name.split('(')[0]
-        not_func_str = False
+        not_func_str: bool = False
         for char in func_name:
             if not char.isalnum() and char != '_':
                 not_func_str = True
                 break
         if not_func_str:
             continue
-        match = _get_func_match(
+        match: Optional[re.Match] = _get_func_match(
             py_module_str=code_str, func_name=func_name)
         if match is None:
             continue
@@ -79,7 +81,7 @@ def get_func_name_list(code_str):
     return func_name_list
 
 
-def _get_args_str(code_str, func_name):
+def _get_args_str(code_str: str, func_name: str) -> str:
     """
     Get the string of the arguments.
 
@@ -95,14 +97,14 @@ def _get_args_str(code_str, func_name):
     args_str : str
         String of arguments. e.g., 'location_id, price=100'
     """
-    search_pattern = 'def %s' % func_name
+    search_pattern: str = f'def {func_name}'
     search_pattern = search_pattern + r'.*?\(.*?\)'
     code_str = re.sub(pattern=r'\n', repl='', string=code_str)
-    searched_result_list = re.findall(
+    searched_result_list: List[str] = re.findall(
         pattern=search_pattern, string=code_str)
-    searched_result_str = ''
+    searched_result_str: str = ''
     for searched_str_unit in searched_result_list:
-        searched_func_name = searched_str_unit.split('(')[0]
+        searched_func_name: str = searched_str_unit.split('(')[0]
         searched_func_name = searched_func_name.replace(
             'def ', '')
         searched_func_name = searched_func_name.strip()
@@ -112,7 +114,7 @@ def _get_args_str(code_str, func_name):
     if searched_result_str == '':
         return searched_result_str
 
-    args_str = searched_result_str.split('def ')[1]
+    args_str: str = searched_result_str.split('def ')[1]
     args_str = args_str.split('(')[1]
     args_str = args_str.split(')')[0]
     args_str = args_str.strip()
@@ -122,7 +124,8 @@ def _get_args_str(code_str, func_name):
 
 
 def get_arg_name_list(
-        py_module_str, func_name, exclude_ignoring_args=True):
+        py_module_str: str, func_name: str,
+        exclude_ignoring_args: Optional[bool] = True) -> List[str]:
     """
     Get a list of argument names of the target function.
 
@@ -141,11 +144,11 @@ def get_arg_name_list(
     arg_name_list : list of str
         List of argument names of target function.
     """
-    args_str = _get_args_str(
+    args_str: str = _get_args_str(
         code_str=py_module_str, func_name=func_name)
     args_str = _remove_type_bracket_block_from_args_str(args_str=args_str)
-    splitted_arg_name_list = args_str.split(',')
-    arg_name_list = []
+    splitted_arg_name_list: List[str] = args_str.split(',')
+    arg_name_list: List[str] = []
     for arg_name in splitted_arg_name_list:
         arg_name = arg_name.replace(' ', '')
         arg_name = arg_name.split(':')[0]
@@ -153,14 +156,14 @@ def get_arg_name_list(
         if arg_name == '':
             continue
         if exclude_ignoring_args:
-            is_in = arg_name in ARG_NAME_LIST_TO_IGNORE
+            is_in: bool = arg_name in ARG_NAME_LIST_TO_IGNORE
             if is_in:
                 continue
         arg_name_list.append(arg_name)
     return arg_name_list
 
 
-def kwargs_exists(py_module_str, func_name):
+def kwargs_exists(py_module_str: str, func_name: str) -> bool:
     """
     Get a boolean value of whether `**kwargs` exists in the arguments.
 
@@ -176,17 +179,17 @@ def kwargs_exists(py_module_str, func_name):
     result_bool : bool
         If exists, True will be set.
     """
-    arg_name_list = get_arg_name_list(
+    arg_name_list: List[str] = get_arg_name_list(
         py_module_str=py_module_str,
         func_name=func_name,
         exclude_ignoring_args=False)
-    is_in = '**kwargs' in arg_name_list
+    is_in: bool = '**kwargs' in arg_name_list
     if is_in:
         return True
     return False
 
 
-def get_func_indent_num(py_module_str, func_name):
+def get_func_indent_num(py_module_str: str, func_name: str) -> int:
     """
     Get the baseline number of the target function's indents.
 
@@ -208,27 +211,27 @@ def get_func_indent_num(py_module_str, func_name):
     ValueError
         If the target function can not be found.
     """
-    match = _get_func_match(
+    match: Optional[re.Match] = _get_func_match(
         py_module_str=py_module_str, func_name=func_name)
     if match is None:
         err_msg = 'Target function not found: %s' % func_name
         raise ValueError(err_msg)
-    start_idx = match.start()
-    space_num = 0
-    current_idx = start_idx - 1
+    start_idx: int = match.start()
+    space_num: int = 0
+    current_idx: int = start_idx - 1
     while True:
         if current_idx < 0:
             break
-        target_char = py_module_str[current_idx]
+        target_char: str = py_module_str[current_idx]
         if target_char != ' ':
             break
         space_num += 1
         current_idx -= 1
-    indent_num = space_num // 4 + 1
+    indent_num: int = space_num // 4 + 1
     return indent_num
 
 
-def get_line_indent_num(line_str):
+def get_line_indent_num(line_str: str) -> int:
     """
     Get the number of indents of the target line.
 
@@ -242,17 +245,18 @@ def get_line_indent_num(line_str):
     line_indent_num : int
         Number of indents.
     """
-    space_num = 0
+    space_num: int = 0
     for line_char in line_str:
         if line_char != ' ':
             break
         space_num += 1
-    line_indent_num = space_num // 4
+    line_indent_num: int = space_num // 4
     return line_indent_num
 
 
 def get_func_overall_docstring(
-        py_module_str, func_name, set_indent_to_1=True):
+        py_module_str: str, func_name: str,
+        set_indent_to_1: bool = True) -> str:
     """
     Get the target docstring of the target function.
 
@@ -270,23 +274,23 @@ def get_func_overall_docstring(
     docstring : str
         Target docstring string.
     """
-    match = _get_func_match(
+    match: Optional[re.Match]= _get_func_match(
         py_module_str=py_module_str, func_name=func_name)
     if match is None:
         return ''
-    func_indent_num = get_func_indent_num(
+    func_indent_num: int = get_func_indent_num(
         py_module_str=py_module_str,
         func_name=func_name)
-    start_idx = match.start()
-    func_str = py_module_str[start_idx:]
+    start_idx: int = match.start()
+    func_str: str = py_module_str[start_idx:]
     func_str = func_str.replace('\\\n', '')
-    line_splitted_list = func_str.split('\n')
-    indent_num = get_func_indent_num(
+    line_splitted_list: List[str] = func_str.split('\n')
+    indent_num: int = get_func_indent_num(
         py_module_str=py_module_str,
         func_name=func_name,
     )
     func_str = ''
-    is_docstring_line = False
+    is_docstring_line: bool = False
     for index, line_str in enumerate(line_splitted_list):
         is_docstring_last_line = False
         if index == 0:
@@ -311,15 +315,16 @@ def get_func_overall_docstring(
 
     stripped_func_str = func_str.replace(' ', '')
     stripped_func_str = stripped_func_str.replace('\n', '')
-    double_quote_doc_exists = (
+    double_quote_doc_exists: bool = (
         ':"""' in stripped_func_str
         or ':r"""' in stripped_func_str)
-    single_quote_doc_exists = (
+    single_quote_doc_exists: bool = (
         ":'''" in stripped_func_str
         or ":r'''" in stripped_func_str)
     if not double_quote_doc_exists and not single_quote_doc_exists:
         return ''
 
+    docstring: str = ''
     if double_quote_doc_exists:
         match = re.search(
             pattern=r'""".*?"""',
@@ -343,7 +348,7 @@ def get_func_overall_docstring(
     return docstring
 
 
-def _type_anotation_comment_exists(line_str):
+def _type_anotation_comment_exists(line_str: str) -> bool:
     """
     Get a boolean value whether type annotation comment exists
     in line or not.
@@ -358,11 +363,11 @@ def _type_anotation_comment_exists(line_str):
     result : bool
         If exists, True will be set.
     """
-    result = '# type: ' in line_str
+    result: bool = '# type: ' in line_str
     return result
 
 
-def _get_func_match(py_module_str, func_name):
+def _get_func_match(py_module_str: str, func_name: str) -> Optional[re.Match]:
     """
     Get a Match object of search result of target function.
 
@@ -378,12 +383,12 @@ def _get_func_match(py_module_str, func_name):
     match : Match or None
         Search result. If not found, None will be set.
     """
-    pattern = 'def %s' % func_name
+    pattern: str = f'def {func_name}'
     for match in re.finditer(pattern=pattern, string=py_module_str):
-        match_start_idx = match.start()
-        match_end_idx = match.end()
+        match_start_idx: int = match.start()
+        match_end_idx: int = match.end()
 
-        is_interactive_shell_example_line_ = \
+        is_interactive_shell_example_line_: bool = \
             is_interactive_shell_example_line(
                 func_start_index=match_start_idx,
                 py_module_str=py_module_str
@@ -391,16 +396,17 @@ def _get_func_match(py_module_str, func_name):
         if is_interactive_shell_example_line_:
             continue
 
-        func_str = py_module_str[match_start_idx:match_end_idx + 10]
+        func_str: str = py_module_str[match_start_idx:match_end_idx + 10]
         func_str = func_str.replace('\n', '')
-        is_in = 'def %s(' % func_name in func_str
+        is_in: bool = f'def {func_name}(' in func_str
         if not is_in:
             continue
         return match
     return None
 
 
-def is_interactive_shell_example_line(func_start_index, py_module_str):
+def is_interactive_shell_example_line(
+        func_start_index: int, py_module_str: str) -> bool:
     """
     Get a boolean value of whether the target function is
     docstring of interactive shell string (e.g., `>>> def sample():`).
@@ -418,9 +424,9 @@ def is_interactive_shell_example_line(func_start_index, py_module_str):
         If the target function is a interactive shell docstring string,
         True will be set.
     """
-    pre_str = py_module_str[func_start_index - 20:func_start_index]
+    pre_str: str = py_module_str[func_start_index - 20:func_start_index]
     pre_str = pre_str.split('\n')[-1]
-    is_in = '>>> ' in pre_str
+    is_in: bool = '>>> ' in pre_str
     if is_in:
         return True
     is_in = '... ' in pre_str
@@ -429,7 +435,8 @@ def is_interactive_shell_example_line(func_start_index, py_module_str):
     return False
 
 
-def _set_docstring_indent_number_to_one(docstring, indent_num):
+def _set_docstring_indent_number_to_one(
+        docstring: str, indent_num: int) -> str:
     """
     Set the number of indents in docstring to one.
 
@@ -455,13 +462,13 @@ def _set_docstring_indent_number_to_one(docstring, indent_num):
     return docstring
 
 
-DOC_PARAM_INFO_KEY_ARG_NAME = 'arg_name'
-DOC_PARAM_INFO_KEY_TYPE_NAME = 'type_name'
-DOC_PARAM_INFO_KEY_DEFAULT_VAL = 'default_value'
-DOC_PARAM_INFO_KEY_DESCRIPTION = 'description'
+DOC_PARAM_INFO_KEY_ARG_NAME: str = 'arg_name'
+DOC_PARAM_INFO_KEY_TYPE_NAME: str = 'type_name'
+DOC_PARAM_INFO_KEY_DEFAULT_VAL: str = 'default_value'
+DOC_PARAM_INFO_KEY_DESCRIPTION: str = 'description'
 
 
-def get_docstring_param_info_list(docstring):
+def get_docstring_param_info_list(docstring: str) -> List[Dict[str, str]]:
     """
     Get a list of argument information in docstring.
 
@@ -486,15 +493,15 @@ def get_docstring_param_info_list(docstring):
         return []
     if not _parameters_exists_in_docstring(docstring=docstring):
         return []
-    splitted_param_doc_list = get_splitted_param_doc_list(
+    splitted_param_doc_list: List[str] = get_splitted_param_doc_list(
         docstring=docstring
     )
-    param_info_list = []
+    param_info_list: List[Dict[str, str]] = []
     for splitted_param_doc in splitted_param_doc_list:
-        arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
-        type_name = _get_docstring_type_name(var_doc=splitted_param_doc)
-        default_val = _get_docstring_default_value(var_doc=splitted_param_doc)
-        description = _get_docstring_var_description(
+        arg_name: str = _get_docstring_var_name(var_doc=splitted_param_doc)
+        type_name: str = _get_docstring_type_name(var_doc=splitted_param_doc)
+        default_val: str = _get_docstring_default_value(var_doc=splitted_param_doc)
+        description: str = _get_docstring_var_description(
             var_doc=splitted_param_doc)
         param_info_list = _append_param_info_to_list(
             param_info_list=param_info_list,
@@ -506,7 +513,8 @@ def get_docstring_param_info_list(docstring):
 
 
 def _append_param_info_to_list(
-        param_info_list, arg_name, type_name, default_val, description):
+        param_info_list: List[Dict[str, str]], arg_name: str, type_name: str,
+        default_val: str, description: str) -> List[Dict[str, str]]:
     """
     Add docstring argument information to the list.
 
@@ -533,7 +541,7 @@ def _append_param_info_to_list(
     param_info_list : list of dicts
         List after dict addition.
     """
-    comma_exists = ',' in arg_name
+    comma_exists: bool = ',' in arg_name
     if not comma_exists:
         param_info_list.append({
             DOC_PARAM_INFO_KEY_ARG_NAME: arg_name,
@@ -542,7 +550,7 @@ def _append_param_info_to_list(
             DOC_PARAM_INFO_KEY_DESCRIPTION: description,
         })
         return param_info_list
-    arg_name_list = arg_name.split(',')
+    arg_name_list: List[str] = arg_name.split(',')
     for arg_name in arg_name_list:
         arg_name = arg_name.strip()
         param_info_list.append({
@@ -554,7 +562,7 @@ def _append_param_info_to_list(
     return param_info_list
 
 
-def _parameters_exists_in_docstring(docstring):
+def _parameters_exists_in_docstring(docstring: str) -> bool:
     """
     Get boolean of whether Parater part exists in docstring
     or not.
@@ -569,13 +577,13 @@ def _parameters_exists_in_docstring(docstring):
     result_bool : bool
         If exists, True will be set.
     """
-    is_in = 'Parameters\n    ---' in docstring
+    is_in: bool = 'Parameters\n    ---' in docstring
     if not is_in:
         return False
     return True
 
 
-def _get_docstring_var_description(var_doc):
+def _get_docstring_var_description(var_doc: str) -> str:
     """
     Get a description of argument or return value from docstring.
 
@@ -590,15 +598,15 @@ def _get_docstring_var_description(var_doc):
         Description of argument or return value.
     """
     var_doc = var_doc.rstrip()
-    splitted_list = var_doc.split('\n')
+    splitted_list: List[str] = var_doc.split('\n')
     if len(splitted_list) < 2:
         return ''
-    description = '\n'.join(splitted_list[1:])
+    description: str = '\n'.join(splitted_list[1:])
     description = description.rstrip()
     return description
 
 
-def _get_docstring_default_value(var_doc):
+def _get_docstring_default_value(var_doc: str) -> str:
     """
     Get the description of argument's default value from docstring.
 
@@ -612,8 +620,8 @@ def _get_docstring_default_value(var_doc):
     default_val : str
         Description of the defautl value.
     """
-    default_val = var_doc.split('\n')[0]
-    is_in = ', default ' in default_val or '(default ' in default_val
+    default_val: str = var_doc.split('\n')[0]
+    is_in: bool = ', default ' in default_val or '(default ' in default_val
     if not is_in:
         return ''
     default_val = default_val.split('default')[1]
@@ -623,7 +631,7 @@ def _get_docstring_default_value(var_doc):
     return default_val
 
 
-def _get_docstring_type_name(var_doc):
+def _get_docstring_type_name(var_doc: str) -> str:
     """
     Get the string of argument or return value type's description
     from docstring.
@@ -638,8 +646,8 @@ def _get_docstring_type_name(var_doc):
     type_name : str
         Argument or return value's type description.
     """
-    type_name = var_doc.split('\n')[0]
-    colon_exists = ':' in type_name
+    type_name: str = var_doc.split('\n')[0]
+    colon_exists: bool = ':' in type_name
     if not colon_exists:
         return ''
     type_name = type_name.split(':')[1]
@@ -648,7 +656,7 @@ def _get_docstring_type_name(var_doc):
     return type_name
 
 
-def _get_docstring_var_name(var_doc):
+def _get_docstring_var_name(var_doc: str) -> str:
     """
     Get the name of argument or return value from docstring.
 
@@ -662,13 +670,13 @@ def _get_docstring_var_name(var_doc):
     var_name : str
         Argument or return value name.
     """
-    var_name = var_doc.split(':')[0]
+    var_name: str = var_doc.split(':')[0]
     var_name = var_name.split('\n')[0]
     var_name = var_name.strip()
     return var_name
 
 
-def get_splitted_param_doc_list(docstring):
+def get_splitted_param_doc_list(docstring: str) -> List[str]:
     """
     Get docstring string splitted into each argument.
 
@@ -682,12 +690,12 @@ def get_splitted_param_doc_list(docstring):
     splitted_param_doc_list : list of str
         List of splitted arugment information.
     """
-    param_docstring = get_param_docstring(docstring=docstring)
-    line_splitted_param_doc_list = param_docstring.split('\n')
-    single_param_doc = ''
-    splitted_param_doc_list = []
+    param_docstring: str = get_param_docstring(docstring=docstring)
+    line_splitted_param_doc_list: List[str] = param_docstring.split('\n')
+    single_param_doc: str = ''
+    splitted_param_doc_list: List[str] = []
     for line_str in line_splitted_param_doc_list:
-        indent_num = get_line_indent_num(line_str=line_str)
+        indent_num: int = get_line_indent_num(line_str=line_str)
         if indent_num == 1:
             if single_param_doc.strip() != '':
                 splitted_param_doc_list.append(single_param_doc)
@@ -700,7 +708,7 @@ def get_splitted_param_doc_list(docstring):
     return splitted_param_doc_list
 
 
-def get_param_docstring(docstring):
+def get_param_docstring(docstring: str) -> str:
     """
     Get docstring of argument part.
 
@@ -714,17 +722,17 @@ def get_param_docstring(docstring):
     param_docstring : str
         Argument part docstring.
     """
-    param_part_started = False
-    initial_hyphen_appeared = False
-    line_splitted_docstring_list = docstring.split('\n')
-    param_docstring = ''
-    pre_line_str = ''
-    second_hyphen_exists = False
+    param_part_started: bool = False
+    initial_hyphen_appeared: bool = False
+    line_splitted_docstring_list: List[str] = docstring.split('\n')
+    param_docstring: str = ''
+    pre_line_str: str = ''
+    second_hyphen_exists: bool = False
     for line_str in line_splitted_docstring_list:
         if line_str == '    Parameters':
             param_part_started = True
             continue
-        is_hyphen_line = '----' in line_str
+        is_hyphen_line: bool = '----' in line_str
         if (param_part_started
                 and not initial_hyphen_appeared
                 and is_hyphen_line):
@@ -749,7 +757,7 @@ def get_param_docstring(docstring):
     return param_docstring
 
 
-def get_func_description_from_docstring(docstring):
+def get_func_description_from_docstring(docstring: str) -> str:
     """
     Get the string of the function's description in docstring.
 
@@ -765,17 +773,17 @@ def get_func_description_from_docstring(docstring):
     """
     if docstring == '':
         return ''
-    last_line_num = 0
-    line_splitted_list = docstring.split('\n')
+    last_line_num: int = 0
+    line_splitted_list: List[str] = docstring.split('\n')
     for line_str in line_splitted_list:
-        is_hyphen_line = '----' in line_str
+        is_hyphen_line: bool = '----' in line_str
         if is_hyphen_line:
             last_line_num -= 1
             break
         last_line_num += 1
     if last_line_num <= 0:
         return ''
-    func_description = '\n'.join(line_splitted_list[:last_line_num])
+    func_description: str = '\n'.join(line_splitted_list[:last_line_num])
     func_description = func_description.strip()
     if func_description.replace(' ', '') == '':
         return ''
@@ -784,7 +792,8 @@ def get_func_description_from_docstring(docstring):
     return func_description
 
 
-def get_arg_default_val_info_dict(py_module_str, func_name):
+def get_arg_default_val_info_dict(
+        py_module_str: str, func_name: str) -> Dict[str, str]:
     """
     Get a dictionary containing information on default values
     of arguments.
@@ -807,28 +816,28 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
     The default value stored in the dictionary will be set
     as a string.
     """
-    args_str = _get_args_str(
+    args_str: str = _get_args_str(
         code_str=py_module_str, func_name=func_name)
     args_str = _remove_type_bracket_block_from_args_str(args_str=args_str)
     if args_str == '':
         return {}
-    splitted_arg_list = args_str.split(',')
-    default_val_info_dict = {}
+    splitted_arg_list: List[str] = args_str.split(',')
+    default_val_info_dict: Dict[str, str] = {}
     for arg_str in splitted_arg_list:
         arg_str = arg_str.replace(' ', '')
         arg_str = _remove_type_str_from_arg_str(arg_str=arg_str)
-        default_val_exists = '=' in arg_str
+        default_val_exists: bool = '=' in arg_str
         if not default_val_exists:
             default_val_info_dict[arg_str] = ''
             continue
-        name_and_default_val_list = arg_str.split('=')
-        arg_name = name_and_default_val_list[0]
-        default_val = name_and_default_val_list[1]
+        name_and_default_val_list: List[str] = arg_str.split('=')
+        arg_name: str = name_and_default_val_list[0]
+        default_val: str = name_and_default_val_list[1]
         default_val_info_dict[arg_name] = default_val
     return default_val_info_dict
 
 
-def _remove_type_bracket_block_from_args_str(args_str: str):
+def _remove_type_bracket_block_from_args_str(args_str: str) -> str:
     """
     Remove type annotation block bracket from arguments string.
 
@@ -866,7 +875,7 @@ def _remove_type_bracket_block_from_args_str(args_str: str):
     return result_str
 
 
-def _remove_type_str_from_arg_str(arg_str):
+def _remove_type_str_from_arg_str(arg_str: str) -> str:
     """
     Remove the string of type information from the argument string.
 
@@ -881,10 +890,10 @@ def _remove_type_str_from_arg_str(arg_str):
         String after type information has been removed.
     """
     arg_str = arg_str.replace(' = ', '=')
-    is_in = ':' in arg_str
+    is_in: bool = ':' in arg_str
     if not is_in:
         return arg_str
-    after_arg_str = arg_str.split(':')[0]
+    after_arg_str: str = arg_str.split(':')[0]
     is_in = '=' in arg_str
     if is_in:
         after_arg_str += '=%s' % arg_str.split('=')[1]
@@ -892,12 +901,13 @@ def _remove_type_str_from_arg_str(arg_str):
     return after_arg_str
 
 
-DOC_RETURN_INFO_KEY_NAME = 'name'
-DOC_RETURN_INFO_KEY_TYPE_NAME = 'type_name'
-DOC_RETURN_INFO_KEY_DESCRIPTION = 'description'
+DOC_RETURN_INFO_KEY_NAME: str = 'name'
+DOC_RETURN_INFO_KEY_TYPE_NAME: str = 'type_name'
+DOC_RETURN_INFO_KEY_DESCRIPTION: str = 'description'
 
 
-def get_docstring_return_val_info_list(docstring):
+def get_docstring_return_val_info_list(
+        docstring: str) -> List[Dict[str, str]]:
     """
     Get a list of return value information in docstring.
 
@@ -919,19 +929,19 @@ def get_docstring_return_val_info_list(docstring):
         - DOC_RETURN_INFO_KEY_DESCRIPTION : str -> Description of
             the return value.
     """
-    return_value_docstring = _get_return_value_docstring(
+    return_value_docstring: str = _get_return_value_docstring(
         docstring=docstring)
     if return_value_docstring == '':
         return []
-    line_splitted_list = return_value_docstring.split('\n')
-    name = ''
-    type_name = ''
-    description = ''
-    return_val_info_list = []
+    line_splitted_list: List[str] = return_value_docstring.split('\n')
+    name: str = ''
+    type_name: str = ''
+    description: str = ''
+    return_val_info_list: List[Dict[str, str]] = []
     for line_str in line_splitted_list:
         if line_str.replace(' ', '') == '':
             continue
-        line_indent_num = get_line_indent_num(line_str=line_str)
+        line_indent_num: int = get_line_indent_num(line_str=line_str)
         if (line_indent_num == 1
                 and name != ''
                 and not _is_additional_info_str(target_str=name)):
@@ -957,7 +967,7 @@ def get_docstring_return_val_info_list(docstring):
     return return_val_info_list
 
 
-def _is_additional_info_str(target_str):
+def _is_additional_info_str(target_str: str) -> bool:
     """
     Get a boolean value whether the target string is additional
     infomation string (e.g., `.. versionadded:: 0.0.1`).
@@ -981,7 +991,8 @@ def _is_additional_info_str(target_str):
 
 
 def _append_return_value_info_unit_dict(
-        name, type_name, description, return_val_info_list):
+        name: str, type_name: str, description: str,
+        return_val_info_list: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """
     Add a return value docstring information dictionary
     to the list.
@@ -1006,7 +1017,7 @@ def _append_return_value_info_unit_dict(
         - DOC_RETURN_INFO_KEY_TYPE_NAME : str
         - DOC_RETURN_INFO_KEY_DESCRIPTION : str
     """
-    return_value_info_dict = {
+    return_value_info_dict: Dict[str, str] = {
         DOC_RETURN_INFO_KEY_NAME: name,
         DOC_RETURN_INFO_KEY_TYPE_NAME: type_name,
         DOC_RETURN_INFO_KEY_DESCRIPTION: description,
@@ -1015,7 +1026,7 @@ def _append_return_value_info_unit_dict(
     return return_val_info_list
 
 
-def _get_return_value_name_from_line(line_str):
+def _get_return_value_name_from_line(line_str: str) -> str:
     """
     Get the return value name from the target line string.
 
@@ -1030,16 +1041,16 @@ def _get_return_value_name_from_line(line_str):
         Return value name. If colon character not exists in
         line string, a blank string will be set.
     """
-    colon_exists = ':' in line_str
+    colon_exists: bool = ':' in line_str
     if colon_exists:
-        return_value_name = line_str.split(':')[0]
+        return_value_name: str = line_str.split(':')[0]
     else:
         return_value_name = ''
     return_value_name = return_value_name.strip()
     return return_value_name
 
 
-def _get_return_value_type_name_from_line(line_str):
+def _get_return_value_type_name_from_line(line_str: str) -> str:
     """
     Get the type name of return value from the target line string.
 
@@ -1053,16 +1064,17 @@ def _get_return_value_type_name_from_line(line_str):
     return_value_type_name : str
         Type name of return value.
     """
-    colon_exists = ':' in line_str
+    colon_exists: bool= ':' in line_str
     if not colon_exists:
-        return_value_type_name = line_str.split(':')[0]
+        return_value_type_name: str = line_str.split(':')[0]
     else:
         return_value_type_name = line_str.split(':')[1]
     return_value_type_name = return_value_type_name.strip()
     return return_value_type_name
 
 
-def _get_return_value_docstring(docstring, drop_additional_info=True):
+def _get_return_value_docstring(
+        docstring: str, drop_additional_info: bool=True) -> str:
     """
     Get the string of docstring's return value part.
 
@@ -1080,14 +1092,14 @@ def _get_return_value_docstring(docstring, drop_additional_info=True):
     """
     if docstring == '':
         return ''
-    start_line_idx = 0
-    last_line_idx = 0
-    line_splitted_list = docstring.split('\n')
+    start_line_idx: int = 0
+    last_line_idx: int = 0
+    line_splitted_list: List[str] = docstring.split('\n')
     for i, line_str in enumerate(line_splitted_list):
-        is_in = 'Returns' in line_str
+        is_in: bool = 'Returns' in line_str
         if not is_in:
             continue
-        hyphens_exists_next_line = _hyphens_exists_next_line(
+        hyphens_exists_next_line: bool = _hyphens_exists_next_line(
             line_splitted_list=line_splitted_list,
             next_line_idx=i + 1)
         if not hyphens_exists_next_line:
@@ -1097,12 +1109,12 @@ def _get_return_value_docstring(docstring, drop_additional_info=True):
     if start_line_idx == 0:
         return ''
 
-    second_hyphen_exists = False
+    second_hyphen_exists: bool = False
     for i, line_str in enumerate(line_splitted_list):
         if i < start_line_idx:
             continue
         last_line_idx = i
-        is_hyphen_line = '----' in line_str
+        is_hyphen_line: bool= '----' in line_str
         if not is_hyphen_line:
             continue
         last_line_idx -= 2
@@ -1128,7 +1140,8 @@ def _get_return_value_docstring(docstring, drop_additional_info=True):
     return docstring
 
 
-def _hyphens_exists_next_line(line_splitted_list, next_line_idx):
+def _hyphens_exists_next_line(
+        line_splitted_list: List[str], next_line_idx: int) -> bool:
     """
     Get the boolean value of whether there are multiple hyphen
     characters on the next line.
@@ -1147,14 +1160,14 @@ def _hyphens_exists_next_line(line_splitted_list, next_line_idx):
     """
     if len(line_splitted_list) < next_line_idx + 1:
         return False
-    next_line_str = line_splitted_list[next_line_idx]
-    is_in = '----' in next_line_str
+    next_line_str: str = line_splitted_list[next_line_idx]
+    is_in: bool= '----' in next_line_str
     if is_in:
         return True
     return False
 
 
-def get_func_str(module_str, func_name):
+def get_func_str(module_str: str, func_name: str) -> str:
     """
     Get the entire function string including docstring and content.
 
@@ -1172,12 +1185,13 @@ def get_func_str(module_str, func_name):
     """
     if module_str == '':
         return ''
-    line_splitted_list = module_str.split('\n')
-    start_line_idx = None
-    last_line_idx = None
-    def_line_str = 'def %s' % func_name
+    line_splitted_list: List[str] = module_str.split('\n')
+    start_line_idx: Optional[int] = None
+    last_line_idx: Optional[int] = None
+    def_line_str = f'def {func_name}'
+    func_indent_baseline_num: int = 0
     for i, line_str in enumerate(line_splitted_list):
-        is_def_line_str = def_line_str in line_str
+        is_def_line_str: bool = def_line_str in line_str
         if not is_def_line_str:
             continue
         func_indent_baseline_num = get_line_indent_num(
@@ -1190,7 +1204,7 @@ def get_func_str(module_str, func_name):
     for i, line_str in enumerate(line_splitted_list):
         if i <= start_line_idx:
             continue
-        line_indent_num = get_line_indent_num(
+        line_indent_num: int = get_line_indent_num(
             line_str=line_str)
         if line_indent_num > func_indent_baseline_num:
             continue
@@ -1202,13 +1216,13 @@ def get_func_str(module_str, func_name):
         last_line_idx = i
         break
 
-    func_str = '\n'.join(
+    func_str: str = '\n'.join(
         line_splitted_list[start_line_idx:last_line_idx])
     func_str = func_str.rstrip()
     return func_str
 
 
-def return_val_exists_in_func(module_str, func_name):
+def return_val_exists_in_func(module_str: str, func_name: str) -> bool:
     """
     Get a boolean value of whether or not there is a return
     value in the functions.
@@ -1226,24 +1240,24 @@ def return_val_exists_in_func(module_str, func_name):
         If there is no return statement, or if the return
         statement does not return a value, False will be set.
     """
-    func_str = get_func_str(module_str=module_str, func_name=func_name)
+    func_str: str = get_func_str(module_str=module_str, func_name=func_name)
     func_str = _remove_docstring_from_func_str(
         func_str=func_str, module_str=module_str, func_name=func_name)
     if func_str == '':
         return False
-    func_indent_num = get_func_indent_num(
+    func_indent_num: int = get_func_indent_num(
         py_module_str=module_str,
         func_name=func_name)
     func_str = _remove_nested_func_str(
         func_str=func_str, func_indent_num=func_indent_num)
     if func_str == '':
         return False
-    line_splitted_list = func_str.split('\n')
+    line_splitted_list: List[str] = func_str.split('\n')
     for line_str in line_splitted_list:
-        return_statement_exists = 'return' in line_str
+        return_statement_exists: bool = 'return' in line_str
         if not return_statement_exists:
             continue
-        return_val_str = re.sub(
+        return_val_str: str = re.sub(
             pattern=r'^.*return', repl='', string=line_str)
         return_val_str = return_val_str.strip()
         if return_val_str == '':
@@ -1252,7 +1266,7 @@ def return_val_exists_in_func(module_str, func_name):
     return False
 
 
-def _add_line_str(target_str, line_str):
+def _add_line_str(target_str: str, line_str: str) -> str:
     """
     Add target line string for string concatenation.
 
@@ -1275,7 +1289,7 @@ def _add_line_str(target_str, line_str):
     return target_str
 
 
-def _remove_nested_func_str(func_str, func_indent_num):
+def _remove_nested_func_str(func_str: str, func_indent_num: int) -> str:
     """
     Remove the string of nested function part.
 
@@ -1292,12 +1306,12 @@ def _remove_nested_func_str(func_str, func_indent_num):
         The string after removed nested function part.
     """
 
-    removed_func_str = ''
-    line_splitted_list = func_str.split('\n')
-    is_initial_function_appeared = False
-    is_nested_func_line = False
+    removed_func_str: str = ''
+    line_splitted_list: List[str]= func_str.split('\n')
+    is_initial_function_appeared: bool = False
+    is_nested_func_line: bool = False
     for line_str in line_splitted_list:
-        is_func_statement_in = 'def ' in line_str
+        is_func_statement_in: bool = 'def ' in line_str
         if not is_nested_func_line:
             if not is_func_statement_in or not is_initial_function_appeared:
                 removed_func_str = _add_line_str(
@@ -1307,7 +1321,7 @@ def _remove_nested_func_str(func_str, func_indent_num):
             continue
         if not is_initial_function_appeared:
             continue
-        line_indent_num = get_line_indent_num(line_str=line_str)
+        line_indent_num: int = get_line_indent_num(line_str=line_str)
         if is_nested_func_line:
             if line_str.strip() == '' or '):' in line_str:
                 continue
