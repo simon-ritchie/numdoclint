@@ -143,6 +143,7 @@ def get_arg_name_list(
     """
     args_str = _get_args_str(
         code_str=py_module_str, func_name=func_name)
+    args_str = _remove_type_bracket_block_from_args_str(args_str=args_str)
     splitted_arg_name_list = args_str.split(',')
     arg_name_list = []
     for arg_name in splitted_arg_name_list:
