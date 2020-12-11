@@ -815,8 +815,6 @@ def get_arg_default_val_info_dict(py_module_str, func_name):
     default_val_info_dict = {}
     for arg_str in splitted_arg_list:
         arg_str = arg_str.replace(' ', '')
-        arg_str = arg_str.replace("'", '')
-        arg_str = arg_str.replace('"', '')
         arg_str = _remove_type_str_from_arg_str(arg_str=arg_str)
         default_val_exists = '=' in arg_str
         if not default_val_exists:

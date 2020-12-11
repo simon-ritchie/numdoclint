@@ -825,14 +825,14 @@ def test_get_arg_default_val_info_dict():
         py_module_str=py_module_str, func_name='sample_func_4')
     expected_dict = {
         'price': '100',
-        'name': 'apple',
+        'name': "'apple'",
     }
     assert default_val_info_dict == expected_dict
 
     default_val_info_dict = helper.get_arg_default_val_info_dict(
         py_module_str=py_module_str, func_name='sample_func_5')
     expected_dict = {
-        'name': 'apple',
+        'name': '"apple"',
     }
     assert default_val_info_dict == expected_dict
 
