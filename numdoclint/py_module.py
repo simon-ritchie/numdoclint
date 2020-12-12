@@ -4,7 +4,7 @@
 import inspect
 import os
 import sys
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from numdoclint import helper
 
@@ -320,10 +320,10 @@ def get_info_id_list() -> List[int]:
 
 
 def get_single_func_info_list(
-        path, code_str, func_name,
-        enable_default_or_optional_doc_check,
-        skip_decorator_name_list,
-        ignore_info_id_list):
+        path: str, code_str: str, func_name: str,
+        enable_default_or_optional_doc_check: bool,
+        skip_decorator_name_list: List[str],
+        ignore_info_id_list: List[int]) -> List[dict]:
     """
     Get a list that stores the check result information for
     one function.
@@ -356,32 +356,35 @@ def get_single_func_info_list(
         - info_id : int
         - info : str
     """
-    info_list = []
-    docstring = helper.get_func_overall_docstring(
+    info_list: List[dict] = []
+    docstring: str = helper.get_func_overall_docstring(
         py_module_str=code_str, func_name=func_name)
-    arg_name_list = helper.get_arg_name_list(
+    arg_name_list: List[str] = helper.get_arg_name_list(
         py_module_str=code_str, func_name=func_name)
-    default_val_info_dict = helper.get_arg_default_val_info_dict(
-        py_module_str=code_str, func_name=func_name)
-    param_info_list = helper.get_docstring_param_info_list(
+    default_val_info_dict: Dict[str, str] = \
+        helper.get_arg_default_val_info_dict(
+            py_module_str=code_str, func_name=func_name)
+    param_info_list: List[Dict[str, str]] = \
+        helper.get_docstring_param_info_list(
+            docstring=docstring)
+    optional_arg_name_list: List[str] = helper.get_optional_arg_name_list(
         docstring=docstring)
-    optional_arg_name_list = helper.get_optional_arg_name_list(
-        docstring=docstring)
-    return_val_info_list = helper.get_docstring_return_val_info_list(
-        docstring=docstring)
-    return_val_exists_in_func = helper.return_val_exists_in_func(
+    return_val_info_list: List[Dict[str, str]] = \
+        helper.get_docstring_return_val_info_list(
+            docstring=docstring)
+    return_val_exists_in_func: bool = helper.return_val_exists_in_func(
         module_str=code_str, func_name=func_name)
-    kwargs_exists = helper.kwargs_exists(
+    kwargs_exists: bool = helper.kwargs_exists(
         py_module_str=code_str, func_name=func_name)
-    decorator_names = helper.get_decorator_names(
+    decorator_names: List[str]= helper.get_decorator_names(
         py_module_str=code_str, func_name=func_name)
-    joined_decorator_names = ' '.join(decorator_names)
+    joined_decorator_names: str = ' '.join(decorator_names)
     for skip_decorator_name in skip_decorator_name_list:
-        is_in = skip_decorator_name in joined_decorator_names
+        is_in: bool = skip_decorator_name in joined_decorator_names
         if is_in:
             return []
 
-    unit_info_list = _check_func_description(
+    unit_info_list: List[dict] = _check_func_description(
         module_path=path, func_name=func_name,
         docstring=docstring)
     info_list.extend(unit_info_list)
@@ -438,7 +441,8 @@ def get_single_func_info_list(
     return info_list
 
 
-def _remove_info_to_ignore_by_id(info_list, ignore_info_id_list):
+def _remove_info_to_ignore_by_id(
+        info_list: List[dict], ignore_info_id_list: List[int]) -> List[dict]:
     """
     Remove information from list if specified to ignore.
 
@@ -462,9 +466,9 @@ def _remove_info_to_ignore_by_id(info_list, ignore_info_id_list):
     """
     if not info_list:
         return info_list
-    after_info_list = []
+    after_info_list: List[dict] = []
     for info_dict in info_list:
-        is_in = info_dict[INFO_KEY_INFO_ID] in ignore_info_id_list
+        is_in: bool = info_dict[INFO_KEY_INFO_ID] in ignore_info_id_list
         if is_in:
             continue
         after_info_list.append(info_dict)
@@ -472,7 +476,8 @@ def _remove_info_to_ignore_by_id(info_list, ignore_info_id_list):
 
 
 def _check_lacked_return_docstring_description(
-        module_path, func_name, return_val_info_list):
+        module_path: str, func_name: str,
+        return_val_info_list: List[dict]) -> List[dict]:
     """
     Check if the docstring description for the return value is lacked.
 
@@ -503,19 +508,19 @@ def _check_lacked_return_docstring_description(
     """
     if not return_val_info_list:
         return []
-    info_list = []
+    info_list: List[dict] = []
     for return_val_info_dict in return_val_info_list:
-        name = return_val_info_dict[helper.DOC_RETURN_INFO_KEY_NAME]
-        type_name = return_val_info_dict[
+        name: str = return_val_info_dict[helper.DOC_RETURN_INFO_KEY_NAME]
+        type_name: str = return_val_info_dict[
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME]
-        description = return_val_info_dict[
+        description: str = return_val_info_dict[
             helper.DOC_RETURN_INFO_KEY_DESCRIPTION]
         if description != '':
             continue
-        info = 'Docstring description of return value is missing.'
+        info: str = 'Docstring description of return value is missing.'
         info += '\nReturn value name: %s' % name
         info += '\nReturn value type: %s' % type_name
-        info_dict = _make_info_dict(
+        info_dict: dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
             info_id=INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION,
@@ -525,7 +530,8 @@ def _check_lacked_return_docstring_description(
 
 
 def _check_lacked_docstring_param_description(
-        module_path, func_name, param_info_list):
+        module_path: str, func_name: str,
+        param_info_list: List[dict]) -> List[dict]:
     """
     Check that the docstring argument description is not lacked.
 
@@ -556,16 +562,16 @@ def _check_lacked_docstring_param_description(
     if not param_info_list:
         return []
 
-    info_list = []
+    info_list: List[dict] = []
     for param_info_dict in param_info_list:
-        arg_name = param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
-        description = param_info_dict[
+        arg_name: str = param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
+        description: str = param_info_dict[
             helper.DOC_PARAM_INFO_KEY_DESCRIPTION]
         if description != '':
             continue
-        info = 'Missing docstring argument information.'
-        info += '\nArgument name: %s' % arg_name
-        info_dict = _make_info_dict(
+        info: str = 'Missing docstring argument information.'
+        info += f'\nArgument name: {arg_name}'
+        info_dict: dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
             info_id=INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION,
@@ -575,7 +581,8 @@ def _check_lacked_docstring_param_description(
 
 
 def _check_lacked_return_docstring_type(
-        module_path, func_name, return_val_info_list):
+        module_path: str, func_name: str,
+        return_val_info_list: List[dict]) -> List[dict]:
     """
     Check that the type specification is not lacked in the
     return value's docstring.
@@ -597,7 +604,7 @@ def _check_lacked_return_docstring_type(
 
     Returns
     -------
-    info_list : list
+    info_list : list of dicts
         A list of check results for one function.
         The following keys are set in the dictionary:
         - module_path : str
@@ -607,18 +614,18 @@ def _check_lacked_return_docstring_type(
     """
     if not return_val_info_list:
         return []
-    info_list = []
+    info_list: List[dict] = []
     for return_val_info_dict in return_val_info_list:
-        return_value_name = return_val_info_dict[
+        return_value_name: str = return_val_info_dict[
             helper.DOC_RETURN_INFO_KEY_NAME]
-        type_name = return_val_info_dict[
+        type_name: str = return_val_info_dict[
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME]
         if type_name != '':
             continue
-        info = 'Missing docstring type information, or maybe missing '\
+        info: str = 'Missing docstring type information, or maybe missing '\
             'return value name (colon not exists).'
-        info += '\nReturn value name: %s' % return_value_name
-        info_dict = _make_info_dict(
+        info += f'\nReturn value name: {return_value_name}'
+        info_dict: dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
             info_id=INFO_ID_LACKED_DOCSTRING_RETURN_TYPE,
@@ -628,8 +635,9 @@ def _check_lacked_return_docstring_type(
 
 
 def _check_lacked_return(
-        module_path, func_name, return_val_info_list,
-        return_val_exists_in_func):
+        module_path: str, func_name: str,
+        return_val_info_list: List[dict],
+        return_val_exists_in_func: bool) -> List[dict]:
     """
     Check if the return value or docstring is lacked.
 
@@ -652,7 +660,7 @@ def _check_lacked_return(
 
     Returns
     -------
-    info_list : list
+    info_list : list of dicts
         A list of check results for one function.
         The following keys are set in the dictionary:
         - module_path : str
@@ -667,9 +675,9 @@ def _check_lacked_return(
         return []
 
     if return_val_exists_in_func and not return_val_info_list:
-        info = 'While the return value exists in the function, '\
+        info: str = 'While the return value exists in the function, '\
             'the return value document does not exist in docstring.'
-        info_dict = _make_info_dict(
+        info_dict: dict = _make_info_dict(
             module_path=module_path, func_name=func_name,
             info_id=INFO_ID_LACKED_DOCSTRING_RETURN,
             info=info)
@@ -688,8 +696,9 @@ def _check_lacked_return(
 
 
 def _check_lacked_default_value(
-        module_path, func_name, param_info_list, default_val_info_dict,
-        optional_arg_name_list):
+        module_path: str, func_name: str, param_info_list: List[dict],
+        default_val_info_dict: Dict[str, str],
+        optional_arg_name_list: List[str]) -> List[dict]:
     """
     Check that the default value of the argument is not missing.
 
@@ -714,7 +723,7 @@ def _check_lacked_default_value(
 
     Returns
     -------
-    info_list : list
+    info_list : list of dicts
         A list of check results for one function.
         The following keys are set in the dictionary:
         - module_path : str
@@ -722,30 +731,30 @@ def _check_lacked_default_value(
         - info_id : int
         - info : str
     """
-    info_list = []
+    info_list: List[dict] = []
     for param_info_dict in param_info_list:
-        param_info_arg_name = param_info_dict[
+        param_info_arg_name: str = param_info_dict[
             helper.DOC_PARAM_INFO_KEY_ARG_NAME]
-        param_info_default_val = param_info_dict[
+        param_info_default_val: str = param_info_dict[
             helper.DOC_PARAM_INFO_KEY_DEFAULT_VAL]
-        has_key = param_info_arg_name in default_val_info_dict
+        has_key: bool = param_info_arg_name in default_val_info_dict
         if not has_key:
             continue
 
-        is_optional_arg = param_info_arg_name in optional_arg_name_list
+        is_optional_arg: bool = param_info_arg_name in optional_arg_name_list
         if is_optional_arg:
             continue
 
         if param_info_default_val == '':
             if default_val_info_dict[param_info_arg_name] == '':
                 continue
-            info = 'While there is no description of default value'\
+            info: str = 'While there is no description of default value'\
                    ' in docstring, there is a default value on the'\
                    ' argument side.'
-            info += '\nArgument name: %s' % param_info_arg_name
+            info += f'\nArgument name: {param_info_arg_name}'
             info += '\nArgument default value: %s' \
                 % default_val_info_dict[param_info_arg_name]
-            info_dict = _make_info_dict(
+            info_dict: dict = _make_info_dict(
                 module_path=module_path,
                 func_name=func_name,
                 info_id=INFO_ID_LACKED_DOC_DEFAULT_VALUE,
@@ -757,8 +766,8 @@ def _check_lacked_default_value(
             continue
         info = 'The default value described in docstring does not '\
                'exist in the actual argument.'
-        info += '\nArgment name: %s' % param_info_arg_name
-        info += '\nDocstring default value: %s' % param_info_default_val
+        info += f'\nArgment name: {param_info_arg_name}'
+        info += f'\nDocstring default value: {param_info_default_val}'
         info_dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
@@ -768,7 +777,8 @@ def _check_lacked_default_value(
     return info_list
 
 
-def _check_func_description(module_path, func_name, docstring):
+def _check_func_description(
+        module_path: str, func_name: str, docstring: str) -> List[dict]:
     """
     Check that the target docstring has a function description.
 
@@ -797,12 +807,12 @@ def _check_func_description(module_path, func_name, docstring):
     """
     if func_name.startswith('test_'):
         return []
-    func_description = helper.get_func_description_from_docstring(
+    func_description: str = helper.get_func_description_from_docstring(
         docstring=docstring)
     if func_description != '':
         return []
-    info = 'The function description is not set to docstring.'
-    info_dict = _make_info_dict(
+    info: str = 'The function description is not set to docstring.'
+    info_dict: dict = _make_info_dict(
         module_path=module_path,
         func_name=func_name,
         info_id=INFO_ID_LACKED_FUNC_DESCRIPTION,
@@ -811,7 +821,8 @@ def _check_func_description(module_path, func_name, docstring):
 
 
 def _check_docstring_param_order(
-        module_path, func_name, arg_name_list, param_info_list):
+        module_path: str, func_name: str, arg_name_list: List[str],
+        param_info_list: List[dict]) -> List[dict]:
     """
     Check that the order of arguments and docstring is the same.
 
@@ -843,19 +854,18 @@ def _check_docstring_param_order(
     """
     if len(arg_name_list) != len(param_info_list):
         return []
-    param_info_arg_name_list = [
+    param_info_arg_name_list: List[str] = [
         param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
         for param_info_dict in param_info_list]
-    info_list = []
+    info_list: List[dict] = []
     for i, arg_name in enumerate(arg_name_list):
-        param_info_arg_name = param_info_arg_name_list[i]
+        param_info_arg_name: str = param_info_arg_name_list[i]
         if arg_name == param_info_arg_name:
             continue
-        info = 'The order of the argument and docstring is different.'
-        info += '\nOrder of arguments: %s' % arg_name_list
-        info += '\nOrder of docstring parameters: %s' \
-            % param_info_arg_name_list
-        info_dict = _make_info_dict(
+        info: str = 'The order of the argument and docstring is different.'
+        info += f'\nOrder of arguments: {arg_name_list}'
+        info += f'\nOrder of docstring parameters: {param_info_arg_name_list}'
+        info_dict: dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
             info_id=INFO_ID_DIFFERENT_PARAM_ORDER,
@@ -866,7 +876,8 @@ def _check_docstring_param_order(
 
 
 def _check_lacked_docstring_param_type(
-        module_path, func_name, param_info_list):
+        module_path: str, func_name: str,
+        param_info_list: List[dict]) -> List[dict]:
     """
     Check that the docstring argument type is not lacked.
 
@@ -894,19 +905,19 @@ def _check_lacked_docstring_param_type(
         - info_id : int
         - info : str
     """
-    info_list = []
+    info_list: List[dict] = []
     for param_info_dict in param_info_list:
-        arg_name = param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
-        type_name = param_info_dict[helper.DOC_PARAM_INFO_KEY_TYPE_NAME]
+        arg_name: str = param_info_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
+        type_name: str = param_info_dict[helper.DOC_PARAM_INFO_KEY_TYPE_NAME]
         if type_name != '':
             continue
-        is_in = helper.args_or_kwargs_str_in_param_name(
+        is_in: bool = helper.args_or_kwargs_str_in_param_name(
             param_arg_name=arg_name)
         if is_in:
             continue
-        info = 'Missing docstring argument type information.'
-        info += '\nTarget argument: %s' % arg_name
-        info_dict = _make_info_dict(
+        info: str = 'Missing docstring argument type information.'
+        info += f'\nTarget argument: {arg_name}'
+        info_dict: dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
             info_id=INFO_ID_LACKED_DOCSTRING_PARAM_TYPE,
@@ -916,8 +927,8 @@ def _check_lacked_docstring_param_type(
 
 
 def _check_lacked_param(
-        module_path, func_name, arg_name_list, param_info_list,
-        kwargs_exists):
+        module_path: str, func_name: str, arg_name_list: List[str],
+        param_info_list: List[dict], kwargs_exists: bool) -> List[dict]:
     """
     Check for missing arguments between arguments and docstring.
 
@@ -949,23 +960,23 @@ def _check_lacked_param(
         - info_id : int
         - info : str
     """
-    info_list = []
+    info_list: List[dict] = []
 
     for param_info_dict in param_info_list:
         if kwargs_exists:
             continue
-        param_arg_name = param_info_dict[
+        param_arg_name: str = param_info_dict[
             helper.DOC_PARAM_INFO_KEY_ARG_NAME]
-        is_in = param_arg_name in arg_name_list
+        is_in: bool = param_arg_name in arg_name_list
         if is_in:
             continue
         is_in = helper.args_or_kwargs_str_in_param_name(
             param_arg_name=param_arg_name)
         if is_in:
             continue
-        info = 'An argument exists in docstring does not exists in '\
+        info: str = 'An argument exists in docstring does not exists in '\
             'the actual argument.'
-        info += '\nLacked argument name: %s' % param_arg_name
+        info += f'\nLacked argument name: {param_arg_name}'
         info_dict = _make_info_dict(
             module_path=module_path,
             func_name=func_name,
@@ -974,7 +985,7 @@ def _check_lacked_param(
         )
         info_list.append(info_dict)
 
-    param_info_arg_name_list = \
+    param_info_arg_name_list: List[str] = \
         [param_dict[helper.DOC_PARAM_INFO_KEY_ARG_NAME]
             for param_dict in param_info_list]
     for arg_name in arg_name_list:
@@ -994,7 +1005,9 @@ def _check_lacked_param(
     return info_list
 
 
-def _make_info_dict(module_path, func_name, info_id, info):
+def _make_info_dict(
+        module_path: str, func_name: str, info_id: int,
+        info: str) -> dict:
     """
     Make a dictionaly of check result information.
 
@@ -1020,7 +1033,7 @@ def _make_info_dict(module_path, func_name, info_id, info):
         - INFO_KEY_INFO_ID : int
         - INFO_KEY_INFO : str
     """
-    info_dict = {
+    info_dict: dict = {
         INFO_KEY_MODULE_PATH: module_path,
         INFO_KEY_FUNC_NAME: func_name,
         INFO_KEY_INFO_ID: info_id,
@@ -1029,7 +1042,7 @@ def _make_info_dict(module_path, func_name, info_id, info):
     return info_dict
 
 
-def _check_module_exists(py_module_path):
+def _check_module_exists(py_module_path: str) -> None:
     """
     Check that the target module exists.
 
@@ -1045,6 +1058,6 @@ def _check_module_exists(py_module_path):
     """
     if os.path.exists(py_module_path):
         return
-    err_msg = 'The target module could not be found.'
-    err_msg += '\npy_module_path: %s' % py_module_path
+    err_msg: str = 'The target module could not be found.'
+    err_msg += f'\npy_module_path: {py_module_path}'
     raise IOError(err_msg)
