@@ -9,3 +9,4 @@
 /numdoclint.egg-info/*
 /sample.py
 *.ipynb_checkpoints
+/tmp_memo.md

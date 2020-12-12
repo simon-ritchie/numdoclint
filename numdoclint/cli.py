@@ -3,12 +3,13 @@
 
 import argparse
 import os
+from typing import List
 
 import numdoclint
 from numdoclint import py_module
 
 
-def _get_list_of_str_from_csv(csv):
+def _get_list_of_str_from_csv(csv: str) -> List[str]:
     """
     Get a list of strings from one line CSV.
 
@@ -27,7 +28,9 @@ def _get_list_of_str_from_csv(csv):
     return csv.split(',')
 
 
-def _validate_args(path, ignore_info_id_list, check_recursively):
+def _validate_args(
+        path: str, ignore_info_id_list: List[int],
+        check_recursively: bool) -> None:
     """
     Check whether the specified argument is valid or not.
 
@@ -48,12 +51,12 @@ def _validate_args(path, ignore_info_id_list, check_recursively):
         - If specified `-r` and a path is not directory.
     """
     if path is None:
-        err_msg = 'A path is not specified in the argument. '\
+        err_msg: str = 'A path is not specified in the argument. '\
                   'Please set the `-p` or `--path` argument.'
         raise Exception(err_msg)
     info_id_list = py_module.get_info_id_list()
     for ignore_info_id in ignore_info_id_list:
-        is_in = ignore_info_id in info_id_list
+        is_in: bool = ignore_info_id in info_id_list
         if is_in:
             continue
         err_msg = 'Invalid information id is specified to '\
@@ -68,7 +71,7 @@ def _validate_args(path, ignore_info_id_list, check_recursively):
             raise Exception(err_msg)
 
 
-def _get_list_of_int_from_csv(csv):
+def _get_list_of_int_from_csv(csv: str) -> List[int]:
     """
     Get a list of integer from one line CSV.
 
@@ -79,25 +82,26 @@ def _get_list_of_int_from_csv(csv):
 
     Returns
     -------
-    result_list : list of str
+    result_list : list of int
         List of splitted integer.
     """
     if csv == '':
         return []
-    ignore_info_id_list = csv.split(',')
-    for i, info_id in enumerate(ignore_info_id_list):
-        ignore_info_id_list[i] = int(info_id)
-    return ignore_info_id_list
+    ignore_info_id_list: List[str] = csv.split(',')
+    result_list: List[int] = []
+    for info_id in ignore_info_id_list:
+        result_list.append(int(info_id))
+    return result_list
 
 
 def _exec_numdoclint(
-        path,
-        check_recursively,
-        is_jupyter,
-        ignore_func_name_prefix_list,
-        ignore_info_id_list,
-        enable_default_or_optional_doc_check,
-        skip_decorator_name_list):
+        path: str,
+        check_recursively: bool,
+        is_jupyter: bool,
+        ignore_func_name_prefix_list: List[str],
+        ignore_info_id_list: List[int],
+        enable_default_or_optional_doc_check: bool,
+        skip_decorator_name_list: List[str]) -> List[dict]:
     """
     Execute Numdoc Lint function.
 
@@ -127,7 +131,7 @@ def _exec_numdoclint(
     info_list : list of dicts
         List of check results.
     """
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     if not is_jupyter:
         if not check_recursively:
             info_list = numdoclint.check_python_module(
