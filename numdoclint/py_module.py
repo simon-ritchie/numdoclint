@@ -174,7 +174,7 @@ def is_func_name_to_ignore(
     return False
 
 
-def _print_info_list(info_list: list[dict], verbose: int) -> str:
+def _print_info_list(info_list: List[dict], verbose: int) -> str:
     """
     Print check result.
 
