@@ -1339,7 +1339,8 @@ def _remove_nested_func_str(func_str: str, func_indent_num: int) -> str:
     return removed_func_str
 
 
-def _remove_docstring_from_func_str(func_str, module_str, func_name):
+def _remove_docstring_from_func_str(
+        func_str: str, module_str: str, func_name: str) -> str:
     """
     Remove the doctring from the function string.
 
@@ -1357,21 +1358,21 @@ def _remove_docstring_from_func_str(func_str, module_str, func_name):
     func_str : str
         Function string after processing.
     """
-    docstring = get_func_overall_docstring(
+    docstring: str = get_func_overall_docstring(
         py_module_str=module_str, func_name=func_name,
         set_indent_to_1=False)
     func_str = func_str.replace(docstring, '')
     func_str = func_str.replace(
         docstring.replace('    ', '', 1), '')
-    line_splitted_list = func_str.split('\n')
+    line_splitted_list: List[str] = func_str.split('\n')
     if len(line_splitted_list) >= 4:
-        double_quote_idx_1_exists = '"""' in line_splitted_list[1]
-        double_quote_idx_2_exists = '"""' in line_splitted_list[2]
-        double_quote_idx_3_exists = '"""' in line_splitted_list[3]
-        single_quote_idx_1_exists = "'''" in line_splitted_list[1]
-        single_quote_idx_2_exists = "'''" in line_splitted_list[2]
-        single_quote_idx_3_exists = "'''" in line_splitted_list[3]
-        pop_index_list = []
+        double_quote_idx_1_exists: bool = '"""' in line_splitted_list[1]
+        double_quote_idx_2_exists: bool = '"""' in line_splitted_list[2]
+        double_quote_idx_3_exists: bool = '"""' in line_splitted_list[3]
+        single_quote_idx_1_exists: bool = "'''" in line_splitted_list[1]
+        single_quote_idx_2_exists: bool = "'''" in line_splitted_list[2]
+        single_quote_idx_3_exists: bool = "'''" in line_splitted_list[3]
+        pop_index_list: List[int] = []
         if ((double_quote_idx_1_exists and double_quote_idx_2_exists)
                 or (single_quote_idx_1_exists and single_quote_idx_2_exists)):
             pop_index_list = [2, 1]
@@ -1384,7 +1385,7 @@ def _remove_docstring_from_func_str(func_str, module_str, func_name):
     return func_str
 
 
-def get_optional_arg_name_list(docstring):
+def get_optional_arg_name_list(docstring: str) -> List[str]:
     """
     Get a list of argument names specified as optional.
 
@@ -1402,20 +1403,20 @@ def get_optional_arg_name_list(docstring):
         return []
     if not _parameters_exists_in_docstring(docstring=docstring):
         return []
-    splitted_param_doc_list = get_splitted_param_doc_list(
+    splitted_param_doc_list: List[str]= get_splitted_param_doc_list(
         docstring=docstring)
-    optional_arg_name_list = []
+    optional_arg_name_list: List[str] = []
     for splitted_param_doc in splitted_param_doc_list:
-        first_line_str = splitted_param_doc.split('\n')[0]
-        optional_str_exists = 'optional' in first_line_str
+        first_line_str: str = splitted_param_doc.split('\n')[0]
+        optional_str_exists: bool = 'optional' in first_line_str
         if not optional_str_exists:
             continue
-        arg_name = _get_docstring_var_name(var_doc=splitted_param_doc)
+        arg_name: str = _get_docstring_var_name(var_doc=splitted_param_doc)
         optional_arg_name_list.append(arg_name)
     return optional_arg_name_list
 
 
-def args_or_kwargs_str_in_param_name(param_arg_name):
+def args_or_kwargs_str_in_param_name(param_arg_name: str) -> bool:
     """
     Get a boolean value of whether the string of `*args`
     or `**kwargs` is included in the docstring argument
@@ -1434,13 +1435,13 @@ def args_or_kwargs_str_in_param_name(param_arg_name):
 
     param_arg_name = param_arg_name.strip()
     for args_or_kwargs_str in ARGS_OR_KWARGS_NAME_LIST:
-        is_in = args_or_kwargs_str in param_arg_name
+        is_in: bool= args_or_kwargs_str in param_arg_name
         if is_in:
             return True
     return False
 
 
-def get_decorator_names(py_module_str, func_name):
+def get_decorator_names(py_module_str: str, func_name: str) -> List[str]:
     """
     Get a list of decorator names set in the target function.
 
@@ -1456,18 +1457,18 @@ def get_decorator_names(py_module_str, func_name):
     decorator_names : list of str
         A list of decorator names.
     """
-    line_splitted_list = py_module_str.split('\n')
-    func_start_line_index = _get_func_start_line_index(
+    line_splitted_list: List[str] = py_module_str.split('\n')
+    func_start_line_index: int = _get_func_start_line_index(
         line_splitted_list=line_splitted_list, func_name=func_name)
     if func_start_line_index == -1:
         return []
-    decorator_names = []
-    current_target_line_idx = func_start_line_index - 1
+    decorator_names: List[str] = []
+    current_target_line_idx: int = func_start_line_index - 1
 
-    in_bracket = False
+    in_bracket: bool = False
     while current_target_line_idx >= 0:
-        line_str = line_splitted_list[current_target_line_idx]
-        at_exists = '@' in line_str
+        line_str: str = line_splitted_list[current_target_line_idx]
+        at_exists: bool = '@' in line_str
         if in_bracket and not at_exists:
             current_target_line_idx -= 1
             continue
@@ -1478,7 +1479,7 @@ def get_decorator_names(py_module_str, func_name):
             in_bracket = False
             continue
 
-        right_bracket_exists = ')' in line_str
+        right_bracket_exists: bool = ')' in line_str
         if right_bracket_exists and not at_exists:
             in_bracket = True
             current_target_line_idx -= 1
@@ -1491,7 +1492,8 @@ def get_decorator_names(py_module_str, func_name):
     return decorator_names
 
 
-def _get_func_start_line_index(line_splitted_list, func_name):
+def _get_func_start_line_index(
+        line_splitted_list: List[str], func_name: str):
     """
     Get the start line index of the target function.
 
@@ -1508,18 +1510,18 @@ def _get_func_start_line_index(line_splitted_list, func_name):
         The start line index of the target function. If target
         function name not found, -1 will be set.
     """
-    search_str = 'def %s' % func_name
+    search_str: str = f'def {func_name}'
     for i, line_str in enumerate(line_splitted_list):
-        is_in = search_str in line_str
+        is_in: bool = search_str in line_str
         if not is_in:
             continue
         if i + 1 >= len(line_splitted_list):
             continue
-        next_line_str = line_splitted_list[i + 1]
-        concatenated_str = line_str + next_line_str
+        next_line_str: str = line_splitted_list[i + 1]
+        concatenated_str: str = line_str + next_line_str
         concatenated_str = concatenated_str.replace('\n', '')
         concatenated_str = concatenated_str.strip()
-        is_in = 'def %s(' % func_name in concatenated_str
+        is_in = f'def {func_name}(' in concatenated_str
         if not is_in:
             continue
         return i
