@@ -1,27 +1,27 @@
 """A module that checks docstring in Jupyter notebook.
 """
 
-from __future__ import print_function
-
 import json
 import os
+from typing import List
 
 from numdoclint import helper, py_module
 
-INFO_KEY_NOTEBOOK_PATH = 'notebook_path'
-INFO_KEY_CODE_CELL_INDEX = 'code_cell_index'
-INFO_KEY_FUNC_NAME = py_module.INFO_KEY_FUNC_NAME
-INFO_KEY_INFO_ID = py_module.INFO_KEY_INFO_ID
-INFO_KEY_INFO = py_module.INFO_KEY_INFO
+INFO_KEY_NOTEBOOK_PATH: str = 'notebook_path'
+INFO_KEY_CODE_CELL_INDEX: str = 'code_cell_index'
+INFO_KEY_FUNC_NAME: str = py_module.INFO_KEY_FUNC_NAME
+INFO_KEY_INFO_ID: str = py_module.INFO_KEY_INFO_ID
+INFO_KEY_INFO: str = py_module.INFO_KEY_INFO
 
-VERBOSE_ENABLED = py_module.VERBOSE_ENABLED
-VERBOSE_DISABLED = py_module.VERBOSE_DISABLED
+VERBOSE_ENABLED: int = py_module.VERBOSE_ENABLED
+VERBOSE_DISABLED: int = py_module.VERBOSE_DISABLED
 
 
 def check_jupyter_notebook(
-        notebook_path, verbose=1, ignore_func_name_prefix_list=['test_'],
-        ignore_info_id_list=[],
-        enable_default_or_optional_doc_check=False):
+        notebook_path: str, verbose: int = 1,
+        ignore_func_name_prefix_list: List[str] = ['test_'],
+        ignore_info_id_list: List[int] = [],
+        enable_default_or_optional_doc_check: bool = False) -> List[dict]:
     """
     Check docstring of single Jupyter notebook.
 
@@ -64,21 +64,21 @@ def check_jupyter_notebook(
         - If the target notebook can not be found.
         - If the target notebook extension is not `ipynb`.
     """
-    is_checkpoint_in = '.ipynb_checkpoints' in notebook_path
+    is_checkpoint_in: bool = '.ipynb_checkpoints' in notebook_path
     if is_checkpoint_in:
         return []
     _check_notebook_exists(notebook_path=notebook_path)
     _check_notebook_extension(notebook_path=notebook_path)
-    notebook_data_dict = _read_notebook_data_dict(
+    notebook_data_dict: dict = _read_notebook_data_dict(
         notebook_path=notebook_path)
-    code_cell_str_list = _get_code_cell_str_list(
+    code_cell_str_list: List[str] = _get_code_cell_str_list(
         notebook_data_dict=notebook_data_dict)
     if not code_cell_str_list:
         return []
-    info_list = []
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    info_list: List[dict]= []
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     for i, code_cell_str in enumerate(code_cell_str_list):
-        info_list_unit = _check_unit_code_cell_str(
+        info_list_unit: List[dict] = _check_unit_code_cell_str(
             notebook_path=notebook_path,
             code_cell_idx=i,
             code_cell_str=code_cell_str,
@@ -91,9 +91,10 @@ def check_jupyter_notebook(
 
 
 def check_jupyter_notebook_recursively(
-        dir_path, verbose=1, ignore_func_name_prefix_list=['test_'],
-        ignore_info_id_list=[],
-        enable_default_or_optional_doc_check=False):
+        dir_path: str, verbose: int = 1,
+        ignore_func_name_prefix_list: List[str] = ['test_'],
+        ignore_info_id_list: List[int] = [],
+        enable_default_or_optional_doc_check: bool = False) -> List[dict]:
     """
     Check docstring of Jupyter notebook recursively.
 
@@ -130,8 +131,8 @@ def check_jupyter_notebook_recursively(
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
-    info_list = _check_jupyter_notebook_recursively(
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
+    info_list: List[dict] = _check_jupyter_notebook_recursively(
         dir_path=dir_path,
         info_list=[],
         verbose=verbose,
@@ -142,9 +143,10 @@ def check_jupyter_notebook_recursively(
 
 
 def _check_jupyter_notebook_recursively(
-        dir_path, info_list, verbose,
-        ignore_func_name_prefix_list, ignore_info_id_list,
-        enable_default_or_optional_doc_check):
+        dir_path: str, info_list: List[dict], verbose: int,
+        ignore_func_name_prefix_list: List[str],
+        ignore_info_id_list: List[int],
+        enable_default_or_optional_doc_check: bool) -> List[dict]:
     """
     Check docstring of Jupyter notebook recursively.
 
@@ -176,12 +178,12 @@ def _check_jupyter_notebook_recursively(
     info_list : list of dicts
         A list containing information on check results.
     """
-    file_or_folder_name_list = os.listdir(dir_path)
+    file_or_folder_name_list: List[str] = os.listdir(dir_path)
     if not file_or_folder_name_list:
         return info_list
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     for file_or_folder_name in file_or_folder_name_list:
-        path = os.path.join(dir_path, file_or_folder_name)
+        path: str = os.path.join(dir_path, file_or_folder_name)
         path = path.replace('\\', '/')
         if os.path.isdir(path):
             info_list = _check_jupyter_notebook_recursively(
@@ -194,7 +196,7 @@ def _check_jupyter_notebook_recursively(
             continue
         if not path.endswith('.ipynb'):
             continue
-        unit_info_list = check_jupyter_notebook(
+        unit_info_list: List[dict]= check_jupyter_notebook(
             notebook_path=path,
             verbose=verbose,
             ignore_func_name_prefix_list=ignore_func_name_prefix_list,
@@ -204,7 +206,7 @@ def _check_jupyter_notebook_recursively(
     return info_list
 
 
-def _print_info_list(info_list, verbose):
+def _print_info_list(info_list: List[dict], verbose: int) -> str:
     """
     Print check result.
 
@@ -230,7 +232,7 @@ def _print_info_list(info_list, verbose):
         return ''
     if verbose != VERBOSE_ENABLED:
         return ''
-    printed_str = ''
+    printed_str: str = ''
     for info_dict in info_list:
         if printed_str != '':
             printed_str += '\n'
@@ -245,9 +247,10 @@ def _print_info_list(info_list, verbose):
 
 
 def _check_unit_code_cell_str(
-        notebook_path, code_cell_idx, code_cell_str,
-        ignore_func_name_prefix_list, ignore_info_id_list,
-        enable_default_or_optional_doc_check):
+        notebook_path: str, code_cell_idx: int, code_cell_str: str,
+        ignore_func_name_prefix_list: List[str],
+        ignore_info_id_list: List[int],
+        enable_default_or_optional_doc_check: bool) -> List[dict]:
     """
     Check the single code cell.
 
@@ -280,25 +283,26 @@ def _check_unit_code_cell_str(
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
-    func_name_list = helper.get_func_name_list(
+    func_name_list: List[str] = helper.get_func_name_list(
         code_str=code_cell_str)
     if not func_name_list:
         return []
-    info_list = []
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    info_list: List[dict] = []
+    enable_def_or_opt_check: bool= enable_default_or_optional_doc_check
     for func_name in func_name_list:
-        is_func_name_to_ignore = py_module.is_func_name_to_ignore(
+        is_func_name_to_ignore: bool = py_module.is_func_name_to_ignore(
             func_name=func_name,
             ignore_func_name_prefix_list=ignore_func_name_prefix_list)
         if is_func_name_to_ignore:
             continue
-        single_func_info_list = py_module.get_single_func_info_list(
-            path=notebook_path,
-            code_str=code_cell_str,
-            func_name=func_name,
-            enable_default_or_optional_doc_check=enable_def_or_opt_check,
-            skip_decorator_name_list=[],
-            ignore_info_id_list=ignore_info_id_list)
+        single_func_info_list: List[dict] = \
+            py_module.get_single_func_info_list(
+                path=notebook_path,
+                code_str=code_cell_str,
+                func_name=func_name,
+                enable_default_or_optional_doc_check=enable_def_or_opt_check,
+                skip_decorator_name_list=[],
+                ignore_info_id_list=ignore_info_id_list)
         info_list.extend(single_func_info_list)
     info_list = _rename_dict_key(info_list=info_list)
     info_list = _add_code_cell_index(
@@ -306,7 +310,7 @@ def _check_unit_code_cell_str(
     return info_list
 
 
-def _add_code_cell_index(info_list, code_cell_idx):
+def _add_code_cell_index(info_list: List[dict], code_cell_idx: int):
     """
     Add cell index value to the dictionaries in the list.
 
@@ -329,7 +333,7 @@ def _add_code_cell_index(info_list, code_cell_idx):
     return info_list
 
 
-def _rename_dict_key(info_list):
+def _rename_dict_key(info_list: List[dict]) -> List[dict]:
     """
     Rename dictionary key names in the list.
 
@@ -354,13 +358,13 @@ def _rename_dict_key(info_list):
         - info : str
     """
     for info_dict in info_list:
-        path_str = info_dict[py_module.INFO_KEY_MODULE_PATH]
+        path_str: str = info_dict[py_module.INFO_KEY_MODULE_PATH]
         info_dict[INFO_KEY_NOTEBOOK_PATH] = path_str
         del info_dict[py_module.INFO_KEY_MODULE_PATH]
     return info_list
 
 
-def _get_code_cell_str_list(notebook_data_dict):
+def _get_code_cell_str_list(notebook_data_dict: dict) -> List[str]:
     """
     Get a list of code cell strings.
 
@@ -374,22 +378,22 @@ def _get_code_cell_str_list(notebook_data_dict):
     code_str_list : list of str
         A list of code cell strings.
     """
-    code_str_list = []
-    has_key = 'cells' in notebook_data_dict
+    code_str_list: List[str] = []
+    has_key: bool = 'cells' in notebook_data_dict
     if not has_key:
         return []
-    cells_list = notebook_data_dict['cells']
+    cells_list: List[dict] = notebook_data_dict['cells']
     for cell_dict in cells_list:
-        cell_type = cell_dict['cell_type']
+        cell_type: str = cell_dict['cell_type']
         if cell_type != 'code':
             continue
-        source_list = cell_dict['source']
+        source_list: List[str] = cell_dict['source']
         source = ''.join(source_list)
         code_str_list.append(source)
     return code_str_list
 
 
-def _read_notebook_data_dict(notebook_path):
+def _read_notebook_data_dict(notebook_path: str) -> dict:
     """
     Read a dictionary of notebook data.
 
@@ -404,12 +408,12 @@ def _read_notebook_data_dict(notebook_path):
         A dictionary of notebook data.
     """
     with open(notebook_path, 'r') as f:
-        notebook_data_str = f.read()
-    notebook_data_dict = json.loads(notebook_data_str)
+        notebook_data_str: str = f.read()
+    notebook_data_dict: dict = json.loads(notebook_data_str)
     return notebook_data_dict
 
 
-def _check_notebook_extension(notebook_path):
+def _check_notebook_extension(notebook_path: str) -> None:
     """
     Check the path extension of the notebook.
 
@@ -423,15 +427,17 @@ def _check_notebook_extension(notebook_path):
     IOError
         If the extension is invalid.
     """
-    extension_str = notebook_path.split('.')[-1]
+    extension_str: str = notebook_path.split('.')[-1]
     if extension_str.endswith('ipynb'):
         return
-    err_msg = 'The extension is invalid. Please Specify a path of '\
-              '`.ipynb` extension.'
+    err_msg: str = (
+        'The extension is invalid. Please Specify a path of '
+        '`.ipynb` extension.'
+    )
     raise IOError(err_msg)
 
 
-def _check_notebook_exists(notebook_path):
+def _check_notebook_exists(notebook_path: str) -> None:
     """
     Check that the target Jupyter notebook exists.
 
@@ -447,6 +453,6 @@ def _check_notebook_exists(notebook_path):
     """
     if os.path.exists(notebook_path):
         return
-    err_msg = 'The target notebook could not be found.'
-    err_msg += '\nNotebook path: %s' % notebook_path
+    err_msg: str = 'The target notebook could not be found.'
+    err_msg += f'\nNotebook path: {notebook_path}'
     raise IOError(err_msg)
