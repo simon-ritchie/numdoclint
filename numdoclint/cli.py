@@ -3,7 +3,7 @@
 
 import argparse
 import os
-from typing import List
+from typing import List, Optional
 
 import numdoclint
 from numdoclint import py_module
@@ -134,7 +134,7 @@ def _exec_numdoclint(
     enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     if not is_jupyter:
         if not check_recursively:
-            info_list = numdoclint.check_python_module(
+            info_list: List[dict] = numdoclint.check_python_module(
                 py_module_path=path,
                 ignore_func_name_prefix_list=ignore_func_name_prefix_list,
                 ignore_info_id_list=ignore_info_id_list,
@@ -164,7 +164,9 @@ def _exec_numdoclint(
     return info_list
 
 
-def main(args=None, return_list=False):
+def main(
+        args: Optional[argparse.Namespace]=None,
+        return_list: bool = False) -> List[dict]:
     """
     The function of command line entry point.
 
@@ -179,11 +181,12 @@ def main(args=None, return_list=False):
 
     Returns
     -------
-    info_list : list of dicts or None
+    info_list : list of dicts
         List of check results.
     """
-    description = 'NumPy style docstring checking in Python code.'
-    parser = argparse.ArgumentParser(description=description)
+    description: str = 'NumPy style docstring checking in Python code.'
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description=description)
 
     parser.add_argument(
         '-p', '--path', type=str,
@@ -237,8 +240,8 @@ def main(args=None, return_list=False):
         ignore_info_id_list=args.ignore_info_id_list,
         check_recursively=args.check_recursively)
 
-    enable_def_or_opt_check = args.enable_default_or_optional_doc_check
-    info_list = _exec_numdoclint(
+    enable_def_or_opt_check: bool = args.enable_default_or_optional_doc_check
+    info_list: List[dict] = _exec_numdoclint(
         path=args.path,
         check_recursively=args.check_recursively,
         is_jupyter=args.is_jupyter,
@@ -247,5 +250,4 @@ def main(args=None, return_list=False):
         enable_default_or_optional_doc_check=enable_def_or_opt_check,
         skip_decorator_name_list=args.skip_decorator_name_list,
     )
-    if return_list:
-        return info_list
+    return info_list
