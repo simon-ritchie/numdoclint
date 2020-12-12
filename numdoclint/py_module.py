@@ -1,23 +1,23 @@
 """A module that checks docstrings in Python files.
 """
 
-from __future__ import print_function
-
 import inspect
 import os
 import sys
+from typing import Any, List, Tuple
 
 from numdoclint import helper
 
-VERBOSE_DISABLED = 0
-VERBOSE_ENABLED = 1
+VERBOSE_DISABLED: int = 0
+VERBOSE_ENABLED: int = 1
 
 
 def check_python_module(
-        py_module_path, verbose=1, ignore_func_name_prefix_list=['test_'],
-        ignore_info_id_list=[],
-        enable_default_or_optional_doc_check=False,
-        skip_decorator_name_list=['Appender']):
+        py_module_path: str, verbose: int = 1,
+        ignore_func_name_prefix_list: List[str] = ['test_'],
+        ignore_info_id_list: List[int] = [],
+        enable_default_or_optional_doc_check: bool = False,
+        skip_decorator_name_list: List[str] = ['Appender']) -> List[dict]:
     """
     Check docstring of single Python module.
 
@@ -71,19 +71,19 @@ def check_python_module(
         in the module, only the first function will be checked.
     """
     _check_module_exists(py_module_path=py_module_path)
-    module_str = helper.read_file_str(file_path=py_module_path)
-    func_name_list = helper.get_func_name_list(code_str=module_str)
+    module_str: str = helper.read_file_str(file_path=py_module_path)
+    func_name_list: List[str] = helper.get_func_name_list(code_str=module_str)
     if not func_name_list:
         return []
-    info_list = []
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    info_list: List[dict] = []
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     for func_name in func_name_list:
-        is_func_name_to_ignore_ = is_func_name_to_ignore(
+        is_func_name_to_ignore_: bool = is_func_name_to_ignore(
             func_name=func_name,
             ignore_func_name_prefix_list=ignore_func_name_prefix_list)
         if is_func_name_to_ignore_:
             continue
-        single_func_info_list = get_single_func_info_list(
+        single_func_info_list: List[dict] = get_single_func_info_list(
             path=py_module_path,
             code_str=module_str,
             func_name=func_name,
@@ -97,10 +97,11 @@ def check_python_module(
 
 
 def check_python_module_recursively(
-        dir_path, verbose=1, ignore_func_name_prefix_list=['test_'],
-        ignore_info_id_list=[],
-        enable_default_or_optional_doc_check=False,
-        skip_decorator_name_list=['Appender']):
+        dir_path: str, verbose: int = 1,
+        ignore_func_name_prefix_list: List[str] = ['test_'],
+        ignore_info_id_list: List[int] = [],
+        enable_default_or_optional_doc_check: bool = False,
+        skip_decorator_name_list: List[str] = ['Appender']) -> List[dict]:
     """
     Check Python module docstring recursively.
 
@@ -139,7 +140,7 @@ def check_python_module_recursively(
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    enable_def_or_opt_check: bool= enable_default_or_optional_doc_check
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
         ignore_func_name_prefix_list=ignore_func_name_prefix_list,
@@ -149,7 +150,9 @@ def check_python_module_recursively(
     return info_list
 
 
-def is_func_name_to_ignore(func_name, ignore_func_name_prefix_list):
+def is_func_name_to_ignore(
+        func_name: str,
+        ignore_func_name_prefix_list: List[str]) -> bool:
     """
     Get boolean value of function name which should be ignored.
 
@@ -171,7 +174,7 @@ def is_func_name_to_ignore(func_name, ignore_func_name_prefix_list):
     return False
 
 
-def _print_info_list(info_list, verbose):
+def _print_info_list(info_list: list[dict], verbose: int) -> str:
     """
     Print check result.
 
@@ -196,7 +199,7 @@ def _print_info_list(info_list, verbose):
         return ''
     if verbose != VERBOSE_ENABLED:
         return ''
-    printed_str = ''
+    printed_str: str = ''
     for info_dict in info_list:
         if printed_str != '':
             printed_str += '\n'
@@ -209,11 +212,11 @@ def _print_info_list(info_list, verbose):
 
 
 def _check_python_module_recursively(
-        dir_path, info_list, verbose=1,
-        ignore_func_name_prefix_list=['test_'],
-        ignore_info_id_list=[],
-        enable_default_or_optional_doc_check=False,
-        skip_decorator_name_list=['Appender']):
+        dir_path: str, info_list: List[dict], verbose: int = 1,
+        ignore_func_name_prefix_list: List[str]=['test_'],
+        ignore_info_id_list: List[int] = [],
+        enable_default_or_optional_doc_check: bool = False,
+        skip_decorator_name_list: List[str] = ['Appender']) -> List[dict]:
     """
     Check Python module docstring recursively.
 
@@ -249,12 +252,12 @@ def _check_python_module_recursively(
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
-    file_or_folder_name_list = os.listdir(dir_path)
+    file_or_folder_name_list: List[str] = os.listdir(dir_path)
     if not file_or_folder_name_list:
         return info_list
-    enable_def_or_opt_check = enable_default_or_optional_doc_check
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     for file_or_folder_name in file_or_folder_name_list:
-        path = os.path.join(dir_path, file_or_folder_name)
+        path: str = os.path.join(dir_path, file_or_folder_name)
         path = path.replace('\\', '/')
         if os.path.isdir(path):
             info_list = _check_python_module_recursively(
@@ -266,7 +269,7 @@ def _check_python_module_recursively(
             continue
         if not path.endswith('.py'):
             continue
-        unit_info_list = check_python_module(
+        unit_info_list: List[dict] = check_python_module(
             py_module_path=path, verbose=verbose,
             ignore_func_name_prefix_list=ignore_func_name_prefix_list,
             ignore_info_id_list=ignore_info_id_list,
@@ -276,26 +279,26 @@ def _check_python_module_recursively(
     return info_list
 
 
-INFO_ID_LACKED_ARGUMENT = 1
-INFO_ID_LACKED_DOCSTRING_PARAM = 2
-INFO_ID_LACKED_DOCSTRING_PARAM_TYPE = 3
-INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION = 4
-INFO_ID_DIFFERENT_PARAM_ORDER = 5
-INFO_ID_LACKED_FUNC_DESCRIPTION = 6
-INFO_ID_LACKED_ARG_DEFAULT_VALUE = 7
-INFO_ID_LACKED_DOC_DEFAULT_VALUE = 8
-INFO_ID_LACKED_DOCSTRING_RETURN = 9
-INFO_ID_LACKED_DOCSTRING_RETURN_TYPE = 10
-INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION = 11
-INFO_ID_LACKED_RETURN_VAL = 12
+INFO_ID_LACKED_ARGUMENT: int = 1
+INFO_ID_LACKED_DOCSTRING_PARAM: int = 2
+INFO_ID_LACKED_DOCSTRING_PARAM_TYPE: int = 3
+INFO_ID_LACKED_DOCSTRING_PARAM_DESCRIPTION: int = 4
+INFO_ID_DIFFERENT_PARAM_ORDER: int = 5
+INFO_ID_LACKED_FUNC_DESCRIPTION: int = 6
+INFO_ID_LACKED_ARG_DEFAULT_VALUE: int = 7
+INFO_ID_LACKED_DOC_DEFAULT_VALUE: int = 8
+INFO_ID_LACKED_DOCSTRING_RETURN: int = 9
+INFO_ID_LACKED_DOCSTRING_RETURN_TYPE: int = 10
+INFO_ID_LACKED_DOCSTRING_RETURN_DESCRIPTION: int = 11
+INFO_ID_LACKED_RETURN_VAL: int = 12
 
-INFO_KEY_MODULE_PATH = 'module_path'
-INFO_KEY_FUNC_NAME = 'func_name'
-INFO_KEY_INFO_ID = 'info_id'
-INFO_KEY_INFO = 'info'
+INFO_KEY_MODULE_PATH: str = 'module_path'
+INFO_KEY_FUNC_NAME: str = 'func_name'
+INFO_KEY_INFO_ID: str = 'info_id'
+INFO_KEY_INFO: str = 'info'
 
 
-def get_info_id_list():
+def get_info_id_list() -> List[int]:
     """
     Get a list of information IDs.
 
@@ -305,8 +308,8 @@ def get_info_id_list():
         A list of information IDs.
     """
     this_module = sys.modules[__name__]
-    members = inspect.getmembers(this_module)
-    info_id_list = []
+    members: List[Tuple[str, Any]] = inspect.getmembers(this_module)
+    info_id_list: List[int] = []
     for name, obj in members:
         if not name.startswith('INFO_ID_'):
             continue
