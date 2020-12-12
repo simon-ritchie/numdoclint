@@ -75,7 +75,7 @@ def check_jupyter_notebook(
         notebook_data_dict=notebook_data_dict)
     if not code_cell_str_list:
         return []
-    info_list: List[dict]= []
+    info_list: List[dict] = []
     enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     for i, code_cell_str in enumerate(code_cell_str_list):
         info_list_unit: List[dict] = _check_unit_code_cell_str(
@@ -196,7 +196,7 @@ def _check_jupyter_notebook_recursively(
             continue
         if not path.endswith('.ipynb'):
             continue
-        unit_info_list: List[dict]= check_jupyter_notebook(
+        unit_info_list: List[dict] = check_jupyter_notebook(
             notebook_path=path,
             verbose=verbose,
             ignore_func_name_prefix_list=ignore_func_name_prefix_list,
@@ -288,7 +288,7 @@ def _check_unit_code_cell_str(
     if not func_name_list:
         return []
     info_list: List[dict] = []
-    enable_def_or_opt_check: bool= enable_default_or_optional_doc_check
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     for func_name in func_name_list:
         is_func_name_to_ignore: bool = py_module.is_func_name_to_ignore(
             func_name=func_name,

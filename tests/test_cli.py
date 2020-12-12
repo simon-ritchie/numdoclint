@@ -156,7 +156,7 @@ def sample_func_2(price=100):
         required=True)
     for info_dict in info_list:
         schema(info_dict)
-    info_id_list: List[int]= [
+    info_id_list: List[int] = [
         info_dict[py_module.INFO_KEY_INFO_ID] for info_dict in info_list]
     info_list = cli._exec_numdoclint(
         path=TMP_TEST_MODULE_PATH_1,
@@ -409,11 +409,11 @@ def sample_func_1(price):
         skip_decorator_name_list: List[str] = []
 
     args: Args = Args()
-    info_list: List[dict]= cli.main(
+    info_list: List[dict] = cli.main(
         args=args,  # type: ignore
         return_list=True)
     assert info_list
-    schema: Schema= Schema(
+    schema: Schema = Schema(
         schema={
             py_module.INFO_KEY_MODULE_PATH: TMP_TEST_MODULE_PATH_1,
             py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',

@@ -140,7 +140,7 @@ def check_python_module_recursively(
         - info_id : int -> Identification number of which information.
         - info : str -> Information of check result.
     """
-    enable_def_or_opt_check: bool= enable_default_or_optional_doc_check
+    enable_def_or_opt_check: bool = enable_default_or_optional_doc_check
     info_list = _check_python_module_recursively(
         dir_path=dir_path, info_list=[], verbose=verbose,
         ignore_func_name_prefix_list=ignore_func_name_prefix_list,
@@ -213,7 +213,7 @@ def _print_info_list(info_list: List[dict], verbose: int) -> str:
 
 def _check_python_module_recursively(
         dir_path: str, info_list: List[dict], verbose: int = 1,
-        ignore_func_name_prefix_list: List[str]=['test_'],
+        ignore_func_name_prefix_list: List[str] = ['test_'],
         ignore_info_id_list: List[int] = [],
         enable_default_or_optional_doc_check: bool = False,
         skip_decorator_name_list: List[str] = ['Appender']) -> List[dict]:
@@ -376,7 +376,7 @@ def get_single_func_info_list(
         module_str=code_str, func_name=func_name)
     kwargs_exists: bool = helper.kwargs_exists(
         py_module_str=code_str, func_name=func_name)
-    decorator_names: List[str]= helper.get_decorator_names(
+    decorator_names: List[str] = helper.get_decorator_names(
         py_module_str=code_str, func_name=func_name)
     joined_decorator_names: str = ' '.join(decorator_names)
     for skip_decorator_name in skip_decorator_name_list:
@@ -749,8 +749,8 @@ def _check_lacked_default_value(
             if default_val_info_dict[param_info_arg_name] == '':
                 continue
             info: str = 'While there is no description of default value'\
-                   ' in docstring, there is a default value on the'\
-                   ' argument side.'
+                ' in docstring, there is a default value on the'\
+                ' argument side.'
             info += f'\nArgument name: {param_info_arg_name}'
             info += '\nArgument default value: %s' \
                 % default_val_info_dict[param_info_arg_name]

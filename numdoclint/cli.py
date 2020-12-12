@@ -52,7 +52,7 @@ def _validate_args(
     """
     if path is None:
         err_msg: str = 'A path is not specified in the argument. '\
-                  'Please set the `-p` or `--path` argument.'
+            'Please set the `-p` or `--path` argument.'
         raise Exception(err_msg)
     info_id_list = py_module.get_info_id_list()
     for ignore_info_id in ignore_info_id_list:
@@ -165,7 +165,7 @@ def _exec_numdoclint(
 
 
 def main(
-        args: Optional[argparse.Namespace]=None,
+        args: Optional[argparse.Namespace] = None,
         return_list: bool = False) -> List[dict]:
     """
     The function of command line entry point.

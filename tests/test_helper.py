@@ -467,7 +467,7 @@ def test_get_param_docstring() -> None:
     """
 
     param_docstring = helper.get_param_docstring(docstring=docstring)
-    expected_docstring: str= """    name : str
+    expected_docstring: str = """    name : str
         Sample name.
     location_id : int
         Sample location id."""
@@ -756,7 +756,7 @@ def test__get_args_str() -> None:
     def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
         pass
     """
-    args_str: str= helper._get_args_str(
+    args_str: str = helper._get_args_str(
         code_str=code_str, func_name='sample_func_1')
     assert args_str == ''
 
@@ -1055,7 +1055,7 @@ def test_get_docstring_return_val_info_list() -> None:
     price : int
         Sample price.
     """
-    return_val_info_list: List[Dict[str, str]]= \
+    return_val_info_list: List[Dict[str, str]] = \
         helper.get_docstring_return_val_info_list(
             docstring=docstring)
     assert return_val_info_list == []
@@ -1309,7 +1309,7 @@ def test__parameters_exists_in_docstring() -> None:
     name : str
         Sample name.
     """
-    result_bool: bool= helper._parameters_exists_in_docstring(
+    result_bool: bool = helper._parameters_exists_in_docstring(
         docstring=docstring)
     assert result_bool
 
@@ -1484,7 +1484,7 @@ def sample_func_2(price):
     pass
     """
 
-    result_bool: bool= helper.kwargs_exists(
+    result_bool: bool = helper.kwargs_exists(
         py_module_str=py_module_str, func_name='sample_func_1')
     assert result_bool
 
@@ -1512,7 +1512,7 @@ def test_args_or_kwargs_str_in_param_name() -> None:
 
 
 def test__append_param_info_to_list() -> None:
-    param_info_list: List[Dict[str, str]]= helper._append_param_info_to_list(
+    param_info_list: List[Dict[str, str]] = helper._append_param_info_to_list(
         param_info_list=[],
         arg_name='price',
         type_name='int',
@@ -1550,14 +1550,14 @@ def test__append_param_info_to_list() -> None:
 
 
 def test__hyphens_exists_next_line() -> None:
-    line_splitted_list: List[str]= [
+    line_splitted_list: List[str] = [
         'Sample docstring',
         '',
         'Parameters',
         '----------',
     ]
 
-    result_bool: bool= helper._hyphens_exists_next_line(
+    result_bool: bool = helper._hyphens_exists_next_line(
         line_splitted_list=line_splitted_list,
         next_line_idx=4)
     assert not result_bool
@@ -1634,7 +1634,7 @@ def sample_func_3(price):
     pass
     """
 
-    decorator_names: List[str]= helper.get_decorator_names(
+    decorator_names: List[str] = helper.get_decorator_names(
         py_module_str=py_module_str, func_name='sample_func_1')
     assert decorator_names == []
 
@@ -1675,7 +1675,7 @@ def sample_func
     pass
     """
 
-    match: Optional[re.Match]= helper._get_func_match(
+    match: Optional[re.Match] = helper._get_func_match(
         py_module_str=py_module_str, func_name='sample_func_1')
     start_idx: int = match.start()
     expected_func_str: str = 'def sample_func_1():'
@@ -1720,7 +1720,7 @@ def test_is_interactive_shell_example_line() -> None:
         pass
     '''
 
-    result_bool: bool= helper.is_interactive_shell_example_line(
+    result_bool: bool = helper.is_interactive_shell_example_line(
         func_start_index=5, py_module_str=py_module_str)
     assert not result_bool
 

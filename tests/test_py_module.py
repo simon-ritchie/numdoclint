@@ -317,7 +317,7 @@ def test__check_lacked_default_value() -> None:
         default_val_info_dict=default_val_info_dict,
         optional_arg_name_list=[])
     assert len(info_list) == 2
-    schema_1: Schema= Schema(
+    schema_1: Schema = Schema(
         schema={
             py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             py_module.INFO_KEY_FUNC_NAME: expected_func_name,
@@ -327,7 +327,7 @@ def test__check_lacked_default_value() -> None:
         },
         required=True)
     schema_1(info_list[0])
-    schema_2: Schema= Schema(
+    schema_2: Schema = Schema(
         schema={
             py_module.INFO_KEY_MODULE_PATH: expected_module_path,
             py_module.INFO_KEY_FUNC_NAME: expected_func_name,
@@ -814,7 +814,7 @@ def sample_func_15(price):
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
 
-    info_list: List[dict]= _exec_target_func(func_name='sample_func_1')
+    info_list: List[dict] = _exec_target_func(func_name='sample_func_1')
     _check_info_list_schema(info_list=info_list)
     _check_info_id_is_in_list(
         expected_info_id=py_module.INFO_ID_LACKED_FUNC_DESCRIPTION,
@@ -920,7 +920,7 @@ location_id = 10
 """
     with open(TMP_TEST_MODULE_PATH, 'w') as f:
         f.write(module_str)
-    info_list: List[dict]= py_module.check_python_module(
+    info_list: List[dict] = py_module.check_python_module(
         py_module_path=TMP_TEST_MODULE_PATH,
         enable_default_or_optional_doc_check=True)
     assert info_list == []
@@ -1138,7 +1138,7 @@ def sample_func_3(price=100):
 def sample_func_4(price):
     pass
     '''
-    module_path_5: str= os.path.join(child_dir_path, 'test_module_5.py')
+    module_path_5: str = os.path.join(child_dir_path, 'test_module_5.py')
     with open(module_path_5, 'w') as f:
         f.write(module_str_5)
     info_list = py_module.check_python_module_recursively(
@@ -1186,7 +1186,7 @@ def test__print_info_list() -> None:
 
 def test_is_func_name_to_ignore() -> None:
     ignore_func_name_prefix_list: List[str] = ['test_', 'sample_']
-    result_bool: bool= py_module.is_func_name_to_ignore(
+    result_bool: bool = py_module.is_func_name_to_ignore(
         func_name='test_get_name',
         ignore_func_name_prefix_list=ignore_func_name_prefix_list)
     assert result_bool

@@ -17,7 +17,7 @@ ARG_NAME_LIST_TO_IGNORE: List[str] = [
 ]
 ARG_NAME_LIST_TO_IGNORE.extend(ARGS_OR_KWARGS_NAME_LIST)
 
-ADDITIONAL_INFO_PREFIX_LIST: List[str]= [
+ADDITIONAL_INFO_PREFIX_LIST: List[str] = [
     '.. versionadded',
     '.. deprecated',
     '.. versionchanged',
@@ -273,7 +273,7 @@ def get_func_overall_docstring(
     docstring : str
         Target docstring string.
     """
-    match: Optional[re.Match]= _get_func_match(
+    match: Optional[re.Match] = _get_func_match(
         py_module_str=py_module_str, func_name=func_name)
     if match is None:
         return ''
@@ -499,7 +499,8 @@ def get_docstring_param_info_list(docstring: str) -> List[Dict[str, str]]:
     for splitted_param_doc in splitted_param_doc_list:
         arg_name: str = _get_docstring_var_name(var_doc=splitted_param_doc)
         type_name: str = _get_docstring_type_name(var_doc=splitted_param_doc)
-        default_val: str = _get_docstring_default_value(var_doc=splitted_param_doc)
+        default_val: str = _get_docstring_default_value(
+            var_doc=splitted_param_doc)
         description: str = _get_docstring_var_description(
             var_doc=splitted_param_doc)
         param_info_list = _append_param_info_to_list(
@@ -1063,7 +1064,7 @@ def _get_return_value_type_name_from_line(line_str: str) -> str:
     return_value_type_name : str
         Type name of return value.
     """
-    colon_exists: bool= ':' in line_str
+    colon_exists: bool = ':' in line_str
     if not colon_exists:
         return_value_type_name: str = line_str.split(':')[0]
     else:
@@ -1073,7 +1074,7 @@ def _get_return_value_type_name_from_line(line_str: str) -> str:
 
 
 def _get_return_value_docstring(
-        docstring: str, drop_additional_info: bool=True) -> str:
+        docstring: str, drop_additional_info: bool = True) -> str:
     """
     Get the string of docstring's return value part.
 
@@ -1113,7 +1114,7 @@ def _get_return_value_docstring(
         if i < start_line_idx:
             continue
         last_line_idx = i
-        is_hyphen_line: bool= '----' in line_str
+        is_hyphen_line: bool = '----' in line_str
         if not is_hyphen_line:
             continue
         last_line_idx -= 2
@@ -1160,7 +1161,7 @@ def _hyphens_exists_next_line(
     if len(line_splitted_list) < next_line_idx + 1:
         return False
     next_line_str: str = line_splitted_list[next_line_idx]
-    is_in: bool= '----' in next_line_str
+    is_in: bool = '----' in next_line_str
     if is_in:
         return True
     return False
@@ -1306,7 +1307,7 @@ def _remove_nested_func_str(func_str: str, func_indent_num: int) -> str:
     """
 
     removed_func_str: str = ''
-    line_splitted_list: List[str]= func_str.split('\n')
+    line_splitted_list: List[str] = func_str.split('\n')
     is_initial_function_appeared: bool = False
     is_nested_func_line: bool = False
     for line_str in line_splitted_list:
@@ -1402,7 +1403,7 @@ def get_optional_arg_name_list(docstring: str) -> List[str]:
         return []
     if not _parameters_exists_in_docstring(docstring=docstring):
         return []
-    splitted_param_doc_list: List[str]= get_splitted_param_doc_list(
+    splitted_param_doc_list: List[str] = get_splitted_param_doc_list(
         docstring=docstring)
     optional_arg_name_list: List[str] = []
     for splitted_param_doc in splitted_param_doc_list:
@@ -1434,7 +1435,7 @@ def args_or_kwargs_str_in_param_name(param_arg_name: str) -> bool:
 
     param_arg_name = param_arg_name.strip()
     for args_or_kwargs_str in ARGS_OR_KWARGS_NAME_LIST:
-        is_in: bool= args_or_kwargs_str in param_arg_name
+        is_in: bool = args_or_kwargs_str in param_arg_name
         if is_in:
             return True
     return False

@@ -107,7 +107,7 @@ def test__get_code_cell_str_list() -> None:
 
 
 def test__rename_dict_key() -> None:
-    info_list: List[dict]= [{
+    info_list: List[dict] = [{
         py_module.INFO_KEY_MODULE_PATH: 'sample/path.ipynb',
         py_module.INFO_KEY_FUNC_NAME: 'sample_func_1',
         py_module.INFO_KEY_INFO_ID: 1,
@@ -136,12 +136,12 @@ def test__rename_dict_key() -> None:
 
 
 def test__add_code_cell_index() -> None:
-    info_list: List[dict]= [{}, {}]
+    info_list: List[dict] = [{}, {}]
     info_list = jupyter_notebook._add_code_cell_index(
         info_list=info_list,
         code_cell_idx=5)
     assert len(info_list) == 2
-    schema: Schema= Schema(
+    schema: Schema = Schema(
         schema={
             jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: 5,
         },
@@ -166,7 +166,7 @@ import numpy as np
         enable_default_or_optional_doc_check=False)
     assert info_list == []
 
-    schema: Schema= Schema(
+    schema: Schema = Schema(
         schema={
             jupyter_notebook.INFO_KEY_NOTEBOOK_PATH: STR_SCHEMA,
             jupyter_notebook.INFO_KEY_CODE_CELL_INDEX: int,
@@ -312,7 +312,7 @@ def test_check_jupyter_notebook() -> None:
         schema(info_dict)
     assert len(info_list) >= 10
 
-    ignore_info_id_list: List[int]= [
+    ignore_info_id_list: List[int] = [
         info_dict[jupyter_notebook.INFO_KEY_INFO_ID]
         for info_dict in info_list]
 
