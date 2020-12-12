@@ -2,7 +2,6 @@
 """
 
 import re
-from io import open
 from typing import Dict, List, Optional
 
 ARGS_OR_KWARGS_NAME_LIST: List[str] = [

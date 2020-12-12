@@ -1,3 +1,6 @@
+import re
+from typing import Dict, List, Optional
+
 import pytest
 import six
 from voluptuous import Schema
@@ -5,15 +8,15 @@ from voluptuous import Schema
 from numdoclint import helper
 
 
-def test_read_file_str():
-    file_str = helper.read_file_str('./tests/test_helper.py')
+def test_read_file_str() -> None:
+    file_str: str = helper.read_file_str('./tests/test_helper.py')
     assert isinstance(file_str, six.string_types)
     assert file_str != ''
     assert 'def' in file_str
 
 
-def test_get_func_name_list():
-    code_str = """
+def test_get_func_name_list() -> None:
+    code_str: str = """
 def sample_func_1():
     pass
 
@@ -45,7 +48,7 @@ def sample_func
 
 sample_str = r'def .*?\\(.*?\\)'
     """
-    func_name_list = helper.get_func_name_list(
+    func_name_list: List[str] = helper.get_func_name_list(
         code_str=code_str)
     assert len(func_name_list) == 4
     assert 'sample_func_1' in func_name_list
@@ -54,8 +57,8 @@ sample_str = r'def .*?\\(.*?\\)'
     assert 'sample_func' in func_name_list
 
 
-def test_get_arg_name_list():
-    py_module_str = """
+def test_get_arg_name_list() -> None:
+    py_module_str: str = """
 def sample_func_1():
     pass
 
@@ -91,7 +94,7 @@ def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
     pass
     """
 
-    arg_name_list = helper.get_arg_name_list(
+    arg_name_list: List[str] = helper.get_arg_name_list(
         py_module_str=py_module_str, func_name='sample_func_1')
     assert arg_name_list == []
 
@@ -130,8 +133,8 @@ def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
     assert arg_name_list == ['dict_val']
 
 
-def test_get_func_indent_num():
-    py_module_str = """
+def test_get_func_indent_num() -> None:
+    py_module_str: str = """
 def sample_func_1(apple):
 
     def sample_func_2(orange):
@@ -152,12 +155,12 @@ class Apple:
         pass
     """
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # type: ignore
         helper.get_func_indent_num(
             py_module_str=py_module_str,
             func_name='sample_func_0')
 
-    indent_num = helper.get_func_indent_num(
+    indent_num: int = helper.get_func_indent_num(
         py_module_str=py_module_str, func_name='sample_func_1')
     assert indent_num == 1
 
@@ -178,8 +181,8 @@ class Apple:
     assert indent_num == 2
 
 
-def test_get_line_indent_num():
-    line_indent_num = helper.get_line_indent_num(
+def test_get_line_indent_num() -> None:
+    line_indent_num: int = helper.get_line_indent_num(
         line_str='print("100")')
     assert line_indent_num == 0
 
@@ -192,8 +195,8 @@ def test_get_line_indent_num():
     assert line_indent_num == 2
 
 
-def test_get_func_overall_docstring():
-    py_module_str = '''
+def test_get_func_overall_docstring() -> None:
+    py_module_str: str = '''
 def sample_func_1(apple):
     print(1)
 
@@ -303,7 +306,7 @@ def sample_func_11(price):
     Sample function with type annotation comment.
     """
     '''
-    docstring = helper.get_func_overall_docstring(
+    docstring: str = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_0')
     assert docstring == ''
 
@@ -313,7 +316,7 @@ def sample_func_11(price):
 
     docstring = helper.get_func_overall_docstring(
         py_module_str=py_module_str, func_name='sample_func_2')
-    expected_docstring = """    sample_func_2.
+    expected_docstring: str = """    sample_func_2.
 
     Parameters
     ----------
@@ -410,8 +413,8 @@ Sample docstring."""
     assert docstring, expected_docstring
 
 
-def test__set_docstring_indent_number_to_one():
-    docstring = """
+def test__set_docstring_indent_number_to_one() -> None:
+    docstring: str = """
     Sample docstring.
 
     Parameters
@@ -442,12 +445,12 @@ def test__set_docstring_indent_number_to_one():
     assert result_docstring == expected_docstring
 
 
-def test_get_param_docstring():
+def test_get_param_docstring() -> None:
 
-    param_docstring = helper.get_param_docstring(docstring='')
+    param_docstring: str = helper.get_param_docstring(docstring='')
     assert param_docstring == ''
 
-    docstring = """
+    docstring: str = """
     Sample docstring.
 
     Parameters
@@ -464,7 +467,7 @@ def test_get_param_docstring():
     """
 
     param_docstring = helper.get_param_docstring(docstring=docstring)
-    expected_docstring = """    name : str
+    expected_docstring: str= """    name : str
         Sample name.
     location_id : int
         Sample location id."""
@@ -492,8 +495,8 @@ def test_get_param_docstring():
     assert param_docstring == expected_docstring
 
 
-def test_get_splitted_param_doc_list():
-    docstring = """
+def test_get_splitted_param_doc_list() -> None:
+    docstring: str = """
     Sample function.
 
     Parameters
@@ -508,10 +511,10 @@ def test_get_splitted_param_doc_list():
     price : int
         Sample price.
     """
-    splitted_param_doc_list = helper.get_splitted_param_doc_list(
+    splitted_param_doc_list: List[str] = helper.get_splitted_param_doc_list(
         docstring=docstring)
     assert len(splitted_param_doc_list) == 2
-    expected_param_doc = """    name : str
+    expected_param_doc: str = """    name : str
         Sample name."""
     assert splitted_param_doc_list[0] == expected_param_doc
 
@@ -535,11 +538,11 @@ def test_get_splitted_param_doc_list():
     assert splitted_param_doc_list[0] == expected_param_doc
 
 
-def test__get_docstring_var_name():
-    var_doc = """    price : int
+def test__get_docstring_var_name() -> None:
+    var_doc: str = """    price : int
         Sample price.
     """
-    var_name = helper._get_docstring_var_name(var_doc=var_doc)
+    var_name: str = helper._get_docstring_var_name(var_doc=var_doc)
     assert var_name == 'price'
 
     var_doc = """    price
@@ -549,11 +552,11 @@ def test__get_docstring_var_name():
     assert var_name == 'price'
 
 
-def test__get_docstring_type_name():
-    var_doc = """    price : int or None, default None, optional
+def test__get_docstring_type_name() -> None:
+    var_doc: str = """    price : int or None, default None, optional
         Sample price.
     """
-    type_name = helper._get_docstring_type_name(var_doc=var_doc)
+    type_name: str = helper._get_docstring_type_name(var_doc=var_doc)
     assert type_name == 'int or None'
 
     var_doc = """    price, optional
@@ -563,11 +566,11 @@ def test__get_docstring_type_name():
     assert type_name == ''
 
 
-def test__get_docstring_default_value():
-    var_doc = """    price : int
+def test__get_docstring_default_value() -> None:
+    var_doc: str = """    price : int
         Sample price.
     """
-    default_val = helper._get_docstring_default_value(var_doc=var_doc)
+    default_val: str = helper._get_docstring_default_value(var_doc=var_doc)
     assert default_val == ''
 
     var_doc = """    price : int or None, default None, optional
@@ -583,14 +586,14 @@ def test__get_docstring_default_value():
     assert default_val == '0'
 
 
-def test__get_docstring_var_description():
-    var_doc = """    price : int
+def test__get_docstring_var_description() -> None:
+    var_doc: str = """    price : int
         Sample price.
         Sample price.
     """
-    description = helper._get_docstring_var_description(
+    description: str = helper._get_docstring_var_description(
         var_doc=var_doc)
-    expected_description = """        Sample price.
+    expected_description: str = """        Sample price.
         Sample price."""
     assert description == expected_description
 
@@ -600,11 +603,12 @@ def test__get_docstring_var_description():
         var_doc=var_doc)
 
 
-def test_get_docstring_param_info_list():
-    param_info_list = helper.get_docstring_param_info_list(docstring='')
+def test_get_docstring_param_info_list() -> None:
+    param_info_list: List[Dict[str, str]] = \
+        helper.get_docstring_param_info_list(docstring='')
     assert param_info_list == []
 
-    docstring = """
+    docstring: str = """
     Sample docstring.
 
     Returns
@@ -635,7 +639,7 @@ def test_get_docstring_param_info_list():
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
     assert len(param_info_list) == 2
-    schema_1 = Schema(
+    schema_1: Schema = Schema(
         schema={
             helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'name',
             helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'str',
@@ -644,7 +648,7 @@ def test_get_docstring_param_info_list():
         },
         required=True)
     schema_1(param_info_list[0])
-    schema_2 = Schema(
+    schema_2: Schema = Schema(
         schema={
             helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'location_id',
             helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int or None',
@@ -666,9 +670,9 @@ def test_get_docstring_param_info_list():
     param_info_list = helper.get_docstring_param_info_list(
         docstring=docstring)
     assert len(param_info_list) == 2
-    expected_arg_name_list = ['one', 'two']
+    expected_arg_name_list: List[str] = ['one', 'two']
     for i, expected_arg_name in enumerate(expected_arg_name_list):
-        schema = Schema(
+        schema: Schema = Schema(
             schema={
                 helper.DOC_PARAM_INFO_KEY_ARG_NAME: expected_arg_name,
                 helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
@@ -679,8 +683,8 @@ def test_get_docstring_param_info_list():
         schema(param_info_list[i])
 
 
-def test_get_func_description_from_docstring():
-    func_description = helper.get_func_description_from_docstring(
+def test_get_func_description_from_docstring() -> None:
+    func_description: str = helper.get_func_description_from_docstring(
         docstring='')
     assert func_description == ''
 
@@ -688,7 +692,7 @@ def test_get_func_description_from_docstring():
         docstring='------\nSample Docstring.')
     assert func_description == ''
 
-    docstring = """
+    docstring: str = """
     Parameters
     ----------
     price : int
@@ -713,8 +717,8 @@ def test_get_func_description_from_docstring():
     assert func_description == expected_description
 
 
-def test__get_args_str():
-    code_str = """
+def test__get_args_str() -> None:
+    code_str: str = """
     def sample_func_1():
         print(100)
 
@@ -752,7 +756,7 @@ def test__get_args_str():
     def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
         pass
     """
-    args_str = helper._get_args_str(
+    args_str: str= helper._get_args_str(
         code_str=code_str, func_name='sample_func_1')
     assert args_str == ''
 
@@ -781,8 +785,8 @@ def test__get_args_str():
     assert args_str == 'price, name'
 
 
-def test_get_arg_default_val_info_dict():
-    py_module_str = """
+def test_get_arg_default_val_info_dict() -> None:
+    py_module_str: str = """
     def sample_func_1():
         print(100)
 
@@ -808,13 +812,14 @@ def test_get_arg_default_val_info_dict():
     def sample_func_6(dict_value: Optional[Dict[str, int]] = None) -> str:
         print(300)
     """
-    default_val_info_dict = helper.get_arg_default_val_info_dict(
-        py_module_str=py_module_str, func_name='sample_func_1')
+    default_val_info_dict: Dict[str, str] = \
+        helper.get_arg_default_val_info_dict(
+            py_module_str=py_module_str, func_name='sample_func_1')
     assert default_val_info_dict == {}
 
     default_val_info_dict = helper.get_arg_default_val_info_dict(
         py_module_str=py_module_str, func_name='sample_func_2')
-    expected_dict = {
+    expected_dict: Dict[str, str] = {
         'price': '',
         'location_id': '100',
         'season': '3',
@@ -852,8 +857,8 @@ def test_get_arg_default_val_info_dict():
     assert default_val_info_dict == expected_dict
 
 
-def test__get_return_value_docstring():
-    docstring = """
+def test__get_return_value_docstring() -> None:
+    docstring: str = """
     Sample docstring.
 
     Parameters
@@ -873,9 +878,9 @@ def test__get_return_value_docstring():
     - Sample notes 1.
     - Sample notes 2.
     """
-    return_value_docstring = helper._get_return_value_docstring(
+    return_value_docstring: str = helper._get_return_value_docstring(
         docstring=docstring)
-    expected_return_value_docstring = """    name : str
+    expected_return_value_docstring: str = """    name : str
         Sample name.
     location_id : int
         Sample location id."""
@@ -996,17 +1001,17 @@ def test__get_return_value_docstring():
     assert return_value_docstring == expected_return_value_docstring
 
 
-def test_append_return_value_info_unit_dict():
-    expected_name = 'sample_name'
-    expected_type_name = 'str'
-    expected_description = '        Sample description.'
+def test_append_return_value_info_unit_dict() -> None:
+    expected_name: str = 'sample_name'
+    expected_type_name: str = 'str'
+    expected_description: str = '        Sample description.'
     return_val_info_list = helper._append_return_value_info_unit_dict(
         name=expected_name,
         type_name=expected_type_name,
         description=expected_description,
         return_val_info_list=[])
     assert len(return_val_info_list) == 1
-    schema = Schema(
+    schema: Schema = Schema(
         schema={
             helper.DOC_RETURN_INFO_KEY_NAME: expected_name,
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME: expected_type_name,
@@ -1016,9 +1021,9 @@ def test_append_return_value_info_unit_dict():
     schema(return_val_info_list[0])
 
 
-def test__get_return_value_name_from_line():
-    line_str = '        price : int'
-    return_value_name = helper._get_return_value_name_from_line(
+def test__get_return_value_name_from_line() -> None:
+    line_str: str = '        price : int'
+    return_value_name: str = helper._get_return_value_name_from_line(
         line_str=line_str)
     assert return_value_name == 'price'
 
@@ -1028,10 +1033,11 @@ def test__get_return_value_name_from_line():
     assert return_value_name == ''
 
 
-def test__get_return_value_type_name_from_line():
-    line_str = '        price : int'
-    return_value_type_name = helper._get_return_value_type_name_from_line(
-        line_str=line_str)
+def test__get_return_value_type_name_from_line() -> None:
+    line_str: str = '        price : int'
+    return_value_type_name: str = \
+        helper._get_return_value_type_name_from_line(
+            line_str=line_str)
     assert return_value_type_name == 'int'
 
     line_str = '    DataFrame'
@@ -1040,8 +1046,8 @@ def test__get_return_value_type_name_from_line():
     assert return_value_type_name == 'DataFrame'
 
 
-def test_get_docstring_return_val_info_list():
-    docstring = """
+def test_get_docstring_return_val_info_list() -> None:
+    docstring: str = """
     Sample docstring.
 
     Paramters
@@ -1049,8 +1055,9 @@ def test_get_docstring_return_val_info_list():
     price : int
         Sample price.
     """
-    return_val_info_list = helper.get_docstring_return_val_info_list(
-        docstring=docstring)
+    return_val_info_list: List[Dict[str, str]]= \
+        helper.get_docstring_return_val_info_list(
+            docstring=docstring)
     assert return_val_info_list == []
 
     docstring = """
@@ -1072,9 +1079,9 @@ def test_get_docstring_return_val_info_list():
     return_val_info_list = helper.get_docstring_return_val_info_list(
         docstring=docstring)
     assert len(return_val_info_list) == 2
-    expected_description = """        Sample name.
+    expected_description: str = """        Sample name.
         Sample text."""
-    schema_1 = Schema(
+    schema_1: Schema = Schema(
         schema={
             helper.DOC_RETURN_INFO_KEY_NAME: 'name',
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME: 'str',
@@ -1082,7 +1089,7 @@ def test_get_docstring_return_val_info_list():
         },
         required=True)
     schema_1(return_val_info_list[0])
-    schema_2 = Schema(
+    schema_2: Schema = Schema(
         schema={
             helper.DOC_RETURN_INFO_KEY_NAME: 'location_id',
             helper.DOC_RETURN_INFO_KEY_TYPE_NAME: 'int or None',
@@ -1104,17 +1111,17 @@ def test_get_docstring_return_val_info_list():
     return_val_info_list = helper.get_docstring_return_val_info_list(
         docstring=docstring)
     assert len(return_val_info_list) == 1
-    return_val_name = return_val_info_list[
+    return_val_name: str = return_val_info_list[
         0][helper.DOC_RETURN_INFO_KEY_NAME]
     assert return_val_name == 'name'
 
 
-def test_get_func_str():
-    func_str = helper.get_func_str(
+def test_get_func_str() -> None:
+    func_str: str = helper.get_func_str(
         module_str='', func_name='sample_func')
     assert func_str == ''
 
-    module_str = '''
+    module_str: str = '''
 sample_int = 100
 
 
@@ -1163,7 +1170,7 @@ sample_str = 'apple'
     func_str = helper.get_func_str(
         module_str=module_str,
         func_name='sample_func_1')
-    expected_func_str = '''def sample_func_1(price):
+    expected_func_str: str = '''def sample_func_1(price):
     """
     Sample func.
 
@@ -1204,8 +1211,8 @@ sample_str = 'apple'
     assert func_str == expected_func_str
 
 
-def test_return_val_exists_in_func():
-    module_str = '''
+def test_return_val_exists_in_func() -> None:
+    module_str: str = '''
 sample_int = 100
 
 
@@ -1259,7 +1266,7 @@ def sample_func_7():
 
     pass
     '''
-    result_bool = helper.return_val_exists_in_func(
+    result_bool: bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_1')
     assert result_bool
 
@@ -1288,8 +1295,8 @@ def sample_func_7():
     assert not result_bool
 
 
-def test__parameters_exists_in_docstring():
-    docstring = """
+def test__parameters_exists_in_docstring() -> None:
+    docstring: str = """
     Sample docstring.
 
     Parameters
@@ -1302,7 +1309,7 @@ def test__parameters_exists_in_docstring():
     name : str
         Sample name.
     """
-    result_bool = helper._parameters_exists_in_docstring(
+    result_bool: bool= helper._parameters_exists_in_docstring(
         docstring=docstring)
     assert result_bool
 
@@ -1319,12 +1326,12 @@ def test__parameters_exists_in_docstring():
     assert not result_bool
 
 
-def test_get_optional_arg_name_list():
-    optional_arg_name_list = helper.get_optional_arg_name_list(
+def test_get_optional_arg_name_list() -> None:
+    optional_arg_name_list: List[str] = helper.get_optional_arg_name_list(
         docstring='')
     assert optional_arg_name_list == []
 
-    docstring = """
+    docstring: str = """
     Sample docstring.
 
     Returns
@@ -1355,8 +1362,8 @@ def test_get_optional_arg_name_list():
     assert 'location_id' in optional_arg_name_list
 
 
-def test__remove_docstring_from_func_str():
-    module_str = '''
+def test__remove_docstring_from_func_str() -> None:
+    module_str: str = '''
 def sample_func_1(price):
     """
     Sample func.
@@ -1416,13 +1423,13 @@ def sample_func_5(price):
     pass
     '''
 
-    func_str = helper.get_func_str(
+    func_str: str = helper.get_func_str(
         module_str=module_str, func_name='sample_func_1')
     func_str = helper._remove_docstring_from_func_str(
         func_str=func_str,
         module_str=module_str,
         func_name='sample_func_1')
-    expected_func_str = """def sample_func_1(price):
+    expected_func_str: str = """def sample_func_1(price):
     pass"""
     assert func_str == expected_func_str
 
@@ -1467,8 +1474,8 @@ def sample_func_5(price):
     assert func_str == expected_func_str
 
 
-def test_kwargs_exists():
-    py_module_str = """
+def test_kwargs_exists() -> None:
+    py_module_str: str = """
 def sample_func_1(price, **kwargs):
     pass
 
@@ -1477,7 +1484,7 @@ def sample_func_2(price):
     pass
     """
 
-    result_bool = helper.kwargs_exists(
+    result_bool: bool= helper.kwargs_exists(
         py_module_str=py_module_str, func_name='sample_func_1')
     assert result_bool
 
@@ -1486,8 +1493,8 @@ def sample_func_2(price):
     assert not result_bool
 
 
-def test_args_or_kwargs_str_in_param_name():
-    result_bool = helper.args_or_kwargs_str_in_param_name(
+def test_args_or_kwargs_str_in_param_name() -> None:
+    result_bool: bool = helper.args_or_kwargs_str_in_param_name(
         param_arg_name='price')
     assert not result_bool
 
@@ -1504,15 +1511,15 @@ def test_args_or_kwargs_str_in_param_name():
     assert result_bool
 
 
-def test__append_param_info_to_list():
-    param_info_list = helper._append_param_info_to_list(
+def test__append_param_info_to_list() -> None:
+    param_info_list: List[Dict[str, str]]= helper._append_param_info_to_list(
         param_info_list=[],
         arg_name='price',
         type_name='int',
         default_val='',
         description='Sample price.')
     assert len(param_info_list) == 1
-    schema = Schema(
+    schema: Schema = Schema(
         schema={
             helper.DOC_PARAM_INFO_KEY_ARG_NAME: 'price',
             helper.DOC_PARAM_INFO_KEY_TYPE_NAME: 'int',
@@ -1529,7 +1536,7 @@ def test__append_param_info_to_list():
         default_val='',
         description='Sample arguments.')
     assert len(param_info_list) == 2
-    expected_arg_name_list = ['one', 'two']
+    expected_arg_name_list: List[str] = ['one', 'two']
     for i, expected_arg_name in enumerate(expected_arg_name_list):
         schema = Schema(
             schema={
@@ -1542,15 +1549,15 @@ def test__append_param_info_to_list():
         schema(param_info_list[i])
 
 
-def test__hyphens_exists_next_line():
-    line_splitted_list = [
+def test__hyphens_exists_next_line() -> None:
+    line_splitted_list: List[str]= [
         'Sample docstring',
         '',
         'Parameters',
         '----------',
     ]
 
-    result_bool = helper._hyphens_exists_next_line(
+    result_bool: bool= helper._hyphens_exists_next_line(
         line_splitted_list=line_splitted_list,
         next_line_idx=4)
     assert not result_bool
@@ -1566,8 +1573,8 @@ def test__hyphens_exists_next_line():
     assert result_bool
 
 
-def test__get_func_start_line_index():
-    line_splitted_list = [
+def test__get_func_start_line_index() -> None:
+    line_splitted_list: List[str] = [
         'price = 100',
         'def sample_func_1():',
         '    return 100',
@@ -1579,7 +1586,7 @@ def test__get_func_start_line_index():
         '    pass'
     ]
 
-    func_start_line_index = helper._get_func_start_line_index(
+    func_start_line_index: int = helper._get_func_start_line_index(
         line_splitted_list=line_splitted_list,
         func_name='sample_func_1')
     assert func_start_line_index == 1
@@ -1600,8 +1607,8 @@ def test__get_func_start_line_index():
     assert func_start_line_index == -1
 
 
-def test_get_decorator_names():
-    py_module_str = """
+def test_get_decorator_names() -> None:
+    py_module_str: str = """
 price = 100
 
 
@@ -1627,7 +1634,7 @@ def sample_func_3(price):
     pass
     """
 
-    decorator_names = helper.get_decorator_names(
+    decorator_names: List[str]= helper.get_decorator_names(
         py_module_str=py_module_str, func_name='sample_func_1')
     assert decorator_names == []
 
@@ -1644,8 +1651,8 @@ def sample_func_3(price):
     assert "@Substitution('')" in decorator_names
 
 
-def test__get_func_match():
-    py_module_str = """
+def test__get_func_match() -> None:
+    py_module_str: str = """
 price = 100
 
 
@@ -1668,10 +1675,10 @@ def sample_func
     pass
     """
 
-    match = helper._get_func_match(
+    match: Optional[re.Match]= helper._get_func_match(
         py_module_str=py_module_str, func_name='sample_func_1')
-    start_idx = match.start()
-    expected_func_str = 'def sample_func_1():'
+    start_idx: int = match.start()
+    expected_func_str: str = 'def sample_func_1():'
     assert py_module_str[start_idx:start_idx + 20] == expected_func_str
 
     match = helper._get_func_match(
@@ -1687,7 +1694,7 @@ def sample_func
     assert py_module_str[start_idx:start_idx + 17] == expected_func_str
 
 
-def test__is_additional_info_str():
+def test__is_additional_info_str() -> None:
     result_bool = helper._is_additional_info_str(
         target_str='    .. versionadded::0.0.1')
     assert result_bool
@@ -1696,8 +1703,8 @@ def test__is_additional_info_str():
     assert not result_bool
 
 
-def test_is_interactive_shell_example_line():
-    py_module_str = '''
+def test_is_interactive_shell_example_line() -> None:
+    py_module_str: str = '''
     def sample_func_1():
         """
         Sample function.
@@ -1713,7 +1720,7 @@ def test_is_interactive_shell_example_line():
         pass
     '''
 
-    result_bool = helper.is_interactive_shell_example_line(
+    result_bool: bool= helper.is_interactive_shell_example_line(
         func_start_index=5, py_module_str=py_module_str)
     assert not result_bool
 
@@ -1725,8 +1732,8 @@ def test_is_interactive_shell_example_line():
     assert result_bool
 
 
-def test__remove_type_str_from_arg_str():
-    after_arg_str = helper._remove_type_str_from_arg_str(
+def test__remove_type_str_from_arg_str() -> None:
+    after_arg_str: str = helper._remove_type_str_from_arg_str(
         arg_str='price')
     assert after_arg_str == 'price'
 
@@ -1743,8 +1750,8 @@ def test__remove_type_str_from_arg_str():
     assert after_arg_str == 'price=100'
 
 
-def test__remove_nested_func_str():
-    func_str = """
+def test__remove_nested_func_str() -> None:
+    func_str: str = """
 def sample_func_1():
 
     def sample_func_2():
@@ -1762,9 +1769,9 @@ def sample_func_1():
 
     print(200)
     """
-    removed_func_str = helper._remove_nested_func_str(
+    removed_func_str: str = helper._remove_nested_func_str(
         func_str=func_str, func_indent_num=1)
-    expected_removed_func_str = """def sample_func_1():
+    expected_removed_func_str: str = """def sample_func_1():
 
     print(200)
     """
@@ -1789,15 +1796,15 @@ def sample_func_1():
     assert removed_func_str == expected_removed_func_str
 
 
-def test__add_line_str():
-    target_str = helper._add_line_str(target_str='', line_str='abc')
+def test__add_line_str() -> None:
+    target_str: str = helper._add_line_str(target_str='', line_str='abc')
     assert target_str == 'abc'
     target_str = helper._add_line_str(target_str='abc', line_str='def')
     assert target_str == 'abc\ndef'
 
 
-def test__type_anotation_comment_exists():
-    result = helper._type_anotation_comment_exists(
+def test__type_anotation_comment_exists() -> None:
+    result: bool = helper._type_anotation_comment_exists(
         line_str='def sample_func():')
     assert not result
 
@@ -1806,19 +1813,19 @@ def test__type_anotation_comment_exists():
     assert result
 
 
-def test__remove_type_bracket_block_from_args_str():
+def test__remove_type_bracket_block_from_args_str() -> None:
     args_str: str = (
         'dict_val: Optional[Dict[str, int]] = None,'
         ' tuple_val: Optional[Tuple[int, str, int]]=None'
     )
-    result_str = helper._remove_type_bracket_block_from_args_str(
+    result_str: str = helper._remove_type_bracket_block_from_args_str(
         args_str=args_str)
-    expected_str = (
+    expected_str: str = (
         'dict_val: Optional = None, tuple_val: Optional=None'
     )
     assert result_str == expected_str
 
-    args_str: str = (
+    args_str = (
         'list_val_1: List[int],'
         ' list_val_2: Optional[List[int]] = [100, 200]'
     )
