@@ -6,12 +6,13 @@ import os
 
 import numdoclint
 
-log_format = '-----------------------------------------\n'\
-             '%(levelname)s : %(asctime)s : %(message)s'
+log_format: str = \
+    '-----------------------------------------\n'\
+    '%(levelname)s : %(asctime)s : %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_format)
 
 
-def main():
+def main() -> None:
     """
     Run tests and lint when executed via the command line.
     """
