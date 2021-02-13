@@ -17,4 +17,4 @@ from numdoclint.py_module import (INFO_ID_DIFFERENT_PARAM_ORDER,
                                   check_python_module,
                                   check_python_module_recursively)
 
-__version__: str = '0.1.4'
+__version__: str = '0.1.5'

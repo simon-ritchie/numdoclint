@@ -1254,7 +1254,7 @@ def return_val_exists_in_func(module_str: str, func_name: str) -> bool:
         return False
     line_splitted_list: List[str] = func_str.split('\n')
     for line_str in line_splitted_list:
-        return_statement_exists: bool = 'return' in line_str
+        return_statement_exists: bool = ' return ' in line_str
         if not return_statement_exists:
             continue
         return_val_str: str = re.sub(

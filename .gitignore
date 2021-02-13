@@ -10,3 +10,5 @@
 /sample.py
 *.ipynb_checkpoints
 /tmp_memo.md
+/out
+/numdoclint/out

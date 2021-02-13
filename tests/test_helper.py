@@ -1265,6 +1265,13 @@ def sample_func_7():
         return 100
 
     pass
+
+def sample_func_9():
+    popen = sp.Popen(
+        command, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT)
+    stdout_bytes: bytes = popen.communicate()[0]
+    if popen.returncode == 0:
+        return
     '''
     result_bool: bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_1')
@@ -1292,6 +1299,10 @@ def sample_func_7():
 
     result_bool = helper.return_val_exists_in_func(
         module_str=module_str, func_name='sample_func_7')
+    assert not result_bool
+
+    result_bool = helper.return_val_exists_in_func(
+        module_str=module_str, func_name='sample_func_9')
     assert not result_bool
 
 
