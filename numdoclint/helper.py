@@ -2,7 +2,7 @@
 """
 
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Match, Optional
 
 ARGS_OR_KWARGS_NAME_LIST: List[str] = [
     '*args',
@@ -72,7 +72,7 @@ def get_func_name_list(code_str: str) -> List[str]:
                 break
         if not_func_str:
             continue
-        match: Optional[re.Match] = _get_func_match(
+        match: Optional[Match] = _get_func_match(
             py_module_str=code_str, func_name=func_name)
         if match is None:
             continue
@@ -210,7 +210,7 @@ def get_func_indent_num(py_module_str: str, func_name: str) -> int:
     ValueError
         If the target function can not be found.
     """
-    match: Optional[re.Match] = _get_func_match(
+    match: Optional[Match] = _get_func_match(
         py_module_str=py_module_str, func_name=func_name)
     if match is None:
         err_msg = 'Target function not found: %s' % func_name
@@ -273,7 +273,7 @@ def get_func_overall_docstring(
     docstring : str
         Target docstring string.
     """
-    match: Optional[re.Match] = _get_func_match(
+    match: Optional[Match] = _get_func_match(
         py_module_str=py_module_str, func_name=func_name)
     if match is None:
         return ''
@@ -366,7 +366,7 @@ def _type_anotation_comment_exists(line_str: str) -> bool:
     return result
 
 
-def _get_func_match(py_module_str: str, func_name: str) -> Optional[re.Match]:
+def _get_func_match(py_module_str: str, func_name: str) -> Optional[Match]:
     """
     Get a Match object of search result of target function.
 

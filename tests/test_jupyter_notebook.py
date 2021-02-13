@@ -344,12 +344,13 @@ def test_check_jupyter_notebook() -> None:
 
 
 def test_check_jupyter_notebook_recursively() -> None:
-    info_list: List[dict] = jupyter_notebook.check_jupyter_notebook_recursively(
-        dir_path='./numdoclint/',
-        verbose=jupyter_notebook.VERBOSE_DISABLED,
-        ignore_func_name_prefix_list=[],
-        ignore_info_id_list=[],
-        enable_default_or_optional_doc_check=True)
+    info_list: List[dict] = \
+        jupyter_notebook.check_jupyter_notebook_recursively(
+            dir_path='./numdoclint/',
+            verbose=jupyter_notebook.VERBOSE_DISABLED,
+            ignore_func_name_prefix_list=[],
+            ignore_info_id_list=[],
+            enable_default_or_optional_doc_check=True)
     assert info_list == []
 
     info_list = jupyter_notebook.check_jupyter_notebook_recursively(

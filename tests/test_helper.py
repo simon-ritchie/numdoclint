@@ -1,5 +1,4 @@
-import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Match, Optional
 
 import pytest
 import six
@@ -1686,7 +1685,7 @@ def sample_func
     pass
     """
 
-    match: Optional[re.Match] = helper._get_func_match(
+    match: Optional[Match] = helper._get_func_match(
         py_module_str=py_module_str, func_name='sample_func_1')
     start_idx: int = match.start()
     expected_func_str: str = 'def sample_func_1():'
