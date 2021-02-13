@@ -703,6 +703,7 @@ $ flake8 ./
 The following library are used for PyPI uploading.
 
 - twine==1.13.0
+- wheel==0.36.2
 
 Build command:
 
