@@ -91,6 +91,9 @@ def sample_func_7(price: int = 100, name: str = 'apple'):
 
 def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
     pass
+
+def sample_func_9(a: int, *, b: int = 20) -> None:
+    pass
     """
 
     arg_name_list: List[str] = helper.get_arg_name_list(
@@ -130,6 +133,10 @@ def sample_func_8(dict_val: Optional[Dict[str, int]] = None):
     arg_name_list = helper.get_arg_name_list(
         py_module_str=py_module_str, func_name='sample_func_8')
     assert arg_name_list == ['dict_val']
+
+    arg_name_list = helper.get_arg_name_list(
+        py_module_str=py_module_str, func_name='sample_func_9')
+    assert arg_name_list == ['a', 'b']
 
 
 def test_get_func_indent_num() -> None:

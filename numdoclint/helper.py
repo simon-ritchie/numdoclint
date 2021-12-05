@@ -14,6 +14,7 @@ ARGS_OR_KWARGS_NAME_LIST: List[str] = [
 ARG_NAME_LIST_TO_IGNORE: List[str] = [
     'self',
     'cls',
+    '*',
 ]
 ARG_NAME_LIST_TO_IGNORE.extend(ARGS_OR_KWARGS_NAME_LIST)
 
