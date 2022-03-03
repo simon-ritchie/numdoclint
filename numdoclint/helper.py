@@ -58,6 +58,7 @@ def get_func_name_list(code_str: str) -> List[str]:
     func_name_list : list of str
         List containing function names.
     """
+    code_str = _remove_strs(code_str=code_str)
     code_str = code_str.replace('\n', '')
     search_pattern: str = r'def .*?\(.*?\)'
     searched_result_list: List[str] = re.findall(
@@ -79,6 +80,102 @@ def get_func_name_list(code_str: str) -> List[str]:
             continue
         func_name_list.append(func_name)
     return func_name_list
+
+
+def _remove_strs(*, code_str: str) -> str:
+    """
+    Remove strings line's callables from a specified code string.
+
+    Parameters
+    ----------
+    code_str : str
+        A target code string.
+
+    Returns
+    -------
+    result_code_str : str
+        A result code string.
+    """
+    is_quoted_area: bool = False
+    quote_str: str = ''
+    result_code_str: str = ''
+    for i, char in enumerate(code_str):
+        prev_char: str = _get_prev_char(code_str=code_str, index=i)
+        following_3_chars: str = _get_following_3_chars(
+            code_str=code_str, index=i)
+        if prev_char == '\\':
+            result_code_str += char
+            continue
+
+        if is_quoted_area:
+            if char == quote_str or following_3_chars == quote_str:
+                quote_str = ''
+                is_quoted_area = False
+            continue
+
+        if following_3_chars == "'''":
+            is_quoted_area = True
+            quote_str = "'''"
+            continue
+        if following_3_chars == '"""':
+            is_quoted_area = True
+            quote_str = '"""'
+            continue
+        if char == "'" or char == '"':
+            is_quoted_area = True
+            quote_str = char
+            continue
+
+        result_code_str += char
+    return result_code_str
+
+
+def _get_prev_char(*, code_str: str, index: int) -> str:
+    """
+    Get a previous index's character in a code string.
+
+    Parameters
+    ----------
+    code_str : str
+        A target code string.
+    index : int
+        A target index. This interface returns a blank string
+        if a specified index is zero.
+
+    Returns
+    -------
+    char : str
+        A target character.
+    """
+    if index == 0:
+        return ''
+    return code_str[index - 1]
+
+
+def _get_following_3_chars(*, code_str: str, index: int) -> str:
+    """
+    Get following characters (including a specified index)
+    from a code string.
+
+    Parameters
+    ----------
+    code_str : str
+        A target code string.
+    index : int
+        A target index.
+
+    Returns
+    -------
+    three_chars : str
+        An extracted three characters.
+    """
+    str_len: int = len(code_str)
+    three_chars: str = code_str[index]
+    if index + 1 < str_len:
+        three_chars += code_str[index + 1]
+    if index + 2 < str_len:
+        three_chars += code_str[index + 2]
+    return three_chars
 
 
 def _get_args_str(code_str: str, func_name: str) -> str:

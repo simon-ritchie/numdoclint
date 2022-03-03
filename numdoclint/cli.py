@@ -166,7 +166,7 @@ def _exec_numdoclint(
 
 def main(
         args: Optional[argparse.Namespace] = None,
-        return_list: bool = False) -> List[dict]:
+        return_list: bool = False) -> Optional[List[dict]]:
     """
     The function of command line entry point.
 
@@ -181,7 +181,7 @@ def main(
 
     Returns
     -------
-    info_list : list of dicts
+    info_list : list of dicts or None
         List of check results.
     """
     description: str = 'NumPy style docstring checking in Python code.'
@@ -250,4 +250,5 @@ def main(
         enable_default_or_optional_doc_check=enable_def_or_opt_check,
         skip_decorator_name_list=args.skip_decorator_name_list,
     )
-    return info_list
+    if return_list:
+        return info_list

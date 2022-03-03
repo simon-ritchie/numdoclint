@@ -46,6 +46,7 @@ def sample_func
 
 
 sample_str = r'def .*?\\(.*?\\)'
+sample_str = 'def sample_func_4(a: int) -> None\n    pass'
     """
     func_name_list: List[str] = helper.get_func_name_list(
         code_str=code_str)
@@ -54,6 +55,7 @@ sample_str = r'def .*?\\(.*?\\)'
     assert 'sample_func_2' in func_name_list
     assert 'sample_func_3' in func_name_list
     assert 'sample_func' in func_name_list
+    assert 'sample_func_4' not in func_name_list
 
 
 def test_get_arg_name_list() -> None:
@@ -1852,3 +1854,56 @@ def test__remove_type_bracket_block_from_args_str() -> None:
         'list_val_1: List, list_val_2: Optional = [100, 200]'
     )
     assert result_str == expected_str
+
+
+def test__get_prev_char() -> None:
+    code_str: str = 'import os'
+    char: str = helper._get_prev_char(code_str=code_str, index=0)
+    assert char == ''
+
+    char = helper._get_prev_char(code_str=code_str, index=1)
+    assert char == 'i'
+
+
+def test__get_following_3_chars() -> None:
+    code_str: str = 'import os'
+    three_chars: str = helper._get_following_3_chars(
+        code_str=code_str, index=8)
+    assert three_chars == 's'
+
+    three_chars = helper._get_following_3_chars(
+        code_str=code_str, index=7)
+    assert three_chars == 'os'
+
+    three_chars = helper._get_following_3_chars(
+        code_str=code_str, index=6)
+    assert three_chars == ' os'
+
+    three_chars = helper._get_following_3_chars(
+        code_str=code_str, index=5)
+    assert three_chars == 't o'
+
+
+def test___remove_strs() -> None:
+    code_str: str = (
+        'import os'
+        '\n\na: int = 10'
+        '\nb: str = "\ndef any_func_1() -> int:\n    ..."'
+        '\ndef any_func_2() -> int:'
+        '\n    '
+        "c: str = '\n\n    def any_func_3() -> None:\n        ...'"
+        '\nd = """\nLorem ipsum\ndolor sit amet\n"""'
+        "\ne = '''Hello\n'''"
+    )
+    code_str = helper._remove_strs(code_str=code_str)
+    expected_str: str = (
+        'import os'
+        '\n\na: int = 10'
+        '\nb: str = '
+        '\ndef any_func_2() -> int:'
+        '\n    '
+        "c: str = "
+        '\nd = '
+        "\ne = "
+    )
+    assert code_str == expected_str
