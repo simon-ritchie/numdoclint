@@ -1337,7 +1337,7 @@ def get_func_str(module_str: str, func_name: str) -> str:
         line_str = line_str.strip()
         if line_str == '':
             continue
-        if line_str.strip() == '):':
+        if is_end_of_signature(line_str):
             continue
         last_line_idx = i
         break
