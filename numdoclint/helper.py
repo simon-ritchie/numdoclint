@@ -465,11 +465,11 @@ def is_end_of_signature(line_str: str) -> bool:
         assert line_str[0] == ')'
         assert line_str[-1] == ':'
 
-        if len(line_str)>2:
-            line_str = line_str.replace(' ','')
+        if len(line_str) > 2:
+            line_str = line_str.replace(' ', '')
             assert line_str[1:3] == '->'
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
