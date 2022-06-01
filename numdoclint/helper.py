@@ -404,7 +404,7 @@ def get_func_overall_docstring(
             is_docstring_last_line = True
         line_indent_num = get_line_indent_num(line_str=line_str)
         if (line_indent_num < indent_num and line_str != ''
-                and line_str.strip() != '):'
+                and not is_end_of_signature(line_str)
                 and not is_docstring_line
                 and not is_docstring_last_line):
             break
@@ -443,6 +443,34 @@ def get_func_overall_docstring(
             indent_num=func_indent_num,
         )
     return docstring
+
+
+def is_end_of_signature(line_str: str) -> bool:
+    """
+    Get a boolean value as to whether line_str represents the end of a
+    function signature or not.
+
+    Parameters
+    ----------
+    line_str : str
+        The target line string.
+
+    Returns
+    -------
+    bool
+    """
+
+    try:
+        line_str = line_str.strip()
+        assert line_str[0] == ')'
+        assert line_str[-1] == ':'
+
+        if len(line_str)>2:
+            line_str = line_str.replace(' ','')
+            assert line_str[1:3] == '->'
+        return True
+    except Exception as e:
+        return False
 
 
 def _type_anotation_comment_exists(line_str: str) -> bool:
@@ -1309,7 +1337,7 @@ def get_func_str(module_str: str, func_name: str) -> str:
         line_str = line_str.strip()
         if line_str == '':
             continue
-        if line_str.strip() == '):':
+        if is_end_of_signature(line_str):
             continue
         last_line_idx = i
         break
